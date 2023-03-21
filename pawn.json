@@ -1,16 +1,17 @@
 {
-    "user": "Revelts",
-    "repo": "UnityRoleplay",
+    "user": "gomerianroleplay",
+    "repo": "GomerianRoleplay",
     "contributors": [
         "Revelts",
-        "rsetiawan7"
+        "rsetiawan7",
+        "gomerianroleplay"
     ],
-    "entry": "gamemodes/UNITY-ROLEPLAY.pwn",
-    "output": "gamemodes/UNITY-ROLEPLAY.amx",
+    "entry": "gamemodes/GOMERIAN-ROLEPLAY.pwn",
+    "output": "gamemodes/GOMERIAN-ROLEPLAY.amx",
     "dependencies": [
         "sampctl/samp-stdlib",
         "Zeex/samp-plugin-crashdetect:v4.21",
-        "samp-incognito/samp-streamer-plugin:v2.9.6",
+        "samp-incognito/samp-streamer-plugin:v2.9.5",
         "pBlueG/SA-MP-MySQL:R41-4",
         "pawn-lang/YSI-Includes@5.x",
         "Y-Less/sscanf:v2.13.8",
@@ -68,7 +69,7 @@
         "output": true,
         "extra": {
             "useartwork": "1",
-            "discord_bot_token": ""
+            "discord_bot_token": "123456789"
         }
     },
     "runtimes": [
@@ -78,7 +79,7 @@
             "mode": "server",
             "echo": "Loading server development configuration...",
             "gamemodes": [
-                "UNITY-ROLEPLAY"
+                "GOMERIAN-ROLEPLAY"
             ],
             "filterscripts": [
                 "CustomInteriors",
@@ -123,7 +124,7 @@
             "output": true,
             "extra": {
                 "long_call_time": "0",
-                "discord_bot_token": "MTA4MzM4MDAxMDQ2MDY1OTgxMw.GyhySa.-IP4iL7SAX1eglEQwj-JpB4_yJZB_GPvfWgT5w"
+                "discord_bot_token": "123456789"
             }
         },
         {
@@ -132,7 +133,7 @@
             "mode": "server",
             "echo": "Loading server live configuration...",
             "gamemodes": [
-                "UNITY-ROLEPLAY"
+                "GOMERIAN-ROLEPLAY"
             ],
             "filterscripts": [
                 "CustomInteriors",
@@ -178,7 +179,7 @@
             "output": true,
             "extra": {
                 "long_call_time": "0",
-                "discord_bot_token": "OTU5MzI3MjQ0NzM4NzU2NjE4.YkaRHg.8HBnLk94c4Ii00JfNbTgsmp3hPA"
+                "discord_bot_token": "123456789"
             }
         },
         {
@@ -187,7 +188,7 @@
             "mode": "server",
             "echo": "Loading server live configuration...",
             "gamemodes": [
-                "UNITY-ROLEPLAY"
+                "GOMERIAN-ROLEPLAY"
             ],
             "filterscripts": [
                 "CustomInteriors",
@@ -232,7 +233,7 @@
             "output": true,
             "extra": {
                 "long_call_time": "0",
-                "discord_bot_token": "OTU5MzI3MjQ0NzM4NzU2NjE4.YkaRHg.8HBnLk94c4Ii00JfNbTgsmp3hPA"
+                "discord_bot_token": "123456789"
             }
         },
         {
