@@ -100,6 +100,20 @@ hook EnterMoneytransVehicle(playerid, vehicleid)
 	return 1;
 }
 
+timer RespawnMoneyTransVehicle[1000](playerid, vehicleid)
+{
+	if(IsPlayerSpawned(playerid) && IsMoneytransWorking(playerid))
+	{
+		MoneytransRespawnCounter[playerid]++;
+		if(MoneytransRespawnCounter[playerid] >= 300)
+		{
+			CancelMoneyTransporter(playerid, vehicleid);
+			SendServerMessage(playerid, "Kamu gagal menjalankan pekerjaan money transporter, mobil telah di respawn!");
+		}
+	}
+	return 1;
+}
+
 hook OnPlayerStateChange(playerid, newstate, oldstate)
 {
 	if(oldstate == PLAYER_STATE_DRIVER && IsMoneytransWorking(playerid))
@@ -152,19 +166,6 @@ task Server_ResetATMMoney[7_200_000]()
 	return 1;
 }
 
-timer RespawnMoneyTransVehicle[1000](playerid, vehicleid)
-{
-	if(IsPlayerSpawned(playerid) && IsMoneytransWorking(playerid))
-	{
-		MoneytransRespawnCounter[playerid]++;
-		if(MoneytransRespawnCounter[playerid] >= 300)
-		{
-			CancelMoneyTransporter(playerid, vehicleid);
-			SendServerMessage(playerid, "Kamu gagal menjalankan pekerjaan money transporter, mobil telah di respawn!");
-		}
-	}
-	return 1;
-}
 ptask Player_MoneyTransUpdate[1000](playerid)
 {
 	if((!PlayerData[playerid][pLogged]) || !PlayerData[playerid][pCreated] || PlayerData[playerid][pKicked])

@@ -1,26 +1,10 @@
 new bool:IsSpeeding[MAX_PLAYERS],
 	Float:pSpeed[MAX_PLAYERS];
 
-hook OnVehicleUpdate(playerid, vehicleid)
+timer StopCameraEffect[30000](playerid)
 {
-	new Float:ovx, Float:ovy, Float:ovz;
-	if(IsPlayerInAnyVehicle(playerid))
-	{
-		GetVehicleVelocity(vehicleid, ovx, ovy, ovz);
-		if(ovx < -0.4 || ovx > 0.4 || ovy < -0.4 || ovy > 0.4 && !IsSpeeding[playerid])
-		{
-			defer Speeding(playerid, vehicleid);
-			ovx = (ovx >= 0) ? ovx : -ovx;
-			ovy = (ovy >= 0) ? ovy : -ovy;
-			pSpeed[playerid] = ((ovx+ovy)/2);
-			IsSpeeding[playerid] = true;
-		}
-		else
-		{
-			pSpeed[playerid] = 0.0;
-			IsSpeeding[playerid] = false;
-		}
-	}
+    SetPlayerDrunkLevel(playerid, 0);
+	IsSpeeding[playerid] = false;
 	return 1;
 }
 
@@ -47,9 +31,25 @@ timer Speeding[500](playerid, vehicleid)
 	return 1;
 }
 
-timer StopCameraEffect[30000](playerid)
+hook OnVehicleUpdate(playerid, vehicleid)
 {
-    SetPlayerDrunkLevel(playerid, 0);
-	IsSpeeding[playerid] = false;
+	new Float:ovx, Float:ovy, Float:ovz;
+	if(IsPlayerInAnyVehicle(playerid))
+	{
+		GetVehicleVelocity(vehicleid, ovx, ovy, ovz);
+		if(ovx < -0.4 || ovx > 0.4 || ovy < -0.4 || ovy > 0.4 && !IsSpeeding[playerid])
+		{
+			defer Speeding(playerid, vehicleid);
+			ovx = (ovx >= 0) ? ovx : -ovx;
+			ovy = (ovy >= 0) ? ovy : -ovy;
+			pSpeed[playerid] = ((ovx+ovy)/2);
+			IsSpeeding[playerid] = true;
+		}
+		else
+		{
+			pSpeed[playerid] = 0.0;
+			IsSpeeding[playerid] = false;
+		}
+	}
 	return 1;
 }

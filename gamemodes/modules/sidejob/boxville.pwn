@@ -143,6 +143,20 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 // 	}
 // }
 
+timer RespawnBoxvilleVehicle[1000](playerid, vehicleid)
+{
+	if(IsPlayerSpawned(playerid) && IsBoxvilleWorking(playerid))
+	{
+		BoxvilleRespawnCounter[playerid]++;
+		if(BoxvilleRespawnCounter[playerid] >= 300)
+		{
+			CancelBoxville(playerid, vehicleid);
+			SendServerMessage(playerid, "Kamu gagal menjalankan pekerjaan box ville, mobil telah di respawn!");
+		}
+	}
+	return 1;
+}
+
 hook OnPlayerStateChange(playerid, newstate, oldstate)
 {
 	if(oldstate == PLAYER_STATE_DRIVER && IsBoxvilleWorking(playerid))
@@ -194,19 +208,6 @@ task Server_ResetHousePacket[1800000]()
 	return 1;
 }
 
-timer RespawnBoxvilleVehicle[1000](playerid, vehicleid)
-{
-	if(IsPlayerSpawned(playerid) && IsBoxvilleWorking(playerid))
-	{
-		BoxvilleRespawnCounter[playerid]++;
-		if(BoxvilleRespawnCounter[playerid] >= 300)
-		{
-			CancelBoxville(playerid, vehicleid);
-			SendServerMessage(playerid, "Kamu gagal menjalankan pekerjaan box ville, mobil telah di respawn!");
-		}
-	}
-	return 1;
-}
 ptask Player_BoxvilleUpdate[1000](playerid)
 {
 	if((!PlayerData[playerid][pLogged]) || !PlayerData[playerid][pCreated] || PlayerData[playerid][pKicked])

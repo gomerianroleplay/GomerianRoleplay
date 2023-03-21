@@ -21,6 +21,17 @@ Float:GetPlayerTotalVelocity(playerid)
     return velocity;
 }
 
+timer SitLoop[1900](playerid)
+{
+	ApplyAnimation(playerid, "BEACH", "PARKSIT_M_LOOP", 4.0, 1, 0, 0, 0, 0);
+}
+
+timer SitDown[800](playerid)
+{
+	ApplyAnimation(playerid, "SUNBATHE", "PARKSIT_M_IN", 4.0, 0, 0, 0, 0, 0);
+	defer SitLoop(playerid);
+}
+
 hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
 
@@ -68,17 +79,6 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				ApplyAnimation(playerid, "GYMNASIUM", "gym_jog_falloff", 4.1, 0, 1, 1, 0, 0);
 		}
 	}
-}
-
-timer SitDown[800](playerid)
-{
-	ApplyAnimation(playerid, "SUNBATHE", "PARKSIT_M_IN", 4.0, 0, 0, 0, 0, 0);
-	defer SitLoop(playerid);
-}
-
-timer SitLoop[1900](playerid)
-{
-	ApplyAnimation(playerid, "BEACH", "PARKSIT_M_LOOP", 4.0, 1, 0, 0, 0, 0);
 }
 
 CMD:animlist(playerid, params[]) {

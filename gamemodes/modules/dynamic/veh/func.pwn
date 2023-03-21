@@ -304,7 +304,7 @@ public VehicleLoaded()
 				}
 			}
 
-			VehicleData[vehicleid][vehVehicleID] = CreateVehicle(VehicleData[vehicleid][vehModel], VehicleData[vehicleid][vehPosX], VehicleData[vehicleid][vehPosY], VehicleData[vehicleid][vehPosZ], VehicleData[vehicleid][vehPosRZ], VehicleData[vehicleid][vehColor1], VehicleData[vehicleid][vehColor2], -1, VehicleData[vehicleid][vehSiren]);
+			VehicleData[vehicleid][vehVehicleID] = CreateVehicle(VehicleData[vehicleid][vehModel], VehicleData[vehicleid][vehPosX], VehicleData[vehicleid][vehPosY], VehicleData[vehicleid][vehPosZ], VehicleData[vehicleid][vehPosRZ], VehicleData[vehicleid][vehColor1], VehicleData[vehicleid][vehColor2], -1, bool:VehicleData[vehicleid][vehSiren]);
 			
 			if(VehicleData[vehicleid][vehModel] == 508)
 			{
@@ -568,7 +568,7 @@ Vehicle_Create(modelid, Float:x, Float:y, Float:z, Float:rotation, color1 = -1, 
 		VehicleData[vehicleid][currentMileage]  = 0.0;
 		VehicleData[vehicleid][durabilityMileage]  = floatround(SAFE_MILEAGE);
 
-		VehicleData[vehicleid][vehVehicleID] = CreateVehicle(modelid, x, y, z, rotation, color1, color2, -1, siren);
+		VehicleData[vehicleid][vehVehicleID] = CreateVehicle(modelid, x, y, z, rotation, color1, color2, -1, bool:siren);
 		//DISABLE RV
 		if(modelid == 508)
 		{

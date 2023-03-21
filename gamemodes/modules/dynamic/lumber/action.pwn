@@ -29,6 +29,44 @@ task Lumber_FeatureUpdate[1000]()
         }
 }
 
+timer HarvestingLumber[1000](playerid)
+{
+    new id;
+
+    if ((id = GetPVarInt(playerid, "lumber_cutting")) != -1)
+    {
+        if (GetPlayerWeapon(playerid) == WEAPON_CHAINSAW)
+        {
+            new Float:time, level = GetLumberLevel(playerid);
+
+            switch (level)
+            {
+                case 1: time = 2.0;
+                case 2: time = 5.0;
+                case 3: time = 7.5;
+                default:
+                    time = 10.0;
+            }
+
+            new Float:value = (GetPlayerProgressBarValue(playerid, PlayerData[playerid][pCuttingBar]) + time);
+
+            if (value >= 100.0)
+            {
+                Reset_Lumber(playerid);
+                MoveDynamicObject(LumberData[id][lumberObject], LumberData[id][lumberPos][0], LumberData[id][lumberPos][1], LumberData[id][lumberPos][2] - 1.0, 0.025, LumberData[id][lumberRot][0], LumberData[id][lumberRot][1] - 80.0, RandomFloat(0.0, 360.0) + LumberData[id][lumberRot][2]);
+
+                LumberData[id][lumberGetCut]   = false;
+                LumberData[id][lumberCut]      = true;
+                Lumber_Save(id, SAVE_LUMBER_CUTTING);
+                return 1;
+            }
+            SetPlayerProgressBarValue(playerid, PlayerData[playerid][pCuttingBar], value);
+            GameTextForPlayer(playerid, "~g~~h~Memotong pohon ..", 1000, 4);
+        }
+    }
+    return 1;
+}
+
 hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
     if ((newkeys & KEY_NO) && GetPlayerState(playerid) == PLAYER_STATE_ONFOOT && GetPlayerJob(playerid) == JOB_LUMBERJACK)
@@ -80,44 +118,6 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
         Reset_Lumber(playerid);
         LumberData[lumber_id][lumberGetCut]   = false;
         SendServerMessage(playerid, "Kamu telah menggagalkan proses pemotongan kayu.");
-    }
-    return 1;
-}
-
-timer HarvestingLumber[1000](playerid)
-{
-    new id;
-
-    if ((id = GetPVarInt(playerid, "lumber_cutting")) != -1)
-    {
-        if (GetPlayerWeapon(playerid) == WEAPON_CHAINSAW)
-        {
-            new Float:time, level = GetLumberLevel(playerid);
-
-            switch (level)
-            {
-                case 1: time = 2.0;
-                case 2: time = 5.0;
-                case 3: time = 7.5;
-                default:
-                    time = 10.0;
-            }
-
-            new Float:value = (GetPlayerProgressBarValue(playerid, PlayerData[playerid][pCuttingBar]) + time);
-
-            if (value >= 100.0)
-            {
-                Reset_Lumber(playerid);
-                MoveDynamicObject(LumberData[id][lumberObject], LumberData[id][lumberPos][0], LumberData[id][lumberPos][1], LumberData[id][lumberPos][2] - 1.0, 0.025, LumberData[id][lumberRot][0], LumberData[id][lumberRot][1] - 80.0, RandomFloat(0.0, 360.0) + LumberData[id][lumberRot][2]);
-
-                LumberData[id][lumberGetCut]   = false;
-                LumberData[id][lumberCut]      = true;
-                Lumber_Save(id, SAVE_LUMBER_CUTTING);
-                return 1;
-            }
-            SetPlayerProgressBarValue(playerid, PlayerData[playerid][pCuttingBar], value);
-            GameTextForPlayer(playerid, "~g~~h~Memotong pohon ..", 1000, 4);
-        }
     }
     return 1;
 }

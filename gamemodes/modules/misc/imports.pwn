@@ -110,6 +110,20 @@ importAnnounceDropCrate(importid)
 	return 1;
 }
 
+timer ReduceImportRemoveItem[1000](importid)
+{
+	// Kurangi 1 detik.
+	importData[importid][importRemovetime]--;
+
+	// Jika waktunya sudah habis, maka stop timer-nya.
+	if (importData[importid][importRemovetime] <= 0)
+	{
+		stop importData[importid][ImportRemoveTimer];
+		// Jalankan fungsi untuk remove crate.
+		importRemove(importid);
+	}
+}
+
 importDropCrate(importid)
 {
 	new string[128];
@@ -147,20 +161,6 @@ timer ReduceImportDropCrateTime[1000](importid)
 		stop importData[importid][ImportDropTimer];
 		// Jalankan fungsi untuk drop crate.
 		importDropCrate(importid);
-	}
-}
-
-timer ReduceImportRemoveItem[1000](importid)
-{
-	// Kurangi 1 detik.
-	importData[importid][importRemovetime]--;
-
-	// Jika waktunya sudah habis, maka stop timer-nya.
-	if (importData[importid][importRemovetime] <= 0)
-	{
-		stop importData[importid][ImportRemoveTimer];
-		// Jalankan fungsi untuk remove crate.
-		importRemove(importid);
 	}
 }
 

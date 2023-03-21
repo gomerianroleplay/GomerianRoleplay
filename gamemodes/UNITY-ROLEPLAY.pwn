@@ -1173,6 +1173,37 @@ FlashTextDraw(playerid, PlayerText:textid, delay = 500)
     return 1;
 }
 
+timer MancingGagal[10000](playerid)
+{
+    if(IsPlayerAttachedObjectSlotUsed(playerid, 4))
+        RemovePlayerAttachedObject(playerid, 4);
+
+    PlayerData[playerid][pFishing] = 0;
+    FishClicked[playerid] = 0;
+    BaitEaten[playerid] = false;
+
+    StopFishing(playerid);
+    ClearAnimations(playerid);
+    SendServerMessage(playerid, "Kamu gagal memancing ikan, ikannya lolos!");
+
+    stop MancingTimer[playerid];
+
+    return 1;
+}
+
+timer getFish[30000](playerid)
+{
+    if(!SQL_IsCharacterLogged(playerid) || !PlayerData[playerid][pFishing])
+        return 0;
+
+    BaitEaten[playerid] = true;
+    MancingTimer[playerid] = defer MancingGagal(playerid);
+    Fishing(playerid);
+    SendServerMessage(playerid, "Umpan di tarik tahan tombol "YELLOW"SPRINT "WHITE"untuk menarik ikan dan lepas ketika hijau.");
+    ShowPlayerFooter(playerid, "Umpan di tarik tahan tombol ~y~SPRINT ~w~untuk menarik ikan dan lepas ketika hijau.");
+    return 1;
+}
+
 AddFish(playerid, name[], Float:weight)
 {
     new maximum_fish, level = GetFishingLevel(playerid);
@@ -2184,6 +2215,17 @@ stock SetPlayerLookAt(playerid, Float:x, Float:y)
     Pa = floatsub(Pa, 90.0);
     if(Pa >= 360.0) Pa = floatsub(Pa, 360.0);
     SetPlayerFacingAngle(playerid, Pa);
+}
+
+timer SetPlayerToUnfreeze[2000](playerid)
+{
+    if(SQL_IsCharacterLogged(playerid))
+    {
+        PlayerData[playerid][pFreeze] = 0;
+        Streamer_ToggleIdleUpdate(playerid,0);
+        TogglePlayerControllable(playerid, 1);
+    }
+    return 1;
 }
 
 stock SetPlayerPosEx(playerid, Float:x, Float:y, Float:z, time = 500)
@@ -8198,6 +8240,12 @@ ResetPlayer(playerid)
     return 1;
 }
 
+timer HideHUDMoney[3000](playerid)
+{
+    PlayerTextDrawHide(playerid, PlayerTextdraws[playerid][textdraw_moneyhud]);
+    return 1;
+}
+
 GiveMoney(playerid, amount, E_SERVER_ECONOMY_FLOW:economy_flow = ECONOMY_FLOW_NONE, string:source[] = "")
 {
     if (playerid != INVALID_PLAYER_ID)
@@ -8234,11 +8282,6 @@ GiveMoney(playerid, amount, E_SERVER_ECONOMY_FLOW:economy_flow = ECONOMY_FLOW_NO
 
         defer HideHUDMoney(playerid);
     }
-    return 1;
-}
-timer HideHUDMoney[3000](playerid)
-{
-    PlayerTextDrawHide(playerid, PlayerTextdraws[playerid][textdraw_moneyhud]);
     return 1;
 }
 
@@ -9256,23 +9299,7 @@ IsValidRoleplayName(const name[]) {
     }
     return 1;
 }
-timer MancingGagal[10000](playerid)
-{
-    if(IsPlayerAttachedObjectSlotUsed(playerid, 4))
-        RemovePlayerAttachedObject(playerid, 4);
 
-    PlayerData[playerid][pFishing] = 0;
-    FishClicked[playerid] = 0;
-    BaitEaten[playerid] = false;
-
-    StopFishing(playerid);
-    ClearAnimations(playerid);
-    SendServerMessage(playerid, "Kamu gagal memancing ikan, ikannya lolos!");
-
-    stop MancingTimer[playerid];
-
-    return 1;
-}
 GagalMancing(playerid)
 {
     if(IsPlayerAttachedObjectSlotUsed(playerid, 4))
@@ -11833,6 +11860,28 @@ Function:DestroyObjectGate(playerid)
     return 1;
 }
 
+timer refuseVCode[600000](playerid) {
+    if (IsPlayerConnected(playerid)) {
+        SendServerMessage(playerid, "Anda di keluarkan dari server dikarenakan terlalu lama memasukkan verifikasi kode.");
+
+        Dialog_Close(playerid);
+        KickEx(playerid);
+    }
+    return 1;
+}
+
+timer refuseLogin[300000](playerid)
+{
+    if(IsPlayerConnected(playerid))
+    {
+        SendServerMessage(playerid, "Anda di keluarkan dari server dikarenakan terlalu lama login ke dalam server.");
+
+        Dialog_Close(playerid);
+        KickEx(playerid);
+    }
+    return 1;
+}
+
 Function:OnQueryFinished(extraid, threadid, race_check)
 {
     if(!IsPlayerConnected(extraid))
@@ -13435,6 +13484,20 @@ public OnPlayerJackVehicle(playerid, targetid, vehicleid)
     return 1;
 }
 
+timer ClearPlayerAnimations[3000](playerid)
+{
+    ClearAnimations(playerid);
+    return 1;
+}
+
+timer GetUpAnimations[500](playerid)
+{
+    ApplyAnimation(playerid, "PED", "GETUP", 4.1, 0, 0, 0, 0, 0, 1);
+    ApplyAnimation(playerid, "PED", "GETUP", 4.1, 0, 0, 0, 0, 0, 1);
+    defer ClearPlayerAnimations(playerid);
+    return 1;
+}
+
 public OnPlayerTakeDamage(playerid, issuerid, Float:amount, weaponid, bodypart)
 {
 	#if defined DEBUG_MODE
@@ -13648,22 +13711,17 @@ public OnPlayerDeath(playerid, killerid, reason)
     
     return 1;
 }
-timer ClearPlayerAnimations[3000](playerid)
-{
-    ClearAnimations(playerid);
-    return 1;
-}
-timer GetUpAnimations[500](playerid)
-{
-    ApplyAnimation(playerid, "PED", "GETUP", 4.1, 0, 0, 0, 0, 0, 1);
-    ApplyAnimation(playerid, "PED", "GETUP", 4.1, 0, 0, 0, 0, 0, 1);
-    defer ClearPlayerAnimations(playerid);
-    return 1;
-}
+
 timer GiveLastWeapon[500](playerid)
 {
     SetPlayerArmedWeapon(playerid, PlayerData[playerid][pLastWeapon]);
     PlayerData[playerid][pLastWeapon] = 0;
+    return 1;
+}
+timer ResetDrinking[3000](playerid)
+{
+    PlayerDrinking[playerid] = 0;
+    AddPlayerSmoking(playerid);
     return 1;
 }
 public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
@@ -36549,12 +36607,7 @@ AddPlayerSmoking(playerid)
     PlayerSmoking[playerid]++;
     return 1;
 }
-timer ResetDrinking[3000](playerid)
-{
-    PlayerDrinking[playerid] = 0;
-    AddPlayerSmoking(playerid);
-    return 1;
-}
+
 IkanDiTarik(playerid, status)
 {
     if(!SQL_IsCharacterLogged(playerid) || !PlayerData[playerid][pFishing])
@@ -36619,58 +36672,12 @@ IkanDiTarik(playerid, status)
     StopFishing(playerid);
     return 1;
 }
-timer getFish[30000](playerid)
-{
-    if(!SQL_IsCharacterLogged(playerid) || !PlayerData[playerid][pFishing])
-        return 0;
-
-    BaitEaten[playerid] = true;
-    MancingTimer[playerid] = defer MancingGagal(playerid);
-    Fishing(playerid);
-    SendServerMessage(playerid, "Umpan di tarik tahan tombol "YELLOW"SPRINT "WHITE"untuk menarik ikan dan lepas ketika hijau.");
-    ShowPlayerFooter(playerid, "Umpan di tarik tahan tombol ~y~SPRINT ~w~untuk menarik ikan dan lepas ketika hijau.");
-    return 1;
-}
-
-timer refuseLogin[300000](playerid)
-{
-    if(IsPlayerConnected(playerid))
-    {
-        SendServerMessage(playerid, "Anda di keluarkan dari server dikarenakan terlalu lama login ke dalam server.");
-
-        Dialog_Close(playerid);
-        KickEx(playerid);
-    }
-    return 1;
-}
-
 timer refuseEmail[300000](playerid) {
     if (IsPlayerConnected(playerid)) {
         SendServerMessage(playerid, "Anda di keluarkan dari server dikarenakan terlalu lama memasukkan email.");
 
         Dialog_Close(playerid);
         KickEx(playerid);
-    }
-    return 1;
-}
-
-timer refuseVCode[600000](playerid) {
-    if (IsPlayerConnected(playerid)) {
-        SendServerMessage(playerid, "Anda di keluarkan dari server dikarenakan terlalu lama memasukkan verifikasi kode.");
-
-        Dialog_Close(playerid);
-        KickEx(playerid);
-    }
-    return 1;
-}
-
-timer SetPlayerToUnfreeze[2000](playerid)
-{
-    if(SQL_IsCharacterLogged(playerid))
-    {
-        PlayerData[playerid][pFreeze] = 0;
-        Streamer_ToggleIdleUpdate(playerid,0);
-        TogglePlayerControllable(playerid, 1);
     }
     return 1;
 }

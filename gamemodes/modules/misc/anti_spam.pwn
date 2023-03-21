@@ -9,6 +9,12 @@ static
 	chat_flood[MAX_PLAYERS] = {0, ...},
 	bool:flood_detect[MAX_PLAYERS] = {false, ...};
 
+timer EnableChat[5000](playerid)
+{
+	chat_flood[playerid] = 0;
+	flood_detect[playerid] = false;
+}
+
 
 hook OnPlayerText(playerid, text[])
 {
@@ -35,10 +41,4 @@ ptask FloodTimer[2500](playerid)
 	{
 		chat_flood[playerid] = 0;
 	}
-}
-
-timer EnableChat[5000](playerid)
-{
-	chat_flood[playerid] = 0;
-	flood_detect[playerid] = false;
 }

@@ -1,6 +1,17 @@
 forward OnVehicleUpdate(playerid, vehicleid);
 
 new Timer:onvehicle_timer[MAX_PLAYERS] = {Timer:-1, ...};
+timer OnVehicleUpdate[100](playerid, vehicleid) 
+{
+	static keys, updown, leftright;
+	GetPlayerKeys(playerid, keys, updown, leftright);
+
+	if(updown && IsABike(vehicleid) && GetVehicleSpeed(vehicleid) > 70) {
+		SetVehicleSpeed(vehicleid, GetVehicleSpeed(vehicleid)-10);
+	}
+
+	CallLocalFunction("OnVehicleUpdate", "dd", playerid, vehicleid);
+}
 
 hook OnPlayerStateChange(playerid, newstate, oldstate)
 {
@@ -23,17 +34,4 @@ hook OnPlayerDisconnect(playerid, reason)
 		stop onvehicle_timer[playerid];
 		onvehicle_timer[playerid] = Timer:-1;
 	}
-}
-
-
-timer OnVehicleUpdate[100](playerid, vehicleid) 
-{
-	static keys, updown, leftright;
-	GetPlayerKeys(playerid, keys, updown, leftright);
-
-	if(updown && IsABike(vehicleid) && GetVehicleSpeed(vehicleid) > 70) {
-		SetVehicleSpeed(vehicleid, GetVehicleSpeed(vehicleid)-10);
-	}
-
-	CallLocalFunction("OnVehicleUpdate", "dd", playerid, vehicleid);
 }

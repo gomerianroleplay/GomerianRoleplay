@@ -57,6 +57,26 @@ hook OnPlayerLeaveDynArea(playerid, areaid)
     }
 }
 
+timer Player_ResetVending[500](playerid)
+{
+    playerUseVending[playerid] = 0;
+    return 1;
+}
+
+timer Player_UseVending[3000](playerid, index)
+{
+    if (!IsPlayerAttachedObjectSlotUsed(playerid, WEAPON_SLOT))
+    {
+        if (Vending_IsExists(index) && VendingData[index][vendType] == VENDING_MACHINE_TYPE_SNACK)
+            SetPlayerAttachedObject(playerid, WEAPON_SLOT, 2702, 6, 0.173041, 0.049197, 0.056789, 0.000000, 274.166107, 299.057983, 1.000000, 1.000000, 1.000000);
+
+        SetTimerEx("RemoveAttachedObject", 3000, false, "dd", playerid, WEAPON_SLOT);
+        ApplyAnimation(playerid, "FOOD", "EAT_Burger", 4.1, 0, 0, 0, 0, 0, 1);
+        defer Player_ResetVending(playerid);
+    }
+    return 1;
+}
+
 hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
     if (newkeys & KEY_CTRL_BACK) //Key H
@@ -101,24 +121,4 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
             }
         }
     }
-}
-
-timer Player_UseVending[3000](playerid, index)
-{
-    if (!IsPlayerAttachedObjectSlotUsed(playerid, WEAPON_SLOT))
-    {
-        if (Vending_IsExists(index) && VendingData[index][vendType] == VENDING_MACHINE_TYPE_SNACK)
-            SetPlayerAttachedObject(playerid, WEAPON_SLOT, 2702, 6, 0.173041, 0.049197, 0.056789, 0.000000, 274.166107, 299.057983, 1.000000, 1.000000, 1.000000);
-
-        SetTimerEx("RemoveAttachedObject", 3000, false, "dd", playerid, WEAPON_SLOT);
-        ApplyAnimation(playerid, "FOOD", "EAT_Burger", 4.1, 0, 0, 0, 0, 0, 1);
-        defer Player_ResetVending(playerid);
-    }
-    return 1;
-}
-
-timer Player_ResetVending[500](playerid)
-{
-    playerUseVending[playerid] = 0;
-    return 1;
 }

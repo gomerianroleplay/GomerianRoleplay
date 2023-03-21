@@ -213,6 +213,12 @@ Actor_Nearest(playerid, Float:range = 6.0)
 	return -1;
 }
 
+timer ResetRobberyNotification[5000](actorid)
+{
+	ActorData[actorid][actorNotification] = 0;
+	return 1;
+}
+
 timer Player_Grabcash[1000](playerid, actorid)
 {
 	new last_biz = PlayerData[playerid][pLastBiz];
@@ -261,11 +267,5 @@ task Server_RestockCash[10800000]()
 	{
 		Actor_SetCash(i, 15000);
 	}
-	return 1;
-}
-
-timer ResetRobberyNotification[5000](actorid)
-{
-	ActorData[actorid][actorNotification] = 0;
 	return 1;
 }

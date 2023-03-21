@@ -6,6 +6,34 @@ new bool:Vehicle_RadarToggle[MAX_DYNAMIC_VEHICLES];
 new Timer:Vehicle_CheckingSpeed[MAX_DYNAMIC_VEHICLES];
 new Player_OldVehicleID[MAX_PLAYERS];
 
+timer Vehicle_CheckSpeed[1000](vehicleid)
+{
+    if (Vehicle_RadarToggle[vehicleid])
+    {
+        new vehid = Vehicle_GetFrontID(vehicleid);
+        if (vehid == -1)
+        {
+            foreach (new i : Player) if (IsPlayerInVehicle(i, vehicleid))
+                {
+                    PlayerTextDrawSetString(i, ModelTD[i], "N/A");
+                    PlayerTextDrawSetString(i, SpeedTD[i], "N/A");
+                    PlayerTextDrawSetString(i, PlateTD[i], "N/A");
+                }
+        }
+        else
+        {
+            foreach (new i : Player) if (IsPlayerInVehicle(i, vehicleid))
+                {
+                    new speed = floatround(GetVehicleSpeed(vehid));
+                    PlayerTextDrawSetString(i, ModelTD[i], sprintf("%s", GetVehicleNameByVehicle(vehid)));
+                    PlayerTextDrawSetString(i, SpeedTD[i], sprintf("%d KMH", speed));
+                    PlayerTextDrawSetString(i, PlateTD[i], sprintf("%s", VehicleData[vehid][vehPlate]));
+                }
+        }
+    }
+    return 1;
+}
+
 CMD:speedradar(playerid, params[])
 {
     if (IsPlayerInAnyVehicle(playerid) && GetFactionType(playerid) == FACTION_POLICE)
@@ -99,34 +127,6 @@ Vehicle_GetFrontID(vehid)
     }
     if (temp < 7.0) return j;
     return -1;
-}
-
-timer Vehicle_CheckSpeed[1000](vehicleid)
-{
-    if (Vehicle_RadarToggle[vehicleid])
-    {
-        new vehid = Vehicle_GetFrontID(vehicleid);
-        if (vehid == -1)
-        {
-            foreach (new i : Player) if (IsPlayerInVehicle(i, vehicleid))
-                {
-                    PlayerTextDrawSetString(i, ModelTD[i], "N/A");
-                    PlayerTextDrawSetString(i, SpeedTD[i], "N/A");
-                    PlayerTextDrawSetString(i, PlateTD[i], "N/A");
-                }
-        }
-        else
-        {
-            foreach (new i : Player) if (IsPlayerInVehicle(i, vehicleid))
-                {
-                    new speed = floatround(GetVehicleSpeed(vehid));
-                    PlayerTextDrawSetString(i, ModelTD[i], sprintf("%s", GetVehicleNameByVehicle(vehid)));
-                    PlayerTextDrawSetString(i, SpeedTD[i], sprintf("%d KMH", speed));
-                    PlayerTextDrawSetString(i, PlateTD[i], sprintf("%s", VehicleData[vehid][vehPlate]));
-                }
-        }
-    }
-    return 1;
 }
 
 hook OnPlayerStateChange(playerid, newstate, oldstate)

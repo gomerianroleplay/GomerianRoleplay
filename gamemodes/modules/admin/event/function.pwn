@@ -85,6 +85,17 @@ stock Player_ToggleEventAntiCheat(playerid, bool:toggle)
 	EnableAntiCheatForPlayer(playerid, 21, toggle);
 	return 1;
 }
+
+timer eventSpawnProp[500](playerid)
+{
+	if(SQL_IsLogged(playerid) && IsPlayerInEvent(playerid))
+	{
+		SetPlayerHealth(playerid, EventData[eventHealth]);
+		SetPlayerArmour(playerid, EventData[eventArmor]);
+	}
+	return 1;
+}
+
 stock eventSpawn(playerid)
 {
 	if(IsPlayerInEvent(playerid))
@@ -200,16 +211,6 @@ stock eventLeave(playerid)
 		RefreshWeapon(playerid);
 	}
 	DisablePlayerRaceCheckpoint(playerid);
-	return 1;
-}
-
-timer eventSpawnProp[500](playerid)
-{
-	if(SQL_IsLogged(playerid) && IsPlayerInEvent(playerid))
-	{
-		SetPlayerHealth(playerid, EventData[eventHealth]);
-		SetPlayerArmour(playerid, EventData[eventArmor]);
-	}
 	return 1;
 }
 
