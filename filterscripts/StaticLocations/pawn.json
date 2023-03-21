@@ -1,0 +1,73 @@
+{
+	"user": "Blockring",
+	"repo": "StaticLocations",
+	"entry": "StaticLocations.pwn",
+	"output": "../StaticLocations.amx",
+	"dependencies": [
+		"sampctl/samp-stdlib",
+		"pawn-lang/YSI-Includes@5.x",
+		"samp-incognito/samp-streamer-plugin:v2.9.6"
+	],
+	"runtime": {
+		"version": "0.3.7",
+		"mode": "server",
+		"rcon_password": "password",
+		"port": 7777,
+		"hostname": "SA-MP Server",
+		"maxplayers": 50,
+		"language": ""
+	},
+	"builds": [
+		{
+			"name": "dev",
+			"version": "3.10.7",
+			"args": [
+				"-;+",
+				"-(+",
+				"-d3",
+				"-Z+"
+			],
+			"includes": [
+				"../../pawno/include"
+			],
+			"constants": {
+				"MAX_PLAYERS": "10"
+			},
+			"compiler": {}
+		},
+		{
+			"name": "live:debug",
+			"version": "3.10.7",
+			"args": [
+				"-;+",
+				"-(+",
+				"-d3",
+				"-Z+"
+			],
+			"includes": [
+				"../../pawno/include"
+			],
+			"constants": {
+				"MAX_PLAYERS": "300"
+			},
+			"compiler": {}
+		},
+		{
+			"name": "live",
+			"version": "3.10.7",
+			"args": [
+				"-;+",
+				"-(+",
+				"-O2",
+				"-Z+"
+			],
+			"includes": [
+				"../../pawno/include"
+			],
+			"constants": {
+				"MAX_PLAYERS": "300"
+			},
+			"compiler": {}
+		}
+	]
+}

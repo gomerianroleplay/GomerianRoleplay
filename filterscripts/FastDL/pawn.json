@@ -1,0 +1,63 @@
+{
+	"user": "Blockring",
+	"repo": "FastDL",
+	"entry": "FastDL.pwn",
+	"output": "../FastDL.amx",
+	"dependencies": [
+		"sampctl/samp-stdlib",
+		"dakyskye/pawn-env:1.1.1"
+	],
+	"builds": [
+		{
+			"name": "dev",
+			"version": "3.10.7",
+			"args": [
+				"-;+",
+				"-(+",
+				"-d3",
+				"-Z+"
+			],
+			"includes": [
+				"../../pawno/include"
+			],
+			"constants": {
+				"MAX_PLAYERS": "10"
+			},
+			"compiler": {}
+		},
+		{
+			"name": "live:debug",
+			"version": "3.10.7",
+			"args": [
+				"-;+",
+				"-(+",
+				"-d3",
+				"-Z+"
+			],
+			"includes": [
+				"../../pawno/include"
+			],
+			"constants": {
+				"MAX_PLAYERS": "300"
+			},
+			"compiler": {}
+		},
+		{
+			"name": "live",
+			"version": "3.10.7",
+			"args": [
+				"-;+",
+				"-(+",
+				"-O2",
+				"-Z+"
+			],
+			"includes": [
+				"../../pawno/include"
+			],
+			"constants": {
+				"MAX_PLAYERS": "300"
+			},
+			"compiler": {}
+		}
+	]
+}

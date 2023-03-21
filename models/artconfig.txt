@@ -1,0 +1,97 @@
+AddCharModel(305, 20001, "lvpdpc2.dff", "lvpdpc2.txd");
+AddCharModel(305, 20002, "lapdpd2.dff", "lapdpd2.txd");
+AddCharModel(2, 20003, "maccer.dff", "maccer.txd");
+AddCharModel(5, 20004, "bb.dff", "bb.txd");
+AddCharModel(19, 20005, "bmydj.dff", "bmydj.txd");
+AddCharModel(21, 20006, "bmycr.dff", "bmycr.txd");
+AddCharModel(22, 20007, "bmyst.dff", "bmyst.txd");
+AddCharModel(60, 20008, "omyst.dff", "omyst.txd");
+AddCharModel(102, 20009, "ballas1.dff", "ballas1.txd");
+AddCharModel(104, 20010, "ballas3.dff", "ballas3.txd");
+AddCharModel(106, 20011, "fam2.dff", "fam2.txd");
+AddCharModel(107, 20012, "fam3.dff", "fam3.txd");
+AddCharModel(119, 20013, "sindaco.dff", "sindaco.txd");
+AddCharModel(120, 20014, "triboss.dff", "triboss.txd");
+AddCharModel(123, 20015, "dnb3.dff", "dnb3.txd");
+AddCharModel(124, 20016, "vmaff1.dff", "vmaff1.txd");
+AddCharModel(155, 20017, "wmypizz.dff", "wmypizz.txd");
+AddCharModel(177, 20018, "wmybar.dff", "wmybar.txd");
+AddCharModel(180, 20019, "bmytatt.dff", "bmytatt.txd");
+AddCharModel(195, 20020, "gangrl3.dff", "gangrl3.txd");
+AddCharModel(291, 20021, "paul.dff", "paul.txd");
+AddCharModel(292, 20021, "cesar.dff", "cesar.txd");
+
+AddCharModel(93, 20022, "bfypd1.dff", "bfypd1.txd");
+AddCharModel(93, 20023, "ofypd1.dff", "ofypd1.txd");
+AddCharModel(93, 20024, "wfypd1.dff", "wfypd1.txd");
+AddCharModel(93, 20025, "wfypdlg.dff", "wfypdlg.txd");
+AddCharModel(93, 20026, "wfysgt1.dff", "wfysgt1.txd");
+
+AddCharModel(280, 20027, "amypd1.dff", "amypd1.txd");
+AddCharModel(280, 20028, "bmopd1.dff", "bmopd1.txd");
+AddCharModel(280, 20029, "bmypd1.dff", "bmypd1.txd");
+AddCharModel(280, 20030, "bmypd2.dff", "bmypd2.txd");
+AddCharModel(280, 20031, "bmypdlg.dff", "bmypdlg.txd");
+AddCharModel(280, 20032, "hmopd1.dff", "hmopd1.txd");
+AddCharModel(280, 20033, "hmosgt1.dff", "hmosgt1.txd");
+AddCharModel(280, 20034, "hmypd1.dff", "hmypd1.txd");
+AddCharModel(280, 20035, "hmypd2.dff", "hmypd2.txd");
+AddCharModel(280, 20036, "hmypdlg.dff", "hmypdlg.txd");
+
+AddCharModel(280, 20037, "omypd1.dff", "omypd1.txd");
+AddCharModel(280, 20038, "pdbik1.dff", "pdbik1.txd");
+AddCharModel(280, 20039, "wmopd1.dff", "wmopd1.txd");
+AddCharModel(280, 20040, "wmyflight1.dff", "wmyflight1.txd");
+AddCharModel(280, 20041, "wmypd1.dff", "wmypd1.txd");
+AddCharModel(280, 20042, "wmypd2.dff", "wmypd2.txd");
+AddCharModel(280, 20043, "wmypd3.dff", "wmypd3.txd");
+AddCharModel(280, 20044, "wmypd4.dff", "wmypd4.txd");
+AddCharModel(280, 20045, "wmypd5.dff", "wmypd5.txd");
+AddCharModel(280, 20046, "wmypdlg1.dff", "wmypdlg1.txd");
+AddCharModel(280, 20047, "wmypdlg2.dff", "wmypdlg2.txd");
+AddCharModel(280, 20048, "wmysgt1.dff", "wmysgt1.txd");
+
+AddCharModel(93, 20049, "fmetro1.dff", "fmetro1.txd");
+AddCharModel(93, 20050, "fmetro2.dff", "fmetro2.txd");
+AddCharModel(93, 20051, "fmetro3.dff", "fmetro3.txd");
+
+AddCharModel(280, 20052, "bmyswat1.dff", "bmyswat1.txd");
+AddCharModel(280, 20053, "hmyswat1.dff", "hmyswat1.txd");
+AddCharModel(280, 20054, "wmyswat1.dff", "wmyswat1.txd");
+AddCharModel(280, 20055, "wmyswat2.dff", "wmyswat2.txd");
+AddCharModel(280, 20056, "wmyswat3.dff", "wmyswat3.txd");
+
+AddCharModel(240, 20058, "swmyri.dff", "swmyri.txd");
+AddCharModel(233, 20059, "wfyst.dff", "wfyst.txd");
+AddCharModel(259, 20060, "heck2.dff", "heck2.txd");
+AddCharModel(240, 20061, "cordl.dff", "cordl.txd");
+
+
+
+AddCharModel(13, 20062, "bfyst.dff", "bfyst.txd"); 
+
+AddCharModel(252, 20063, "wmyro1.dff", "wmyro1.txd");
+
+AddCharModel(252, 20064, "wmyva2_1.dff", "wmyva2_1.txd");
+
+AddCharModel(252, 20065, "wmyva2_2.dff", "wmyva2_2.txd");
+
+AddCharModel(252, 20066, "wmyva2_3.dff", "wmyva2_3.txd");
+
+AddCharModel(252, 20067, "wmyva2_3.dff", "wmyva2_3.txd");
+
+AddCharModel(252, 20068, "wmyva2_4.dff", "wmyva2_4.txd");
+
+AddCharModel(252, 20069, "wmyva2_5.dff", "wmyva2_5.txd");
+
+
+
+AddCharModel(59, 20070, "amygss.dff", "amygss.txd");
+AddCharModel(265, 20071, "bmygss.dff", "bmygss.txd");
+AddCharModel(280, 20072, "wmygss1.dff", "wmygss1.txd");
+AddCharModel(280, 20073, "wmygss2.dff", "wmygss2.txd");
+AddCharModel(292, 20074, "hmygss.dff", "hmygss.txd");
+
+AddSimpleModel(-1,19379, -2000, "wallzzz.dff", "wallzzz.txd");
+AddSimpleModel(-1,1942, -2001, "SWATArmour1.dff", "SWATArmour1.txd");
+AddSimpleModel(-1,1942, -2002, "vest.dff", "vest.txd");
