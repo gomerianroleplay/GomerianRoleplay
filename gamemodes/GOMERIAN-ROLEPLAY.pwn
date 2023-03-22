@@ -18885,7 +18885,7 @@ CMD:gotoco(playerid, params[]){
     return PermissionError(playerid);
 
 	new Float: pos[3], int;
-	if(sscanf(params, "fffd", pos[0], pos[1], pos[2], int)) return SendClientMessageEx(playerid, COLOR_WHITE, "USAGE: /gotoco [x coordinate] [y coordinate] [z coordinate] [interior]");
+	if(sscanf(params, "p<,>fffd", pos[0], pos[1], pos[2], int)) return SendClientMessageEx(playerid, COLOR_WHITE, "USAGE: /gotoco [x coordinate] [y coordinate] [z coordinate] [interior]");
 
 	SendClientMessageEx(playerid, COLOR_WHITE, "You have been teleported to the coordinates specified.");
 	SetPlayerPos(playerid, pos[0], pos[1], pos[2]);
