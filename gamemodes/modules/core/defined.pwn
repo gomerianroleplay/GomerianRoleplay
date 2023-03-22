@@ -4,10 +4,10 @@ Script Defined List
 
 //============================== SERVER CONFIGURATION =============================
 
-#define SERVER_NAME                     "The Andreas Community Project"
+#define SERVER_NAME                     "Roleplay"
 #define SERVER_URL                      "ComingSoon"
-#define SERVER_DISCORD					"https://discord.gg/S2hPZZEfm3
-#define SERVER_REVISION                 "The Andreas Community Project"
+#define SERVER_DISCORD					"https://discord.gg/Fp5UEdBNC6"
+#define SERVER_REVISION                 "Gomerian Roleplay"
 
 //==============================   SERVER MACROS 	=============================
 
