@@ -18,33 +18,31 @@
 
 public OnFilterScriptInit()
 {
-  Init_Dealership();
-  Init_Hauler();
-  Init_Sweeper();
-  Init_Trashmaster();
-  Init_TaxiStation();
-  Init_MechanicCenter();
-  Init_AecHardware();
-  Init_Boxville2();
-  Init_IdlewoodGasStation();
-  Init_Ikea();
-  Init_LSMarketDoughnutShop();
-  Init_Steakhouse();
-  return 1;
+    Init_Dealership();
+    Init_Hauler();
+    Init_Sweeper();
+    Init_Trashmaster();
+    Init_TaxiStation();
+    Init_MechanicCenter();
+    Init_AecHardware();
+    Init_Boxville2();
+    Init_IdlewoodGasStation();
+    Init_Ikea();
+    Init_LSMarketDoughnutShop();
+    return 1;
 }
 
 public OnFilterScriptExit()
 {
-  return 1;
+    return 1;
 }
 
 public OnPlayerConnect(playerid)
 {
-  DL_RemoveBuilding(playerid);
-  HL_RemoveBuilding(playerid);
-  TM_RemoveBuilding(playerid);
-  MC_RemoveBuilding(playerid);
-  SH_RemoveBuilding(playerid);
-  BV2_RemoveBuilding(playerid);
-  return 1;
+    DL_RemoveBuilding(playerid);
+    HL_RemoveBuilding(playerid);
+    TM_RemoveBuilding(playerid);
+    MC_RemoveBuilding(playerid);
+    BV2_RemoveBuilding(playerid);
+    return 1;
 }
