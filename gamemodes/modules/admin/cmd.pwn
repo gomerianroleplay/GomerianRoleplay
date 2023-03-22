@@ -1641,7 +1641,7 @@ CMD:spawn(playerid, params[])
     if (sscanf(params, "dfff", interior, x, y, z))
         return SendSyntaxMessage(playerid, "/spawn [interior] [x] [y] [z]");
 
-    SetPlayerPos(playerid, x, y, z);
+    SetPlayerPos(playerid, Float:x, Float:y, Float:z);
     SetPlayerInterior(playerid, interior);
     return 1;
 }
@@ -1652,7 +1652,7 @@ CMD:sethp(playerid, params[])
 
     if (CheckAdmin(playerid, 1))
         return PermissionError(playerid);
-    
+
     if (sscanf(params, "uf", userid, amount))
         return SendSyntaxMessage(playerid, "/sethp [playerid/PartOfName] [amount]");
 
