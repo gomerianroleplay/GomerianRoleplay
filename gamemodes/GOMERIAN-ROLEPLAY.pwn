@@ -24000,15 +24000,18 @@ CMD:hangup(playerid, params[])
 
 CMD:id(playerid, params[])
 {
-    if(isnull(params))
+    new user, count;
+    if (sscanf(params, "u", user))
         return SendSyntaxMessage(playerid, "/id [playerid/PartOfName]");
 
-    new count;
+    // if(user == INVALID_PLAYER_ID)
+    //     return SendErrorMessage(playerid, "Player tersebut tidak login ke server.");
+    //new count;
 
     
     foreach (new i : Player)
     {
-        if(strfind(ReturnName(i), params, true) != -1)
+        if(user == i || strfind(ReturnName(i), params, true) != -1) 
         {
             //new szString[144];
             //format(szString, sizeof(szString), "Packets lost: %.2f percent.", NetStats_PacketLossPercent(params));
@@ -30835,4 +30838,5971 @@ Dialog:TrackConfirm(playerid, response, listitem, inputtext[])
 }
 Dialog:TrackCaller(playerid, response, listitem, inputtext[])
 {
-    // Mendapatkan 
+    // Mendapatkan ID caller-nya (yaitu playerid-nya) dan menetapkan pilihan emergency call list. (/clist)
+    selectedCaller[playerid] = strval(inputtext);
+
+    if(response)
+    {
+        Dialog_Show(playerid, TrackConfirm, DIALOG_STYLE_MSGBOX, "911 Tracker", "Anda yakin ingin mengambil panggilan ini ?", "Accept", "Delete");
+    }
+    return 1;
+}
+Dialog:MainGPS(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        switch (listitem)
+        {
+            case 0:
+            {
+                static
+                    string[MAX_GPS_LOCATIONS * 32];
+
+                string = "Add Location\n";
+
+                for (new i = 0; i != MAX_GPS_LOCATIONS; i ++) if(LocationData[playerid][i][locationExists]) {
+                    format(string, sizeof(string), "%s%s\n", string, LocationData[playerid][i][locationName]);
+                }
+                Dialog_Show(playerid, CustomLocations, DIALOG_STYLE_LIST, "Custom Locations", string, "Select", "Back");
+            }
+            case 1:
+            {
+                new string[128], count;
+                strcat(string,"House ID\tAddress\tLocation\n");
+                for (new i = 0; i != MAX_HOUSES; i ++) if(HouseData[i][houseExists] && House_IsOwner(playerid, i, false))
+                {
+                    strcat(string, sprintf("%d\t%s\t%s\n", i, HouseData[i][houseAddress], GetLocation(HouseData[i][housePos][0], HouseData[i][housePos][1], HouseData[i][housePos][2])));
+                    ListedHouse[playerid][count++] = i;
+                }
+                if(!count) return SendErrorMessage(playerid, "You don't have house.");
+                Dialog_Show(playerid, FindHouse, DIALOG_STYLE_TABLIST_HEADERS, "Find House", string, "Find", "Cancel");
+            }
+            case 2: Dialog_Show(playerid, FindBusiness, DIALOG_STYLE_LIST, "Find Business", "Retail Store\nWeapon Store\nClothing Store\nFast Food\nDealership\nGas Station\nFurniture Store\nElectronic Store\nBar & Lounge", "Submit", "Cancel");
+            case 3: Dialog_Show(playerid, FindEntrance, DIALOG_STYLE_LIST, "Find Entrance", "Nearest DMV\nNearest Bank\nNearest Warehouse\nNearest City Hall", "Select", "Back");
+            case 4: Dialog_Show(playerid, FindJob, DIALOG_STYLE_LIST, "Find Job", "Trucker\nMechanic\nTaxi Driver\nCargo Unloader\nMiner\nFood Vendor\nPackage Sorter\nArms Dealer\nLumberjack\nHauler\nFarmer", "Select", "Cancel");
+            case 5: Show_Lumber(playerid);
+            case 6: Dealership_GPS(playerid);
+            case 7:
+            {
+                new string[255];
+                format(string, sizeof(string), "#\tName\n");
+                for(new id = 0; id < MAX_WORKSHOP; id++) if(WorkshopData[id][wExists]) {
+                    format(string, sizeof(string), "%s%d\t%s\n", string, id, WorkshopData[id][wName]);
+                }
+                Dialog_Show(playerid, ListWorkshop, DIALOG_STYLE_TABLIST_HEADERS, "GPS Workshop", string, "Select", "Close");
+            }
+            case 9: Dialog_Show(playerid, OtherLocation, DIALOG_STYLE_LIST, "Other Location", "Component Warehouse\nWheels & Hydraulics Shop\nFish Shop\nModshop\nMechanic Center\nSweeper Sidejob\nInsurance Center\nBus Sidejob\nDMV\nRodeo Bank\nAdvertisement Agency\nButcher\nPublic Parking Downtown\nPublic Parking Market\nMoney Transporter Sidejob\nBoxville Sidejob\nTrashmaster\nFarm Warehouse", "Select", "Close");
+            case 10: Dialog_Show(playerid, FindCargo, DIALOG_STYLE_LIST, "Find Cargo (Trucker Only)", "Retail Cargo\nClothes Cargo\nFuel Cargo\nFood Cargo\nFurniture Cargo\nElectronics Cargo\nAmmunation Cargo\nBar Cargo", "Select", "Close");
+        }
+    }
+    return 1;
+}
+
+Dialog:FindCargo(playerid, response, listitem, inputtext[])
+{
+    if(response) {
+        switch(listitem) {
+            case 0: SetPlayerWaypoint(playerid, inputtext, 2354.1101,-2288.1799,17.4219); // Retail Cargo
+            case 1: SetPlayerWaypoint(playerid, inputtext, 2255.5000,-2387.4399,17.4219); // Clothes Cargo
+            case 2: SetPlayerWaypoint(playerid, inputtext, 2719.2700,-2517.8201,17.3672); // Fuel Cargo
+            case 3: SetPlayerWaypoint(playerid, inputtext, 2444.5801,-2548.1599,17.9107); // Food Cargo
+            case 4: SetPlayerWaypoint(playerid, inputtext, 2721.2700,-2380.0400,17.3403); // Furniture Cargo
+            case 5: SetPlayerWaypoint(playerid, inputtext, 2530.7200,-2434.4099,17.8828); // Electronics Cargo
+            case 6: SetPlayerWaypoint(playerid, inputtext, 2734.8364,-2465.6392,13.6484); // Ammunation Cargo
+            case 7: SetPlayerWaypoint(playerid, inputtext, 2699.7881,-2386.3250,13.6328);
+        }
+        SendServerMessage(playerid, "Waypoint %s marked on your map.", inputtext);
+    }
+    return 1;
+}
+Dialog:OtherLocation(playerid, response, listitem, inputtext[])
+{
+    if(response) {
+        switch(listitem) {
+            case 0: SetPlayerWaypoint(playerid, inputtext, 2195.5840,-1972.5920,13.6881);
+            case 1: SetPlayerWaypoint(playerid, inputtext, 1953.6633,-1997.0308,13.5469);
+            case 2: SetPlayerWaypoint(playerid, inputtext, 128.7940,-1813.1044,2.2147);
+            case 3: SetPlayerWaypoint(playerid, inputtext, 2246.1946,-2016.3121,13.5469);
+            case 4: SetPlayerWaypoint(playerid, inputtext, 2427.5293,-2089.8679,13.5469);
+            case 5: SetPlayerWaypoint(playerid, inputtext, 1700.1438,-1543.4144,13.3828); 
+            case 6: SetPlayerWaypoint(playerid, inputtext, 1111.6385,-1795.5822,16.5938);
+            case 7: SetPlayerWaypoint(playerid, inputtext, 1789.9645,-1911.4059,13.5041);
+            case 8: SetPlayerWaypoint(playerid, inputtext, 1081.1970,-1696.7852,13.5469);
+            case 9: SetPlayerWaypoint(playerid, inputtext, 588.4249,-1239.4244,17.82159);
+            case 10: SetPlayerWaypoint(playerid, inputtext, 643.9781,-1357.1801,13.5695);
+            case 11: SetPlayerWaypoint(playerid, inputtext, -384.0056,-1438.9092,26.3203);
+            case 12: SetPlayerWaypoint(playerid, inputtext, 1630.7808,-1139.1279,23.9063);
+            case 13: SetPlayerWaypoint(playerid, inputtext, 1224.6685,-1376.7126,14.9861);
+            case 14: SetPlayerWaypoint(playerid, inputtext, 891.3865,-1208.2157,16.9766);
+            case 15: SetPlayerWaypoint(playerid, inputtext, 1363.1598,-1648.3190,13.3828);
+            case 16: SetPlayerWaypoint(playerid, inputtext, 2286.7566,-1981.7808,13.5699);
+            case 17: SetPlayerWaypoint(playerid, inputtext, -64.8065,-1120.8037,1.0781);
+        }
+        SendServerMessage(playerid, "Waypoint %s marked on your map.", inputtext);
+    }
+    return 1;
+}
+
+Dialog:ListWorkshop(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new id = strval(inputtext);
+        SetPlayerWaypoint(playerid, "Go to workshop", WorkshopData[id][wPos][0], WorkshopData[id][wPos][1], WorkshopData[id][wPos][2]);
+        SendServerMessage(playerid, "Waypoint set to workshop id \"%d\" (marked on radar).", id);
+    }
+    return 1;
+}
+
+Dialog:FindHouse(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new i = ListedHouse[playerid][listitem];
+        SetPlayerWaypoint(playerid, HouseData[i][houseAddress], HouseData[i][housePos][0], HouseData[i][housePos][1], HouseData[i][housePos][2]);
+        SendServerMessage(playerid, "Waypoint set to \"%s\" (marked on radar).", HouseData[i][houseAddress]);
+    }
+    else cmd_gps(playerid, "\1");
+    return 1;
+}
+
+Dialog:FindBusiness(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new header[24],
+            string[1024],
+            count = 0;
+
+        format(header, sizeof(header), "Business type %s", inputtext);
+
+        strcat(string, "Index\tBusiness Name\n");
+        for(new i = 0; i != MAX_BUSINESSES; i++) 
+        {
+            if(BusinessData[i][bizExists] && BusinessData[i][bizType] == (listitem+1))
+            {
+                if(Business_EmployeeDuty(i))
+                {
+                    strcat(string, sprintf("%d\t%s "GREEN"(Active Business)\n", i, BusinessData[i][bizName]));
+                    count++;
+                }
+                else
+                {
+                    strcat(string, sprintf("%d\t%s "RED"(Inactive Business)\n", i, BusinessData[i][bizName]));
+                    count++;                    
+                }
+            }
+        }
+        if ( count ) Dialog_Show(playerid, TrackBusiness, DIALOG_STYLE_TABLIST_HEADERS, header, string, "Track", "Back");
+        else SendErrorMessage(playerid, "Unable to find business with this type."), cmd_gps(playerid, "\1");
+    }
+    else cmd_gps(playerid, "\1");//Dialog_Show(playerid, FindBusiness, DIALOG_STYLE_LIST, "Find Business", "Retail Store\nWeapon Store\nClothing Store\nFast Food\nDealership\nGas Station\nFurniture Store\nElectronic Store", "Submit", "Cancel");
+    return 1;
+}
+
+Dialog:TrackBusiness(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new bizid = strval(inputtext);
+        SetPlayerWaypoint(playerid, BusinessData[bizid][bizName], BusinessData[bizid][bizPos][0], BusinessData[bizid][bizPos][1], BusinessData[bizid][bizPos][2]);
+        SendServerMessage(playerid, "Waypoint set to closest %s (marked on radar).", inputtext);
+    }
+    else cmd_gps(playerid, "\1");
+    return 1;
+}
+
+Dialog:FindEntrance(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new id = GetClosestEntrance(playerid, listitem + 1);
+
+        if(id != -1)
+        {
+            SetPlayerWaypoint(playerid, EntranceData[id][entranceName], EntranceData[id][entrancePos][0], EntranceData[id][entrancePos][1], EntranceData[id][entrancePos][2]);
+            SendServerMessage(playerid, "Waypoint set to %s (marked on radar).", inputtext);
+        }
+        else
+        {
+            SendErrorMessage(playerid, "The GPS was unable to locate any entrance.");
+        }
+    }
+    else cmd_gps(playerid, "\1");
+    return 1;
+}
+
+Dialog:FindJob(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new id = GetClosestJob(playerid, listitem + 1);
+
+        if(id != -1)
+        {
+            static
+                str[32];
+
+            format(str, 32, "%s Job", inputtext);
+
+            SetPlayerWaypoint(playerid, str, JobData[id][jobPos][0], JobData[id][jobPos][1], JobData[id][jobPos][2]);
+            SendServerMessage(playerid, "Waypoint set to %s (marked on radar).", str);
+        }
+        else
+        {
+            SendErrorMessage(playerid, "The GPS was unable to locate any job.");
+        }
+    }
+    else cmd_gps(playerid, "\1");
+    return 1;
+}
+
+Dialog:CustomLocations(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        if(!listitem) {
+            Dialog_Show(playerid, AddLocation, DIALOG_STYLE_INPUT, "Add Location", "Please enter the desired name of the location below:", "Submit", "Cancel");
+        }
+        else
+        {
+            new id = Location_GetID(playerid, inputtext);
+
+            if(id != -1) {
+                PlayerData[playerid][pSelectedSlot] = id;
+
+                Dialog_Show(playerid, LocationInfo, DIALOG_STYLE_LIST, inputtext, "Set Waypoint\nDelete Location", "Select", "Back");
+            }
+        }
+    }
+    else cmd_gps(playerid, "\1");
+    return 1;
+}
+
+Dialog:AddLocation(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        if(isnull(inputtext))
+            return Dialog_Show(playerid, AddLocation, DIALOG_STYLE_INPUT, "Add Location", "Please enter the desired name of the location below:", "Submit", "Cancel");
+
+        if(strlen(inputtext) > 32)
+            return Dialog_Show(playerid, AddLocation, DIALOG_STYLE_INPUT, "Add Location", "Error: The name can't exceed 32 characters.\n\nPlease enter the desired name of the location below:", "Submit", "Cancel");
+
+        static
+            Float:fX,
+            Float:fY,
+            Float:fZ,
+            id = -1;
+
+        if((id = House_Inside(playerid)) != -1) {
+            fX = HouseData[id][housePos][0];
+            fY = HouseData[id][housePos][1];
+            fZ = HouseData[id][housePos][2];
+        }
+        else if((id = Business_Inside(playerid)) != -1) {
+            fX = BusinessData[id][bizPos][0];
+            fY = BusinessData[id][bizPos][1];
+            fZ = BusinessData[id][bizPos][2];
+        }
+        else if((id = Entrance_Inside(playerid)) != -1) {
+            fX = EntranceData[id][entrancePos][0];
+            fY = EntranceData[id][entrancePos][1];
+            fZ = EntranceData[id][entrancePos][2];
+        }
+        else GetPlayerPos(playerid, fX, fY, fZ);
+
+        Location_Add(playerid, inputtext, fX, fY, fZ);
+    }
+    else cmd_gps(playerid, "\1");
+    return 1;
+}
+
+Dialog:LocationInfo(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new id = PlayerData[playerid][pSelectedSlot];
+
+        switch (listitem)
+        {
+            case 0:
+            {
+                SetPlayerWaypoint(playerid, LocationData[playerid][id][locationName], LocationData[playerid][id][locationPos][0], LocationData[playerid][id][locationPos][1], LocationData[playerid][id][locationPos][2]);
+                SendServerMessage(playerid, "Waypoint set to \"%s\" (marked on radar).", LocationData[playerid][id][locationName]);
+            }
+            case 1:
+            {
+                SendServerMessage(playerid, "You have removed \"%s\" from your GPS.", LocationData[playerid][id][locationName]);
+
+                Location_Delete(playerid, LocationData[playerid][id][locationName]);
+                dialog_MainGPS(playerid, 1, 4, "\1");
+            }
+        }
+    }
+    else dialog_MainGPS(playerid, 1, 4, "\1");
+    return 1;
+}
+
+Dialog:Warrants(playerid, response, listitem, inputtext[])
+{
+    if(GetFactionType(playerid) != FACTION_POLICE || IsABike(GetPlayerVehicleID(playerid)) || !IsEngineVehicle(GetPlayerVehicleID(playerid)))
+        return 0;
+
+    if(response)
+    {
+        static
+            name[64],
+            targetid = INVALID_PLAYER_ID;
+
+        strmid(name, inputtext, 0, strfind(inputtext, "(") - 1);
+
+        if((targetid = GetPlayerID(name, 0)) == INVALID_PLAYER_ID)
+            return SendErrorMessage(playerid, "The player is no longer connected.");
+
+        if(PlayerData[targetid][pWarrants] < 1)
+            return SendErrorMessage(playerid, "The player no longer has any warrants.");
+
+        PlayerData[playerid][pMDCPlayer] = targetid;
+
+        format(name, sizeof(name), "MDC: %s", name);
+        Dialog_Show(playerid, WarrantList, DIALOG_STYLE_LIST, name, "Track Player\nClear Warrants", "Select", "Back");
+    }
+    else cmd_mdc(playerid, "\1");
+    return 1;
+}
+
+Dialog:WarrantList(playerid, response, listitem, inputtext[])
+{
+    if(GetFactionType(playerid) != FACTION_POLICE || IsABike(GetPlayerVehicleID(playerid)) || !IsEngineVehicle(GetPlayerVehicleID(playerid)) || PlayerData[playerid][pMDCPlayer] == INVALID_PLAYER_ID)
+        return 0;
+
+    if(response)
+    {
+        switch (listitem)
+        {
+            case 0:
+            {
+                SendServerMessage(playerid, "The MDC Satellite System is now trying to track %s...", ReturnName(PlayerData[playerid][pMDCPlayer], 0));
+                PlayerData[playerid][pTrackTime] = 3;
+            }
+            case 1:
+            {
+                PlayerData[PlayerData[playerid][pMDCPlayer]][pWarrants] = 0;
+
+                SendServerMessage(playerid, "You have cleared %s's warrants.", ReturnName(PlayerData[playerid][pMDCPlayer], 0));
+                SendFactionMessage(PlayerData[playerid][pFaction], COLOR_RADIO, "RADIO: %s has cleared %s's active warrants.", ReturnName(playerid, 0), ReturnName(PlayerData[playerid][pMDCPlayer], 0));
+
+                PlayerData[playerid][pMDCPlayer] = INVALID_PLAYER_ID;
+            }
+        }
+    }
+    else
+    {
+        PlayerData[playerid][pMDCPlayer] = INVALID_PLAYER_ID;
+        dialog_MainMDC(playerid, 1, 0, "\1");
+    }
+    return 1;
+}
+
+Dialog:ChargeName(playerid, response, listitem, inputtext[])
+{
+    if(GetFactionType(playerid) != FACTION_POLICE || IsABike(GetPlayerVehicleID(playerid)) || !IsEngineVehicle(GetPlayerVehicleID(playerid)))
+        return 0;
+
+    if(response)
+    {
+        new targetid;
+
+        if(sscanf(inputtext, "u", targetid))
+            return Dialog_Show(playerid, ChargeName, DIALOG_STYLE_INPUT, "Place Charges", "Error: Please enter a valid user.\n\nPlease enter the name or ID of the player:", "Submit", "Back");
+
+        if(targetid == INVALID_PLAYER_ID)
+            return Dialog_Show(playerid, ChargeName, DIALOG_STYLE_INPUT, "Place Charges", "Error: Invalid user specified.\n\nPlease enter the name or ID of the player:", "Submit", "Back");
+
+        if(PlayerData[targetid][pWarrants] > 14)
+            return Dialog_Show(playerid, ChargeName, DIALOG_STYLE_INPUT, "Place Charges", "Error: The user already has 15 active warrants.\n\nPlease enter the name or ID of the player:", "Submit", "Back");
+
+        PlayerData[playerid][pMDCPlayer] = targetid;
+        Dialog_Show(playerid, PlaceCharge, DIALOG_STYLE_INPUT, "Place Charge", "Please enter the description of the crime committed by %s:", "Submit", "Back", ReturnName(PlayerData[playerid][pMDCPlayer], 0));
+    }
+    else cmd_mdc(playerid, "\1");
+    return 1;
+}
+
+Dialog:PlaceCharge(playerid, response, listitem, inputtext[])
+{
+    if(GetFactionType(playerid) != FACTION_POLICE || IsABike(GetPlayerVehicleID(playerid)) || !IsEngineVehicle(GetPlayerVehicleID(playerid)) || PlayerData[playerid][pMDCPlayer] == INVALID_PLAYER_ID)
+        return 0;
+
+    if(response)
+    {
+        if(isnull(inputtext))
+            return Dialog_Show(playerid, PlaceCharge, DIALOG_STYLE_INPUT, "Place Charge", "Please enter the description of the crime committed by %s:", "Submit", "Back", ReturnName(PlayerData[playerid][pMDCPlayer], 0));
+
+        PlayerData[PlayerData[playerid][pMDCPlayer]][pWarrants]++;
+
+        AddWarrant(PlayerData[playerid][pMDCPlayer], playerid, inputtext);
+        SendFactionMessage(PlayerData[playerid][pFaction], COLOR_RADIO, "RADIO: %s has placed a charge on %s for \"%s\".", ReturnName(playerid, 0), ReturnName(PlayerData[playerid][pMDCPlayer], 0), inputtext);
+
+        cmd_mdc(playerid, "\1");
+    }
+    else
+    {
+        PlayerData[playerid][pMDCPlayer] = INVALID_PLAYER_ID;
+        cmd_mdc(playerid, "\1");
+    }
+    return 1;
+}
+
+Dialog:MainMDC(playerid, response, listitem, inputtext[])
+{
+    if(GetFactionType(playerid) != FACTION_POLICE || IsABike(GetPlayerVehicleID(playerid)) || !IsEngineVehicle(GetPlayerVehicleID(playerid)))
+        return 0;
+
+    if(response)
+    {
+        switch (listitem)
+        {
+            case 0:
+            {
+                static
+                    string[512];
+
+                string[0] = 0;
+
+                foreach (new i : Player) if(PlayerData[i][pWarrants] > 4) {
+                    format(string, sizeof(string), "%s%s (%d warrants)\n", string, ReturnName(i, 0), PlayerData[i][pWarrants]);
+                }
+                if(!strlen(string))
+                    return SendErrorMessage(playerid, "There are no active warrants.");
+
+                Dialog_Show(playerid, Warrants, DIALOG_STYLE_LIST, "Active Warrants", string, "Select", "Back");
+            }
+            case 1: Dialog_Show(playerid, ChargeName, DIALOG_STYLE_INPUT, "Place Charges", "Please enter the ID of the player:", "Submit", "Back");
+            case 2: Dialog_Show(playerid, ViewCharges, DIALOG_STYLE_INPUT, "View Charges", "Please enter the ID of the player:", "Submit", "Back");
+            // case 3: Dialog_Show(playerid, PersonalIdentification, DIALOG_STYLE_INPUT, "Personal Identification", "Please enter the ID of the player:", "Submit", "Back");
+            case 3: Dialog_Show(playerid, LookupList, DIALOG_STYLE_LIST, "MDC Lookup", "Lookup by Name\nLookup By Plate", "Choose", "Back"); //MDCmark
+        }
+    }
+    return 1;
+}
+Dialog:LookupList(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        switch(listitem)
+        {
+            case 0:
+            {
+                Dialog_Show(playerid, OfflineIdentification, DIALOG_STYLE_INPUT, "Personal Identification", "Please enter the name you want to lookup:", "Submit", "Back");
+            }
+            case 1:
+            {
+                Dialog_Show(playerid, PlateIdentification, DIALOG_STYLE_INPUT, "Personal Identification", "Please enter the plate numnber you want to lookup:", "Submit", "Back");
+            }
+            case 2:
+            {
+                Dialog_Show(playerid, SerialIdentification, DIALOG_STYLE_INPUT, "Serial Number Lookup", "Please enter weapon serial number :", "Lookup", "Back");
+            }
+        }
+    }
+    return 1;
+}
+Dialog:PlateIdentification(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        mysql_tquery(g_iHandle, sprintf("SELECT * FROM `characters` LEFT JOIN `server_vehicles` ON characters.ID=server_vehicles.extraid WHERE `plate` = '%s';", SQL_ReturnEscaped(inputtext)), "OfflinePI", "ds", playerid, inputtext);
+    }
+    return 1;
+}
+
+Dialog:SerialIdentification(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new 
+            serial_id[10], 
+            length = strlen(inputtext)
+        ;
+        strmid(serial_id, inputtext, 5, length);
+        mysql_tquery(g_iHandle, sprintf("SELECT * FROM `characters` WHERE `ID`='%d';", strval(serial_id)), "OfflinePI", "ds", playerid, serial_id);
+    }
+    return 1;
+}
+
+Dialog:OfflineIdentification(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        mysql_tquery(g_iHandle, sprintf("SELECT * FROM `characters` WHERE `Character`='%s';", SQL_ReturnEscaped(inputtext)), "OfflinePI", "ds", playerid, inputtext);
+    }
+    return 1;
+}
+
+Dialog:PersonalIdentification(playerid, response, listitem, inputtext[])
+{
+    if(GetFactionType(playerid) != FACTION_POLICE || IsABike(GetPlayerVehicleID(playerid)) || !IsEngineVehicle(GetPlayerVehicleID(playerid)))
+        return 0;
+
+    if(response)
+    {
+        new
+            id,
+            str[1024],
+            query[128],
+            Cache:charges;
+
+        if(sscanf(inputtext, "u", id))
+            return Dialog_Show(playerid, PersonalIdentification, DIALOG_STYLE_INPUT, "Personal Identification", "(error) Invalid player id!\n\nPlease enter the ID of the player:", "Submit", "Back");
+
+        if(id == INVALID_PLAYER_ID)
+            return Dialog_Show(playerid, PersonalIdentification, DIALOG_STYLE_INPUT, "Personal Identification", "(error) Invalid player id!\n\nPlease enter the ID of the player:", "Submit", "Back");
+
+        strcat(str, sprintf("{AAC4E5}I. Personal information\n"WHITE"Personal ID: "YELLOW"SA%09d\n"WHITE"Name: "YELLOW"%s\n", PlayerData[id][pID], ReturnName(id)));
+        strcat(str, sprintf(""WHITE"Phone Number: "YELLOW"%d\n"WHITE"Job: "YELLOW"%s\n", PlayerData[id][pPhone], Job_GetName(PlayerData[playerid][pJob])));
+        if(PlayerData[id][pFaction] != -1) {
+            strcat(str, sprintf(""WHITE"Faction/Family: "YELLOW"%s\n"WHITE"Rank: "YELLOW"%s\n", Faction_GetName(id), Faction_GetRank(id)));
+        }
+        strcat(str, "\n{AAC4E5}II. Licenses"WHITE"\n");
+        //---------------------------
+        if(PlayerData[id][pDrivingLicense])  {
+            if(PlayerData[id][pDrivingLicenseExpired] != 0) strcat(str, sprintf("Driving: ["COL_GREEN"Valid until %s"WHITE"]\n", ConvertTimestamp(Timestamp:PlayerData[id][pDrivingLicenseExpired])));
+            else strcat(str, "Driving: ["COL_RED"Expired"WHITE"]\n");
+        }
+        else strcat(str, "Driving: ["COL_RED"Not Passed"WHITE"]\n");
+
+        if(PlayerData[id][pTruckLicense])  {
+            if(PlayerData[id][pTruckLicenseExpired] != 0) strcat(str, sprintf("Trucker: ["COL_GREEN"Valid until %s"WHITE"]\n", ConvertTimestamp(Timestamp:PlayerData[id][pTruckLicenseExpired])));
+            else strcat(str, "Trucker: ["COL_RED"Expired"WHITE"]\n");
+        }
+        else strcat(str, "Trucker: ["COL_RED"Not Passed"WHITE"]\n");
+
+        if(PlayerData[id][pFirearmLicense])  {
+            if(PlayerData[id][pFirearmLicenseExpired] != 0) strcat(str, sprintf("Firearm: ["COL_GREEN"Valid until %s"WHITE"]\n", ConvertTimestamp(Timestamp:PlayerData[id][pFirearmLicenseExpired])));
+            else strcat(str, "Firearm: ["COL_RED"Expired"WHITE"]\n");
+        }
+        else strcat(str, "Firearm: ["COL_RED"Not Passed"WHITE"]\n");
+
+        if(PlayerData[id][pBusinessLicense])  {
+            if(PlayerData[id][pBusinessLicenseExpired] != 0) strcat(str, sprintf("Business: ["COL_GREEN"Valid until %s"WHITE"]\n", ConvertTimestamp(Timestamp:PlayerData[id][pBusinessLicenseExpired])));
+            else strcat(str, "Business: ["COL_RED"Expired"WHITE"]\n");
+        }
+        else strcat(str, "Business: ["COL_RED"Not Passed"WHITE"]\n");
+
+        if(PlayerData[id][pWorkshopLicense])  {
+            if(PlayerData[id][pWorkshopLicenseExpired] != 0) strcat(str, sprintf("Workshop: ["COL_GREEN"Valid until %s"WHITE"]\n", ConvertTimestamp(Timestamp:PlayerData[id][pWorkshopLicenseExpired])));
+            else strcat(str, "Workshop: ["COL_RED"Expired"WHITE"]\n");
+        }
+        else strcat(str, "Workshop: ["COL_RED"Not Passed"WHITE"]\n");
+
+        if(PlayerData[id][pLumberLicense])  {
+            if(PlayerData[id][pLumberLicenseExpired] != 0) strcat(str, sprintf("Lumber: ["COL_GREEN"Valid until %s"WHITE"]\n", ConvertTimestamp(Timestamp:PlayerData[id][pLumberLicenseExpired])));
+            else strcat(str, "Lumber: ["COL_RED"Expired"WHITE"]\n");
+        }
+        else strcat(str, "Lumber: ["COL_RED"Not Passed"WHITE"]\n");
+
+        if(PlayerData[id][pBLSLicense])  {
+            if(PlayerData[id][pBLSLicenseExpired] != 0) strcat(str, sprintf("BLS Certificate: ["COL_GREEN"Valid until %s"WHITE"]\n", ConvertTimestamp(Timestamp:PlayerData[id][pBLSLicenseExpired])));
+            else strcat(str, "BLS Certificate: ["COL_RED"Expired"WHITE"]\n");
+        }
+        else strcat(str, "BLS Certificate: ["COL_RED"Not Passed"WHITE"]\n");
+
+        strcat(str, "\n{AAC4E5}III. Active Charges\n"WHITE"");
+        mysql_format(g_iHandle, query, sizeof(query), "SELECT * FROM `warrants` WHERE `Arrest` = '0' AND `Suspect` = '%s' ORDER BY `ID` DESC", ReturnName(id));
+        charges = mysql_query(g_iHandle, query);
+
+        if(!cache_num_rows())
+            strcat(str, "None\n");
+
+        for(new i=0; i<cache_num_rows(); i++) {
+            new reason[128],date[64], suspect[24], username[24];
+            cache_get_field_content(i, "Suspect", suspect);
+            cache_get_field_content(i, "Description", reason);
+            cache_get_field_content(i, "Date", date);
+            cache_get_field_content(i, "Username", username);
+            strcat(str, sprintf("%d. {BDF38B}%s\n"WHITE"Issuer: "YELLOW"%s"WHITE" - (%s)\n", i+1, reason, username, date));
+        }
+        cache_delete(charges);
+
+        strcat(str, "\n{AAC4E5}IV. Owned Vehicle"WHITE"\n");
+
+        new count = 0, platenumber[20];
+        foreach(new vehicle : OwnedVehicles<id>)
+        {
+            format(platenumber, sizeof(platenumber), "%s", GetVehicleNumberPlate(VehicleData[vehicle][vehVehicleID]));
+            if(!strcmp(platenumber, "None", true))
+            {
+                continue;
+            }
+            else
+            {
+                strcat(str, sprintf("%d. "CYAN"%s - "YELLOW"P: %s"WHITE"\n", (count + 1), GetVehicleNameByVehicle(VehicleData[vehicle][vehVehicleID]), GetVehicleNumberPlate(VehicleData[vehicle][vehVehicleID])));
+            }
+            count++;
+        }
+
+        if(!count)
+            strcat(str, "None");
+
+        strcat(str, "\n{AAC4E5}V. Unpaid Ticket"WHITE"\n");
+
+        count = 0;
+        for (new i = 0; i < MAX_PLAYER_TICKETS; i ++) if(TicketData[id][i][ticketExists]) {
+            strcat(str, sprintf("%d. {BDF38B}%s "WHITE"(%s - %s)\n", i+1, TicketData[id][i][ticketReason], FormatNumber(TicketData[id][i][ticketFee]), TicketData[id][i][ticketDate]));
+            count++;
+        }
+        if(!count)
+            strcat(str, "None");
+
+        Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_MSGBOX, "Summary", str, "Close", "");
+    }
+    return 1;
+}
+
+Dialog:ViewCharges(playerid, response, listitem, inputtext[])
+{
+    if(GetFactionType(playerid) != FACTION_POLICE || IsABike(GetPlayerVehicleID(playerid)) || !IsEngineVehicle(GetPlayerVehicleID(playerid)))
+        return 0;
+
+    if(response)
+    {
+        if(isnull(inputtext) || strlen(inputtext) > 24)
+            return Dialog_Show(playerid, ViewCharges, DIALOG_STYLE_INPUT, "View Charges", "Please enter the name or ID of the player:", "Submit", "Back");
+
+        if(IsNumeric(inputtext) && IsPlayerConnected(strval(inputtext))) {
+            ViewCharges(playerid, ReturnName(strval(inputtext)));
+        }
+        else if(!IsNumeric(inputtext)) {
+            ViewCharges(playerid, inputtext);
+        }
+        else {
+            Dialog_Show(playerid, ViewCharges, DIALOG_STYLE_INPUT, "View Charges", "Error: Invalid user specified.\n\nPlease enter the name or ID of the player:", "Submit", "Back");
+        }
+    }
+    else cmd_mdc(playerid, "\1");
+    return 1;
+}
+
+Dialog:Locker(playerid, response, listitem, inputtext[])
+{
+    new factionid = PlayerData[playerid][pFaction];
+
+    if(factionid == -1 || !IsNearFactionLocker(playerid))
+        return 0;
+
+    if(response)
+    {
+        new skins[8], string[1024];
+
+        string[0] = 0;
+
+        if(FactionData[factionid][factionType] != FACTION_GANG)
+        {
+            switch (listitem)
+            {
+                case 0:
+                {
+                    if(!PlayerData[playerid][pOnDuty])
+                    {
+                        if(!PlayerData[playerid][pSkinFaction])
+                            return SendErrorMessage(playerid, "Faction skin isn't set. (/flocker > Locker Skins)");
+
+                        if(ReturnWeaponCount(playerid))
+                            return SendErrorMessage(playerid, "Kamu masih memegang senjata milikmu (/weapons), letakkan dirumah atau kendaraan.");
+
+                        PlayerData[playerid][pOnDuty] = true;
+
+                        SetFactionColor(playerid);
+                        SetHealth(playerid, 100);
+                        SetPlayerSkinEx(playerid, PlayerData[playerid][pSkinFaction], 1);
+
+                        if (PlayerData[playerid][pFactionSalaryResettedAt] == 0)
+                        {
+                            PlayerData[playerid][pFactionSalaryResettedAt] = gettime() + (3600 * 24 * 7); // 1 minggu
+                        }
+
+                        if (Player_IsFactionSalaryExceeded(playerid))
+                        {
+                            SendCustomMessage(playerid, "DUTY", "You are now "COL_GREEN"on "WHITE"duty, but you're not receive any salary right now.");
+                        }
+                        else
+                        {
+                            SendCustomMessage(playerid, "DUTY", "You are now "COL_GREEN"on "WHITE"duty.");
+                        }
+                    }
+                    else
+                    {
+                        if(PlayerData[playerid][pTazer]) {
+                            cmd_tazer(playerid, "\1");
+                        }
+
+                        ResetFactionWeapon(playerid);
+                        ResetWeapons(playerid);
+
+                        PlayerData[playerid][pOnDuty] = false;
+                        PlayerData[playerid][pUndercoverDuty] = false;
+                        SetPlayerColor(playerid, DEFAULT_COLOR);
+
+                        SetArmour(playerid, 0.0);
+                        SetPlayerSkinEx(playerid, PlayerData[playerid][pSkin]);
+                        SendCustomMessage(playerid, "DUTY", "You are now "COL_RED"off "WHITE"duty.");
+                    }
+                }
+                case 1:
+                {
+                    if(!PlayerData[playerid][pOnDuty])
+                        return SendErrorMessage(playerid, "You can't take Armored Vest if not in duty");
+
+                    SetArmour(playerid, 100.0);
+                    SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s reaches into the locker and takes out a vest.", ReturnName(playerid, 0));
+                }
+                case 2:
+                {
+                    for (new i = 0; i < sizeof(skins); i ++)
+                        skins[i] = (FactionData[factionid][factionSkins][i]) ? (FactionData[factionid][factionSkins][i]) : (19300);
+
+                    ShowModelSelectionMenu(playerid, "Choose Skin", MODEL_SELECTION_FACTION_SKIN, skins, sizeof(skins), -16.0, 0.0, -55.0);
+                }
+                case 3:
+                {
+                    if(!PlayerData[playerid][pOnDuty])
+                        return SendErrorMessage(playerid, "You can't use this if you're not duty");
+
+                    if(PlayerData[playerid][pScore] < 2)
+                        return SendErrorMessage(playerid, "You're not allowed to accese this locker if you're not level 2.");
+
+                    for (new i = 0; i < 10; i ++)
+                    {
+                        if(FactionData[factionid][factionWeapons][i]) format(string, sizeof(string), "%sWeapon %d: %s\n", string, i + 1, ReturnWeaponName(FactionData[factionid][factionWeapons][i]));
+                        else format(string, sizeof(string), "%sEmpty Slot\n", string);
+                    }
+                    Dialog_Show(playerid, LockerWeapons, DIALOG_STYLE_LIST, "Locker Weapons", string, "Select", "Cancel");
+                }
+                case 4: Dialog_Show(playerid, FactionBank, DIALOG_STYLE_LIST, "Faction Bank", "Check balance\nDeposit money (%s)\nWithdraw money (%s)", "Select", "Close", FormatNumber(GetMoney(playerid)), FormatNumber(FactionData[PlayerData[playerid][pFaction]][factionMoney]));
+                case 5: {
+                    if(PlayerData[playerid][pFactionRank] < FactionData[PlayerData[playerid][pFaction]][factionRanks] - 2)
+                        return SendErrorMessage(playerid, "You can't use this menu.");
+
+                    Vehicle_FactionRespawn(GetPlayerFactionID(playerid));
+                    SendAdminMessage(X11_TOMATO_1, "AdmWarn: %s respawned all unused vehicle for faction id %d", ReturnName(playerid,0), PlayerData[playerid][pFaction]);
+                    SendFactionMessage(PlayerData[playerid][pFaction], COLOR_CLIENT, "FACTIONCARS: "YELLOW"%s "WHITE"now is respawned all unused vehicle on this faction.", ReturnName(playerid, 0));
+                }
+                case 6:
+                {
+                    if(!PlayerData[playerid][pOnDuty])
+                        return SendErrorMessage(playerid, "You can't use this if you're not duty");
+
+                    Dialog_Show(playerid, undercoverSkin, DIALOG_STYLE_INPUT, "Undercover Skin","Input Skin ID Number :", "Take", "Cancel");
+                }
+                case 7:
+                {
+                    if(!PlayerData[playerid][pOnDuty])
+                        return SendErrorMessage(playerid, "You can't use this if you're not duty");
+
+                    Dialog_Show(playerid, customSkin, DIALOG_STYLE_INPUT, "Custom Skin","ID 20022 - 20056, 20070 - 20074\n\nInput Skin ID Number :", "Take", "Cancel");
+                }
+            }
+        }
+        else
+        {
+            if(FactionData[factionid][factionType] == FACTION_GANG)
+            {
+                switch (listitem)
+                {
+                    case 0:
+                    {
+                        if(PlayerData[playerid][pScore] < 2) return SendErrorMessage(playerid, "You're not allowed to accese this locker if you're not level 2.");
+                        if(PlayerData[playerid][pFactionRank] < 2) return SendErrorMessage(playerid, "Level 1 family can'taccese this weapon locker.");
+
+                        for (new i = 0; i < 10; i ++)
+                        {
+                            if(FactionData[factionid][factionWeapons][i] && GetFactionType(playerid) != FACTION_GANG)
+                                format(string, sizeof(string), "%sWeapon %d: %s\n", string, i + 1, ReturnWeaponName(FactionData[factionid][factionWeapons][i]));
+
+                            else if(FactionData[factionid][factionWeapons][i] && GetFactionType(playerid) == FACTION_GANG)
+                                format(string, sizeof(string), "%s#%d: %s ("YELLOW"ammo: %d"WHITE") ("GREEN"durability: %d"WHITE")\n", string, i + 1, ReturnWeaponName(FactionData[factionid][factionWeapons][i]), FactionData[factionid][factionAmmo][i], FactionData[factionid][factionDurability][i]);
+
+                            else format(string, sizeof(string), "%sEmpty Slot\n", string);
+                        }
+                        Dialog_Show(playerid, LockerWeapons, DIALOG_STYLE_LIST, "Locker Weapons", string, "Select", "Cancel");
+                    }
+                    case 1: Dialog_Show(playerid, FactionBank, DIALOG_STYLE_LIST, "Faction Bank", "Check balance\nDeposit money (%s)\nWithdraw money (%s)", "Select", "Close", FormatNumber(GetMoney(playerid)), FormatNumber(FactionData[PlayerData[playerid][pFaction]][factionMoney]));
+                    case 2: {
+                        if(PlayerData[playerid][pFactionRank] < FactionData[PlayerData[playerid][pFaction]][factionRanks] - 2)
+                            return SendErrorMessage(playerid, "You can't use this menu.");
+
+                        Vehicle_FactionRespawn(GetPlayerFactionID(playerid));
+                        SendAdminMessage(X11_TOMATO_1, "AdmWarn: %s respawned all unused vehicle for faction id %d", ReturnName(playerid,0), PlayerData[playerid][pFaction]);
+                        SendFactionMessage(PlayerData[playerid][pFaction], COLOR_CLIENT, "FACTIONCARS: "WHITE""COL_RED"%s "WHITE"now is respawned all unused vehicle on this faction.", ReturnName(playerid, 0));
+                    }
+                }
+            }
+            else if(FactionData[factionid][factionType] == FACTION_LEGAL)
+            {
+                switch (listitem)
+                {
+                    case 0: Dialog_Show(playerid, FactionBank, DIALOG_STYLE_LIST, "Faction Bank", "Check balance\nDeposit money (%s)\nWithdraw money (%s)", "Select", "Close", FormatNumber(GetMoney(playerid)), FormatNumber(FactionData[PlayerData[playerid][pFaction]][factionMoney]));
+                    case 1: {
+                        if(PlayerData[playerid][pFactionRank] < FactionData[PlayerData[playerid][pFaction]][factionRanks] - 2)
+                            return SendErrorMessage(playerid, "You can't use this menu.");
+
+                        Vehicle_FactionRespawn(GetPlayerFactionID(playerid));
+                        SendAdminMessage(X11_TOMATO_1, "AdmWarn: %s respawned all unused vehicle for faction id %d", ReturnName(playerid,0), PlayerData[playerid][pFaction]);
+                        SendFactionMessage(PlayerData[playerid][pFaction], COLOR_CLIENT, "FACTIONCARS: "WHITE""COL_RED"%s "WHITE"now is respawned all unused vehicle on this faction.", ReturnName(playerid, 0));
+                    }
+                }
+            }
+        }
+    }
+    return 1;
+}
+
+Dialog:FactionBank(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new id = PlayerData[playerid][pFaction];
+        switch(listitem)
+        {
+            case 0:
+            {
+                Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_MSGBOX, "Faction Bank", ""WHITE"Faction bank status\n\nFaction bank of: %s\n"WHITE"Current money on bank faction: "COL_GREEN"%s\n"WHITE"Last deposit: "YELLOW"%s "WHITE"for "COL_GREEN"%s\n"WHITE"Last withdrawn: "YELLOW"%s "WHITE"for "COL_RED"-%s", "Close", "", FactionData[id][factionName], FormatNumber(FactionData[id][factionMoney]), FactionData[id][factionDeposit], FormatNumber(FactionData[id][factionDepositMoney]), FactionData[id][factionWithdraw], FormatNumber(FactionData[id][factionWithdrawMoney]));
+            }
+            case 1:
+            {
+                Dialog_Show(playerid, DepositFaction, DIALOG_STYLE_INPUT, "Deposit For Faction Bank", "Bank of faction: %s\nYour money: %s\n\nHow much money you have to added to bank account?.", "Deposit", "Close", FactionData[id][factionName], FormatNumber(GetMoney(playerid)));
+            }
+            case 2:
+            {
+                if(PlayerData[playerid][pFactionRank] < FactionData[id][factionRanks] - 1)
+                    return SendErrorMessage(playerid, "You must be at least rank %d.", FactionData[id][factionRanks] - 1);
+
+                Dialog_Show(playerid, WithdrawFaction, DIALOG_STYLE_INPUT, "Withdraw Faction Bank", "Bank of faction: %s\nCurrent Balance: %s\n\nHow much money you want to withdraw?.", "Withdraw", "Close", FactionData[id][factionName], FormatNumber(FactionData[id][factionMoney]));
+            }
+        }
+    }
+    return 1;
+}
+
+Dialog:WithdrawFaction(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new id = PlayerData[playerid][pFaction];
+
+        if(strval(inputtext) < 1)
+            return SendErrorMessage(playerid, "You can't withdraw money under $0.");
+
+        if(strval(inputtext) > FactionData[id][factionMoney])
+            return SendErrorMessage(playerid, "Uang di bank faction tidak mencukupi.");
+
+        FactionData[id][factionMoney] -= strval(inputtext);
+        FactionData[id][factionWithdrawMoney] = strval(inputtext);
+        GiveMoney(playerid, strval(inputtext));
+        format(FactionData[id][factionWithdraw], MAX_PLAYER_NAME, NormalName(playerid));
+        SendCustomMessage(playerid, "BANK FACTION", "Anda telah mengambil "YELLOW"%s "WHITE"dari bank faction. bank faction sekarang tersisa "COL_GREEN"%s", FormatNumber(strval(inputtext)), FormatNumber(FactionData[id][factionMoney]));
+        Log_Save(E_LOG_WITHDRAW, sprintf("[%s] %s withdrawn %s for %s.", ReturnDate(), ReturnName2(playerid, 0), FormatNumber(strval(inputtext)), FactionData[id][factionName]));
+        Faction_Save(id);
+    }
+    return 1;
+}
+
+Dialog:DepositFaction(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new
+            id = PlayerData[playerid][pFaction]
+        ;
+        if(strval(inputtext) < 1)
+            return SendErrorMessage(playerid, "You can't deposit money under $0.");
+
+        if(GetMoney(playerid) < strval(inputtext))
+            return SendErrorMessage(playerid, "You don't have enough money.");
+
+        FactionData[id][factionMoney] += strval(inputtext);
+        FactionData[id][factionDepositMoney] = strval(inputtext);
+
+        GiveMoney(playerid, -strval(inputtext));
+        format(FactionData[id][factionDeposit], MAX_PLAYER_NAME, NormalName(playerid));
+
+        SendCustomMessage(playerid, "BANK FACTION", "Anda telah menyimpan "GREEN"%s"WHITE" dalam bank faction "YELLOW"(total: %d).", FormatNumber(strval(inputtext)), FormatNumber(FactionData[id][factionMoney]));
+
+        Faction_Save(id);
+    }
+    return 1;
+}
+
+Dialog:LockerWeapons(playerid, response, listitem, inputtext[])
+{
+    new factionid = PlayerData[playerid][pFaction];
+
+    if(factionid == -1 || !IsNearFactionLocker(playerid))
+        return 0;
+
+    if(response)
+    {
+        new
+            weaponid = FactionData[factionid][factionWeapons][listitem],
+            ammo = FactionData[factionid][factionAmmo][listitem],
+            durability = FactionData[factionid][factionDurability][listitem],
+            rank = FactionData[factionid][factionGunRank][listitem];
+
+        new serial[128];
+        valstr(serial, FactionData[factionid][factionSerial][listitem]);
+
+        if(weaponid)
+        {
+            if(GetFactionType(playerid) == FACTION_GANG)
+            {
+                if(PlayerHasWeaponInSlot(playerid, weaponid))
+                    return SendErrorMessage(playerid, "Kamu memiliki senjata dislot yang sama, simpan terlebih dahulu.");
+
+                if(PlayerData[playerid][pFactionRank] < rank)
+                    return SendErrorMessage(playerid, "Rank kamu tidak cukup untuk mengambil senjata dari locker.");
+
+                GivePlayerWeaponEx(playerid, weaponid, ammo, durability, serial);
+
+                FactionData[factionid][factionWeapons][listitem] = 0;
+                FactionData[factionid][factionAmmo][listitem] = 0;
+                FactionData[factionid][factionDurability][listitem] = 0;
+                FactionData[factionid][factionSerial][listitem] = 0;
+
+                Faction_Save(factionid);
+            }
+            else
+            {
+                if(PlayerData[playerid][pFactionRank] < rank)
+                    return SendErrorMessage(playerid, "Rank belum tercapai untuk menggunakan senjata ini.");
+
+                // if(ReturnWeaponCount(playerid))
+                //     return SendErrorMessage(playerid, "Kamu masih memegang senjata milikmu (/weapons), letakkan dirumah atau kendaraan.");
+
+                GiveFactionWeapon(playerid, weaponid, ammo); //Temporary
+            }
+            SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s reaches inside the locker and equips a %s.", ReturnName(playerid, 0), ReturnWeaponName(weaponid));
+        }
+        else
+        {
+            if(GetFactionType(playerid) == FACTION_GANG)
+            {
+                if((weaponid = GetWeapon(playerid)) == 0)
+                    return SendErrorMessage(playerid, "You are not holding any weapon.");
+
+                FactionData[factionid][factionWeapons][listitem]    = weaponid;
+                FactionData[factionid][factionAmmo][listitem]       = ReturnWeaponAmmo(playerid, weaponid);
+                FactionData[factionid][factionDurability][listitem] = ReturnWeaponDurability(playerid, weaponid);
+
+                new slot = g_aWeaponSlots[weaponid];
+                FactionData[factionid][factionSerial][listitem] = strval(PlayerGuns[playerid][slot][weapon_serial]);
+
+                Faction_Save(factionid);
+
+                ResetWeaponID(playerid, weaponid);
+                SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s takes out a %s and stores it in the locker.", ReturnName(playerid, 0), ReturnWeaponName(weaponid));
+            }
+            else SendErrorMessage(playerid, "The selected weapon slot is empty.");
+        }
+    }
+    else cmd_flocker(playerid, "\1");
+    return 1;
+}
+
+Dialog:FactionLocker(playerid, response, listitem, inputtext[])
+{
+    if(PlayerData[playerid][pFactionEdit] == -1)
+        return 0;
+
+    if(response)
+    {
+        switch (listitem)
+        {
+            case 0:
+            {
+                static
+                    Float:x,
+                    Float:y,
+                    Float:z;
+
+                GetPlayerPos(playerid, x, y, z);
+
+                FactionData[PlayerData[playerid][pFactionEdit]][factionLockerPos][0] = x;
+                FactionData[PlayerData[playerid][pFactionEdit]][factionLockerPos][1] = y;
+                FactionData[PlayerData[playerid][pFactionEdit]][factionLockerPos][2] = z;
+
+                FactionData[PlayerData[playerid][pFactionEdit]][factionLockerInt] = GetPlayerInterior(playerid);
+                FactionData[PlayerData[playerid][pFactionEdit]][factionLockerWorld] = GetPlayerVirtualWorld(playerid);
+
+                Faction_Refresh(PlayerData[playerid][pFactionEdit]);
+                Faction_Save(PlayerData[playerid][pFactionEdit]);
+                SendServerMessage(playerid, "You have adjusted the locker position of faction ID: %d.", PlayerData[playerid][pFactionEdit]);
+            }
+            case 1:
+            {
+                static
+                    string[512];
+
+                string[0] = 0;
+
+                for (new i = 0; i < 10; i ++)
+                {
+                    if(FactionData[PlayerData[playerid][pFactionEdit]][factionWeapons][i]) format(string, sizeof(string), "%sWeapon %d: %s\n", string, i + 1, ReturnWeaponName(FactionData[PlayerData[playerid][pFactionEdit]][factionWeapons][i]));
+                    else format(string, sizeof(string), "%sEmpty Slot\n", string);
+                }
+                Dialog_Show(playerid, FactionWeapons, DIALOG_STYLE_LIST, "Locker Weapons", string, "Select", "Cancel");
+            }
+        }
+    }
+    return 1;
+}
+
+Dialog:FactionWeapons(playerid, response, listitem, inputtext[])
+{
+    if(PlayerData[playerid][pFactionEdit] == -1)
+        return 0;
+
+    if(response)
+    {
+        PlayerData[playerid][pSelectedSlot] = listitem;
+        Dialog_Show(playerid, FactionWeapon, DIALOG_STYLE_LIST, "Edit Weapon", "Set Weapon (%d)\nSet Ammunition (%d)\nSet Rank (%d)\nClear Slot", "Select", "Cancel", FactionData[PlayerData[playerid][pFactionEdit]][factionWeapons][PlayerData[playerid][pSelectedSlot]], FactionData[PlayerData[playerid][pFactionEdit]][factionAmmo][PlayerData[playerid][pSelectedSlot]], FactionData[PlayerData[playerid][pFactionEdit]][factionGunRank][PlayerData[playerid][pSelectedSlot]]);
+    }
+    return 1;
+}
+
+Dialog:FactionWeapon(playerid, response, listitem, inputtext[])
+{
+    if(PlayerData[playerid][pFactionEdit] == -1)
+        return 0;
+
+    if(response)
+    {
+        switch (listitem)
+        {
+            case 0: Dialog_Show(playerid, FactionWeaponID, DIALOG_STYLE_INPUT, "Set Weapon", "Current Weapon: %s (%d)\n\nPlease enter the new weapon ID for slot %d:", "Submit", "Cancel", ReturnWeaponName(FactionData[PlayerData[playerid][pFactionEdit]][factionWeapons][PlayerData[playerid][pSelectedSlot]]), FactionData[PlayerData[playerid][pFactionEdit]][factionWeapons][PlayerData[playerid][pSelectedSlot]], PlayerData[playerid][pSelectedSlot]);
+            case 1: Dialog_Show(playerid, FactionWeaponAmmo, DIALOG_STYLE_INPUT, "Set Ammunition", "Current Ammo: %d\n\nPlease enter the new ammunition for the weapon in slot %d:", "Submit", "Cancel", FactionData[PlayerData[playerid][pFactionEdit]][factionAmmo][PlayerData[playerid][pSelectedSlot]], PlayerData[playerid][pSelectedSlot]);
+            case 2: Dialog_Show(playerid, FactionWeaponRank, DIALOG_STYLE_INPUT, "Set Rank", "Current Rank: %d\n\nPlease enter the new rank for the weapon in slot %d:", "Submit", "Cancel", FactionData[PlayerData[playerid][pFactionEdit]][factionGunRank][PlayerData[playerid][pSelectedSlot]], PlayerData[playerid][pSelectedSlot]);
+            case 3:
+            {
+                FactionData[PlayerData[playerid][pFactionEdit]][factionWeapons][PlayerData[playerid][pSelectedSlot]] = 0;
+                FactionData[PlayerData[playerid][pFactionEdit]][factionAmmo][PlayerData[playerid][pSelectedSlot]] = 0;
+
+                Faction_Save(PlayerData[playerid][pFactionEdit]);
+
+                dialog_FactionLocker(playerid, 1, 1, "\1");
+                SendServerMessage(playerid, "You have removed the weapon in slot %d.", PlayerData[playerid][pSelectedSlot] + 1);
+            }
+        }
+    }
+    else {
+        dialog_FactionLocker(playerid, 1, 1, "\1");
+    }
+    return 1;
+}
+
+Dialog:FactionWeaponID(playerid, response, listitem, inputtext[])
+{
+    if(PlayerData[playerid][pFactionEdit] == -1)
+        return 0;
+
+    if(response)
+    {
+        new weaponid = strval(inputtext);
+
+        if(isnull(inputtext))
+            return Dialog_Show(playerid, FactionWeaponID, DIALOG_STYLE_INPUT, "Set Weapon", "Current Weapon: %s (%d)\n\nPlease enter the new weapon ID for slot %d:", "Submit", "Cancel", ReturnWeaponName(FactionData[PlayerData[playerid][pFactionEdit]][factionWeapons][PlayerData[playerid][pSelectedSlot]]), FactionData[PlayerData[playerid][pFactionEdit]][factionWeapons][PlayerData[playerid][pSelectedSlot]], PlayerData[playerid][pSelectedSlot]);
+
+        if(weaponid < 0 || weaponid > 46)
+            return Dialog_Show(playerid, FactionWeaponID, DIALOG_STYLE_INPUT, "Set Weapon", "Error: The weapon ID can't be below 0 or above 46.\n\nCurrent Weapon: %s (%d)\n\nPlease enter the new weapon ID for slot %d:", "Submit", "Cancel", ReturnWeaponName(FactionData[PlayerData[playerid][pFactionEdit]][factionWeapons][PlayerData[playerid][pSelectedSlot]]), FactionData[PlayerData[playerid][pFactionEdit]][factionWeapons][PlayerData[playerid][pSelectedSlot]], PlayerData[playerid][pSelectedSlot]);
+
+        FactionData[PlayerData[playerid][pFactionEdit]][factionWeapons][PlayerData[playerid][pSelectedSlot]] = weaponid;
+        Faction_Save(PlayerData[playerid][pFactionEdit]);
+
+        Dialog_Show(playerid, FactionWeapon, DIALOG_STYLE_LIST, "Edit Weapon", "Set Weapon (%d)\nSet Ammunition (%d)\nSet Rank (%d)\nClear Slot", "Select", "Cancel", FactionData[PlayerData[playerid][pFactionEdit]][factionWeapons][PlayerData[playerid][pSelectedSlot]], FactionData[PlayerData[playerid][pFactionEdit]][factionAmmo][PlayerData[playerid][pSelectedSlot]], FactionData[PlayerData[playerid][pFactionEdit]][factionGunRank][PlayerData[playerid][pSelectedSlot]]);
+
+        if(weaponid) {
+            SendServerMessage(playerid, "You have set the weapon in slot %d to %s.", PlayerData[playerid][pSelectedSlot] + 1, ReturnWeaponName(weaponid));
+        }
+        else {
+            SendServerMessage(playerid, "You have removed the weapon in slot %d.", PlayerData[playerid][pSelectedSlot] + 1);
+        }
+    }
+    return 1;
+}
+
+Dialog:FactionWeaponRank(playerid, response, listitem, inputtext[])
+{
+    if(PlayerData[playerid][pFactionEdit] == -1)
+        return 0;
+
+    if(response)
+    {
+        new rank = strval(inputtext);
+
+        if(isnull(inputtext))
+            return Dialog_Show(playerid, FactionWeaponRank, DIALOG_STYLE_INPUT, "Set Rank", "Current Rank: %d\n\nPlease enter the new rank for the weapon in slot %d:", "Submit", "Cancel", FactionData[PlayerData[playerid][pFactionEdit]][factionGunRank][PlayerData[playerid][pSelectedSlot]], PlayerData[playerid][pSelectedSlot]);
+
+        if(rank < 1 || rank > FactionData[PlayerData[playerid][pFactionEdit]][factionRanks])
+            return Dialog_Show(playerid, FactionWeaponRank, DIALOG_STYLE_INPUT, "Set Rank", "Error: The rank can't be below 1 or above %d.\n\nCurrent Rank: %d\n\nPlease enter the new rank for the weapon in slot %d:", "Submit", "Cancel", FactionData[PlayerData[playerid][pFactionEdit]][factionRanks], FactionData[PlayerData[playerid][pFactionEdit]][factionGunRank][PlayerData[playerid][pSelectedSlot]], PlayerData[playerid][pSelectedSlot]);
+
+        FactionData[PlayerData[playerid][pFactionEdit]][factionGunRank][PlayerData[playerid][pSelectedSlot]] = rank;
+        Faction_Save(PlayerData[playerid][pFactionEdit]);
+
+        Dialog_Show(playerid, FactionWeapon, DIALOG_STYLE_LIST, "Edit Weapon", "Set Weapon (%d)\nSet Ammunition (%d)\nSet Rank (%d)\nClear Slot", "Select", "Cancel", FactionData[PlayerData[playerid][pFactionEdit]][factionWeapons][PlayerData[playerid][pSelectedSlot]], FactionData[PlayerData[playerid][pFactionEdit]][factionAmmo][PlayerData[playerid][pSelectedSlot]], FactionData[PlayerData[playerid][pFactionEdit]][factionGunRank][PlayerData[playerid][pSelectedSlot]]);
+        SendServerMessage(playerid, "You have set the rank in slot %d to %d.", PlayerData[playerid][pSelectedSlot] + 1, rank);
+    }
+    return 1;
+}
+
+Dialog:FactionWeaponAmmo(playerid, response, listitem, inputtext[])
+{
+    if(PlayerData[playerid][pFactionEdit] == -1)
+        return 0;
+
+    if(response)
+    {
+        new ammo = strval(inputtext);
+
+        if(isnull(inputtext))
+            return Dialog_Show(playerid, FactionWeaponAmmo, DIALOG_STYLE_INPUT, "Set Ammunition", "Current Ammo: %d\n\nPlease enter the new ammunition for the weapon in slot %d:", "Submit", "Cancel", FactionData[PlayerData[playerid][pFactionEdit]][factionAmmo][PlayerData[playerid][pSelectedSlot]], PlayerData[playerid][pSelectedSlot]);
+
+        if(ammo < 1 || ammo > 15000)
+            return Dialog_Show(playerid, FactionWeaponAmmo, DIALOG_STYLE_INPUT, "Set Ammunition", "Error: The ammo can't be below 1 or above 15,000.\n\nCurrent Ammo: %d\n\nPlease enter the new ammunition for the weapon in slot %d:", "Submit", "Cancel", FactionData[PlayerData[playerid][pFactionEdit]][factionAmmo][PlayerData[playerid][pSelectedSlot]], PlayerData[playerid][pSelectedSlot]);
+
+        FactionData[PlayerData[playerid][pFactionEdit]][factionAmmo][PlayerData[playerid][pSelectedSlot]] = ammo;
+        Faction_Save(PlayerData[playerid][pFactionEdit]);
+
+        Dialog_Show(playerid, FactionWeapon, DIALOG_STYLE_LIST, "Edit Weapon", "Set Weapon (%d)\nSet Ammunition (%d)\nSet Rank (%d)\nClear Slot", "Select", "Cancel", FactionData[PlayerData[playerid][pFactionEdit]][factionWeapons][PlayerData[playerid][pSelectedSlot]], FactionData[PlayerData[playerid][pFactionEdit]][factionAmmo][PlayerData[playerid][pSelectedSlot]], FactionData[PlayerData[playerid][pFactionEdit]][factionGunRank][PlayerData[playerid][pSelectedSlot]]);
+        SendServerMessage(playerid, "You have set the ammunition in slot %d to %d.", PlayerData[playerid][pSelectedSlot] + 1, ammo);
+    }
+    return 1;
+}
+
+Dialog:FactionSkin(playerid, response, listitem, inputtext[])
+{
+    if(PlayerData[playerid][pFactionEdit] == -1)
+        return 0;
+
+    if(response)
+    {
+        static
+            skins[311];
+
+        switch (listitem)
+        {
+            case 0:
+                Dialog_Show(playerid, FactionModel, DIALOG_STYLE_INPUT, "Add by Model ID", "Please enter the model ID of the skin below (0-311):", "Add", "Cancel");
+
+            case 1:
+            {
+                for (new i = 0; i < sizeof(skins); i ++)
+                    skins[i] = i + 1;
+
+                ShowModelSelectionMenu(playerid, "Add Skin", MODEL_SELECTION_ADD_SKIN, skins, sizeof(skins), -16.0, 0.0, -55.0);
+            }
+            case 2:
+            {
+                FactionData[PlayerData[playerid][pFactionEdit]][factionSkins][PlayerData[playerid][pSelectedSlot]] = 0;
+
+                Faction_Save(PlayerData[playerid][pFactionEdit]);
+                SendServerMessage(playerid, "You have removed the skin ID in slot %d.", PlayerData[playerid][pSelectedSlot] + 1);
+            }
+        }
+    }
+    return 1;
+}
+IsNormalSkin(skinid)
+{
+    if(skinid >= 1 && skinid <= 311)
+    {
+        return 1;
+    }
+    return 0;
+}
+IsCustomSkin(skinid)
+{
+    if(skinid >= 20001 && skinid <= 20074)
+    {
+        return 1;
+    }
+    return 0;
+}
+Dialog:FactionModel(playerid, response, listitem, inputtext[])
+{
+    if(PlayerData[playerid][pFactionEdit] == -1)
+        return 0;
+
+    if(response)
+    {
+        new skin = strval(inputtext);
+
+        if(isnull(inputtext))
+            return Dialog_Show(playerid, FactionModel, DIALOG_STYLE_INPUT, "Add by Model ID", "Please enter the model ID of the skin below (0-311):", "Add", "Cancel");
+
+        // if(skin < 0 || skin > 311)
+        //     return Dialog_Show(playerid, FactionModel, DIALOG_STYLE_INPUT, "Add by Model ID", "Error: The skin ID can't be below 0 or above 311.\n\nPlease enter the model ID of the skin below (0-309):", "Add", "Cancel");
+
+        if(IsNormalSkin(skin) || IsCustomSkin(skin))
+        {
+            FactionData[PlayerData[playerid][pFactionEdit]][factionSkins][PlayerData[playerid][pSelectedSlot]] = skin;
+            Faction_Save(PlayerData[playerid][pFactionEdit]);
+
+            if(skin) {
+                SendServerMessage(playerid, "You have set the skin ID in slot %d to %d.", PlayerData[playerid][pSelectedSlot] + 1, skin);
+            }
+            else {
+                SendServerMessage(playerid, "You have removed the skin ID in slot %d.", PlayerData[playerid][pSelectedSlot] + 1);
+            }
+        }
+        else Dialog_Show(playerid, FactionModel, DIALOG_STYLE_INPUT, "Add by Model ID", "Error: The skin ID can't be below 0 or above 311 || 20001 or above 20056.\n\nPlease enter the model ID of the skin below (0-309):", "Add", "Cancel");
+    }
+    return 1;
+}
+
+Dialog:Crates(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        if(PlayerData[playerid][pCarryCrate] != -1)
+            return SendErrorMessage(playerid, "You are already carrying a crate.");
+
+        new id = strfind(inputtext, "#");
+
+        if(id != -1) {
+            id = strval(inputtext[id + 1]);
+
+            CrateData[id][crateVehicle] = INVALID_VEHICLE_ID;
+            PlayerData[playerid][pCarryCrate] = id;
+
+            SetPlayerAttachedObject(playerid, JOB_SLOT, 964, 1, -0.157020, 0.413313, 0.000000, 0.000000, 88.000000, 180.000000, 0.500000, 0.500000, 0.500000);
+            SetPlayerSpecialAction(playerid, SPECIAL_ACTION_CARRY);
+
+            SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s takes a crate out of the vehicle.", ReturnName(playerid, 0));
+            SendServerMessage(playerid, "You have taken a %s crate out of the vehicle.", Crate_GetType(CrateData[id][crateType]));
+        }
+    }
+    return 1;
+}
+
+Dialog:EnterNumber(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        static
+            name[32],
+            string[128];
+
+        strunpack(name, PlayerData[playerid][pEditingItem]);
+
+        if(isnull(inputtext) || !IsNumeric(inputtext))
+            return Dialog_Show(playerid, EnterNumber, DIALOG_STYLE_INPUT, "Contact Number", "Contact Name: %s\n\nPlease enter the phone number for this contact:", "Submit", "Back", name);
+
+        for (new i = 0; i != MAX_CONTACTS; i ++)
+        {
+            if(!ContactData[playerid][i][contactExists])
+            {
+                ContactData[playerid][i][contactExists] = true;
+                ContactData[playerid][i][contactNumber] = strval(inputtext);
+
+                format(ContactData[playerid][i][contactName], 32, name);
+
+                format(string, sizeof(string), "INSERT INTO `contacts` (`ID`, `contactName`, `contactNumber`) VALUES('%d', '%s', '%d')", PlayerData[playerid][pID], SQL_ReturnEscaped(name), ContactData[playerid][i][contactNumber]);
+                mysql_tquery(g_iHandle, string, "OnContactAdd", "dd", playerid, i);
+
+                SendServerMessage(playerid, "You have added \"%s\" to your contacts.", name);
+                return cmd_phone(playerid, "");
+            }
+        }
+        SendErrorMessage(playerid, "There is no room left for anymore contacts.");
+    }
+    else {
+        ShowContacts(playerid);
+    }
+    return 1;
+}
+
+Dialog:NewContact(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        if(isnull(inputtext))
+            return Dialog_Show(playerid, NewContact, DIALOG_STYLE_INPUT, "New Contact", "Error: Please enter a contact name.\n\nPlease enter the name of the contact below:", "Submit", "Back");
+
+        if(strlen(inputtext) > 32)
+            return Dialog_Show(playerid, NewContact, DIALOG_STYLE_INPUT, "New Contact", "Error: The contact name can't exceed 32 characters.\n\nPlease enter the name of the contact below:", "Submit", "Back");
+
+        strpack(PlayerData[playerid][pEditingItem], inputtext, 32);
+
+        Dialog_Show(playerid, EnterNumber, DIALOG_STYLE_INPUT, "Contact Number", "Contact Name: %s\n\nPlease enter the phone number for this contact:", "Submit", "Back", inputtext);
+    }
+    else {
+        ShowContacts(playerid);
+    }
+    return 1;
+}
+
+Dialog:ContactInfo(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new
+            id = PlayerData[playerid][pContact],
+            string[72];
+
+        switch (listitem)
+        {
+            case 0:
+            {
+                format(string, 16, "%d", ContactData[playerid][id][contactNumber]);
+                cmd_call(playerid, string);
+            }
+            case 1:
+            {
+                format(string, sizeof(string), "DELETE FROM `contacts` WHERE `ID` = '%d' AND `contactID` = '%d'", PlayerData[playerid][pID], ContactData[playerid][id][contactID]);
+                mysql_tquery(g_iHandle, string);
+
+                SendServerMessage(playerid, "You have deleted \"%s\" from your contacts.", ContactData[playerid][id][contactName]);
+
+                ContactData[playerid][id][contactExists] = false;
+                ContactData[playerid][id][contactNumber] = 0;
+                ContactData[playerid][id][contactID] = 0;
+
+                ShowContacts(playerid);
+            }
+        }
+    }
+    else {
+        ShowContacts(playerid);
+    }
+    return 1;
+}
+
+Dialog:Contacts(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        if(!listitem) {
+            Dialog_Show(playerid, NewContact, DIALOG_STYLE_INPUT, "New Contact", "Please enter the name of the contact below:", "Submit", "Back");
+        }
+        else {
+            PlayerData[playerid][pContact] = ListedContacts[playerid][listitem - 1];
+
+            Dialog_Show(playerid, ContactInfo, DIALOG_STYLE_LIST, ContactData[playerid][PlayerData[playerid][pContact]][contactName], "Call Contact\nDelete Contact", "Select", "Back");
+        }
+    }
+    // else {
+    //     cmd_phone(playerid, "\1");
+    // }
+    for (new i = 0; i != MAX_CONTACTS; i ++) {
+        ListedContacts[playerid][i] = -1;
+    }
+    return 1;
+}
+
+Dialog:DialNumber(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new
+            string[16];
+
+        if(isnull(inputtext) || !IsNumeric(inputtext))
+            return Dialog_Show(playerid, DialNumber, DIALOG_STYLE_INPUT, "Dial Number", "Please enter the number that you wish to dial below:", "Dial", "Back");
+
+        format(string, 16, "%d", strval(inputtext));
+        cmd_call(playerid, string);
+    }
+    // else {
+    //     cmd_phone(playerid, "\1");
+    // }
+    return 1;
+}
+
+Dialog:SendText(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new 
+            number = strval(inputtext)
+        ;
+
+        if(isnull(inputtext) || !IsNumeric(inputtext))
+            return Dialog_Show(playerid, SendText, DIALOG_STYLE_INPUT, "Send Text Message", "Please enter the number that you wish to send a text message to:", "Dial", "Back");
+
+        if(GetNumberOwner(number) == INVALID_PLAYER_ID)
+            return Dialog_Show(playerid, SendText, DIALOG_STYLE_INPUT, "Send Text Message", "Error: That number is not online right now.\n\nPlease enter the number that you wish to send a text message to:", "Dial", "Back");
+
+        PlayerData[playerid][pContact] = GetNumberOwner(number);
+        Dialog_Show(playerid, TextMessage, DIALOG_STYLE_INPUT, "Text Message", "Please enter the message to send to %s:", "Send", "Back", ReturnName(PlayerData[playerid][pContact], 0));
+    }
+    // else {
+    //     cmd_phone(playerid, "\1");
+    // }
+    return 1;
+}
+Dialog:ShareLoc(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new 
+            number = strval(inputtext),
+            targetid,
+            Float:x,
+            Float:y,
+            Float:z
+        ;
+
+        if(isnull(inputtext) || !IsNumeric(inputtext))
+            return Dialog_Show(playerid, ShareLoc, DIALOG_STYLE_INPUT, "Share Location", "Please enter the number that you wish to send a location to:", "Send", "Back");
+
+        if(GetNumberOwner(number) == INVALID_PLAYER_ID)
+            return Dialog_Show(playerid, ShareLoc, DIALOG_STYLE_INPUT, "Share Location", "ERROR : This phone number is not in service!\n\nPlease enter the number that you wish to send a location to:", "Send", "Back");
+
+        if(PlayerData[playerid][pCredits] < 250)
+            return SendErrorMessage(playerid, "You don't have enough phone credits to share location to this number!");
+
+        PlayerData[playerid][pCredits] -= 250;
+        ShowPlayerFooter(playerid, "You've been ~r~charged~w~ 250 credits to share your location.");
+
+        GetPlayerPos(playerid, x, y, z);
+
+        targetid = GetNumberOwner(number);
+
+        ShareLocationCP[targetid] = 1;
+        DisablePlayerRaceCheckpoint(targetid);
+        SetPlayerRaceCheckpoint(targetid, 1, x, y, z, 0, 0, 0, 2.0);
+        SendServerMessage(targetid, ""RED"%s "WHITE"just share their location to your phone, check GPS!", ReturnName(playerid));
+        PlayerPlaySoundEx(playerid, 21001);
+        PlayerPlaySoundEx(targetid, 21001);
+    }
+    return 1;
+}
+
+Dialog:TextMessage(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        if(isnull(inputtext))
+            return Dialog_Show(playerid, TextMessage, DIALOG_STYLE_INPUT, "Text Message", "Error: Please enter a message to send.\n\nPlease enter the message to send to %s:", "Send", "Back", ReturnName(PlayerData[playerid][pContact], 0));
+
+        new targetid = PlayerData[playerid][pContact];
+
+        if(!IsPlayerConnected(targetid) || !PlayerData[targetid][pPhone])
+            return SendErrorMessage(playerid, "The specified phone number went offline.");
+
+        if(PlayerData[playerid][pCredits] < 25)
+            return SendErrorMessage(playerid, "You don't have enough phone credits to text this number!");
+
+        PlayerData[playerid][pCredits] -= 25;
+        ShowPlayerFooter(playerid, "You've been ~r~charged~w~ 25 credits to send a text.");
+
+        SendClientMessageEx(targetid, X11_YELLOW_2, "[TEXT]: %s - %s (%d)", inputtext, ReturnName(playerid, 0), PlayerData[playerid][pPhone]);
+        SendClientMessageEx(playerid, X11_YELLOW_2, "[TEXT]: %s - %s (%d)", inputtext, ReturnName(playerid, 0), PlayerData[playerid][pPhone]);
+
+        PlayerPlaySoundEx(targetid, 21001);
+        SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s takes out their phone and sends a text.", ReturnName(playerid, 0));
+    }
+    else {
+        Dialog_Show(playerid, SendText, DIALOG_STYLE_INPUT, "Send Text Message", "Please enter the number that you wish to send a text message to:", "Submit", "Back");
+    }
+    return 1;
+}
+
+Dialog:MyPhone(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        switch (listitem)
+        {
+            case 0:
+            {
+                if(!PlayerData[playerid][pPhone])
+                    return SendErrorMessage(playerid, "You dont have SIM card on your phone.");
+
+                if(PlayerData[playerid][pPhoneOff])
+                    return SendErrorMessage(playerid, "Your phone must be powered on.");
+
+                Dialog_Show(playerid, DialNumber, DIALOG_STYLE_INPUT, "Dial Number", "Please enter the number that you wish to dial below:", "Dial", "Back");
+            }
+            case 1:
+            {
+                if(PlayerData[playerid][pPhoneOff])
+                    return SendErrorMessage(playerid, "Your phone must be powered on.");
+
+                ShowContacts(playerid);
+            }
+            case 2:
+            {
+                if(!PlayerData[playerid][pPhone])
+                    return SendErrorMessage(playerid, "You dont have SIM card on your phone.");
+
+                if(PlayerData[playerid][pPhoneOff])
+                    return SendErrorMessage(playerid, "Your phone must be powered on.");
+
+                Dialog_Show(playerid, SendText, DIALOG_STYLE_INPUT, "Send Text Message", "Please enter the number that you wish to send a text message to:", "Dial", "Back");
+            }
+            case 3:
+            {
+                if(!PlayerData[playerid][pPhoneOff])
+                {
+                    if(PlayerData[playerid][pCallLine] != INVALID_PLAYER_ID) {
+                        CancelCall(playerid);
+                    }
+                    PlayerData[playerid][pPhoneOff] = 1;
+                    SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has powered off their cellphone.", ReturnName(playerid, 0));
+                }
+                else
+                {
+                    PlayerData[playerid][pPhoneOff] = 0;
+
+                    SendCustomMessage(playerid, "CELLPHONE", "There is total %d miss call on your phone.", GetMissCallCount(playerid));
+                    SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has powered on their cellphone.", ReturnName(playerid, 0));
+                }
+            }
+            case 5: ShowMissCallList(playerid);
+            case 6:
+            {
+                Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_MSGBOX, "Phone Credits", "%d", "Close", "", PlayerData[playerid][pCredits]);
+            }
+            case 7:
+            {
+                Dialog_Show(playerid, NomorTujuan, DIALOG_STYLE_INPUT, "Transfer Credits", "Insert Phone Number : ", "Submit", "Cancel");
+            }
+        }
+    }
+    return 1;
+}
+Dialog:CreditsMenu(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        switch(listitem)
+        {
+            case 0:
+            {
+                Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_MSGBOX, "Phone Credits", " Your Phone Credits : %d", "Close", "", PlayerData[playerid][pCredits]);
+            }
+            case 1:
+            {
+                Dialog_Show(playerid, NomorTujuan, DIALOG_STYLE_INPUT, "Transfer Credits", "Insert Phone Number : ", "Submit", "Cancel");
+            }
+        }
+    }
+    return 1;
+}
+Dialog:NomorTujuan(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        static targetid;
+        if((targetid = GetNumberOwner(strval(inputtext))) != INVALID_PLAYER_ID)
+        {
+            TransferAmount[playerid] = targetid;
+            Dialog_Show(playerid, TransferPulsa, DIALOG_STYLE_INPUT, "Transfer Credits", "Your phone credits : %d\nHow much you want to transfer ?", "Transfer", "Cancel", PlayerData[playerid][pCredits]);
+        }
+        else
+        {
+            Dialog_Show(playerid, NomorTujuan, DIALOG_STYLE_INPUT, "Transfer Credits", "Invalid Number\nInsert Phone Number : ", "Submit", "Cancel");
+        }
+    }
+    return 1;
+}
+Dialog:TransferPulsa(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        if(strval(inputtext) > PlayerData[playerid][pCredits]) return Dialog_Show(playerid, TransferPulsa, DIALOG_STYLE_INPUT, "Transfer Credits", "Invalid Amount!\nYour phone credits : %d\nHow much you want to transfer ?", "Transfer", "Cancel", PlayerData[playerid][pCredits]);
+        else if(strval(inputtext) <= 0) return Dialog_Show(playerid, TransferPulsa, DIALOG_STYLE_INPUT, "Transfer Credits", "Invalid Amount!\nYour phone credits : %d\nHow much you want to transfer ?", "Transfer", "Cancel", PlayerData[playerid][pCredits]);
+
+        new targetid = TransferAmount[playerid];
+        PlayerData[playerid][pCredits] -= strval(inputtext);
+        PlayerData[targetid][pCredits] += strval(inputtext);
+        SendClientMessageEx(playerid, COLOR_WHITE, "You transfer "RED"%d "WHITE"Phone Credits to "YELLOW"%d,"WHITE"You have "GREEN"%d "WHITE"phone credits remaining", strval(inputtext), PlayerData[targetid][pPhone], PlayerData[playerid][pCredits]);
+        SendClientMessageEx(targetid, COLOR_WHITE, "You received "RED"%d "WHITE"Phone Credits from "YELLOW"%d,"WHITE"Now you have "GREEN"%d "WHITE"phone credits", strval(inputtext), PlayerData[playerid][pPhone], PlayerData[targetid][pCredits]);
+    }
+    return 1;
+}
+Dialog:ListedFurniture(playerid, response, listitem, inputtext[])
+{
+    if(response && listitem >= 0)
+    {
+        new id = House_Inside(playerid);
+
+        if(id != -1 && House_IsOwner(playerid, id, false))
+        {
+            PlayerData[playerid][pEditFurniture] = ListedFurniture[playerid][listitem];
+            Dialog_Show(playerid, FurnitureList, DIALOG_STYLE_LIST, FurnitureData[PlayerData[playerid][pEditFurniture]][furnitureName], "Edit Position\nMove to in front me\nDestroy Furniture", "Select", "Cancel");
+        }
+    }
+    return 1;
+}
+
+Dialog:FurnitureList(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new id = House_Inside(playerid),
+            Float:x,
+            Float:y,
+            Float:z,
+            Float:angle;
+
+        GetPlayerPos(playerid, x, y, z);
+        GetPlayerFacingAngle(playerid, angle);
+
+        x += 1.0 * floatsin(-angle, degrees);
+        y += 1.0 * floatcos(-angle, degrees);
+
+        if(id != -1 && House_IsOwner(playerid, id, false))
+        {
+            switch (listitem)
+            {
+                case 0:
+                {
+                    new furnitureid = PlayerData[playerid][pEditFurniture];
+
+                    PlayerData[playerid][pEditingMode] = FURNITURE;
+
+                    if(FurnitureData[furnitureid][furnitureUnused])
+                    {
+                        FurnitureData[furnitureid][furnitureUnused] = 0;
+                        FurnitureData[furnitureid][furniturePos][0] = x;
+                        FurnitureData[furnitureid][furniturePos][1] = y;
+                        FurnitureData[furnitureid][furniturePos][2] = z;
+                        FurnitureData[furnitureid][furnitureRot][0] = 0.0;
+                        FurnitureData[furnitureid][furnitureRot][1] = 0.0;
+                        FurnitureData[furnitureid][furnitureRot][2] = angle;
+
+                        Furniture_Refresh(furnitureid);
+                    }
+                    EditDynamicObject(playerid, FurnitureData[furnitureid][furnitureObject]);
+                    SendServerMessage(playerid, "You are now editing the position of item \"%s\".", FurnitureData[furnitureid][furnitureName]);
+                }
+                case 1:
+                {
+                    new furnitureid = PlayerData[playerid][pEditFurniture];
+
+                    if(FurnitureData[PlayerData[playerid][pEditFurniture]][furnitureUnused])
+                        return SendErrorMessage(playerid, "Attach this furniture first by select option \"Editing Position\"");
+
+                    FurnitureData[furnitureid][furnitureUnused] = 0;
+                    FurnitureData[furnitureid][furniturePos][0] = x;
+                    FurnitureData[furnitureid][furniturePos][1] = y;
+                    FurnitureData[furnitureid][furniturePos][2] = z;
+                    FurnitureData[furnitureid][furnitureRot][0] = 0.0;
+                    FurnitureData[furnitureid][furnitureRot][1] = 0.0;
+                    FurnitureData[furnitureid][furnitureRot][2] = angle;
+
+                    Furniture_Update(furnitureid);
+                    SendServerMessage(playerid, "Now this furniture is moved to in front you.");
+                }
+                case 2:
+                {
+                    if(Furniture_Delete(PlayerData[playerid][pEditFurniture]))
+                    {
+                        SendServerMessage(playerid, "You have destroyed furniture \"%s\".", FurnitureData[PlayerData[playerid][pEditFurniture]][furnitureName]);   
+                    }
+                    else 
+                    {
+                        SendErrorMessage(playerid, "Gagal menghapus furniture");
+                    }
+                    CancelEdit(playerid);
+                    PlayerData[playerid][pEditFurniture] = -1;
+                }
+            }
+        }
+        else {
+            PlayerData[playerid][pEditFurniture] = -1;
+        }
+    }
+    else {
+        PlayerData[playerid][pEditFurniture] = -1;
+    }
+    return 1;
+}
+Dialog:eTransfer(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        static
+            userid;
+
+        //if(PlayerData[playerid][pScore] < 2) return SendErrorMessage(playerid, "You must be level 2.");
+
+        if(sscanf(inputtext, "u", userid))
+            return Dialog_Show(playerid, eTransfer, DIALOG_STYLE_INPUT, "Make a transfer", "Your bank account's balance: %s\n\nPlease enter the name or ID of the player below:", "Continue", "Back", FormatNumber(PlayerData[playerid][pBankMoney]));
+
+        if(userid == INVALID_PLAYER_ID)
+            return Dialog_Show(playerid, eTransfer, DIALOG_STYLE_INPUT, "Make a transfer", "Error: Invalid player specified.\n\nYour bank account's balance: %s\n\nPlease enter the name or ID of the player below:", "Continue", "Back", FormatNumber(PlayerData[playerid][pBankMoney]));
+
+        if(userid == playerid)
+            return Dialog_Show(playerid, eTransfer, DIALOG_STYLE_INPUT, "Make a transfer", "Error: You can't transfer funds to yourself.\n\nYour bank account's balance: %s\n\nPlease enter the name or ID of the player below:", "Continue", "Back", FormatNumber(PlayerData[playerid][pBankMoney]));
+
+        PlayerData[playerid][pTransfer] = userid;
+        Dialog_Show(playerid, eTransferCash, DIALOG_STYLE_INPUT, "Make a transfer", "Your bank account's balance: %s\n\nPlease enter the amount of money to transfer to %s:", "Continue", "Back", FormatNumber(PlayerData[playerid][pBankMoney]), ReturnName(PlayerData[playerid][pTransfer], 0));
+    }
+    return 1;
+}
+
+Dialog:eTransferCash(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new amount = strval(inputtext);
+
+        if(isnull(inputtext))
+            return Dialog_Show(playerid, eTransferCash, DIALOG_STYLE_INPUT, "Make a transfer", "Your bank account's balance: %s\n\nPlease enter the amount of money to transfer to %s:", "Continue", "Back", FormatNumber(PlayerData[playerid][pBankMoney]), ReturnName(PlayerData[playerid][pTransfer], 0));
+
+        if(amount < 1 || amount > PlayerData[playerid][pBankMoney])
+            return Dialog_Show(playerid, eTransferCash, DIALOG_STYLE_INPUT, "Make a transfer", "Error: Insufficient funds!\n\nYour bank account's balance: %s\n\nPlease enter the amount of money to transfer to %s:", "Continue", "Back", FormatNumber(PlayerData[playerid][pBankMoney]), ReturnName(PlayerData[playerid][pTransfer], 0));
+
+        if(!strcmp(AccountData[playerid][pIP], AccountData[PlayerData[playerid][pTransfer]][pIP])) {
+            SendAdminMessage(X11_TOMATO_1, "AdmWarn: %s (%s) has transferred %s to %s (%s).", ReturnName(playerid, 0), AccountData[playerid][pIP], FormatNumber(amount), ReturnName(PlayerData[playerid][pTransfer], 0), AccountData[playerid][pIP]);
+        }
+        PlayerData[playerid][pBankMoney] -= amount;
+        PlayerData[PlayerData[playerid][pTransfer]][pBankMoney] += amount;
+
+        SendServerMessage(playerid, "You have transferred %s to %s's bank account.", FormatNumber(amount), ReturnName(PlayerData[playerid][pTransfer], 0));
+        SendServerMessage(PlayerData[playerid][pTransfer], "%s has transferred %s into your bank account.", ReturnName(playerid, 0), FormatNumber(amount));
+
+        Log_Save(E_LOG_TRANSFER, sprintf("[%s] %s (%s) has transferred %s to %s (%s).", ReturnDate(), ReturnName(playerid), AccountData[playerid][pIP], FormatNumber(amount), ReturnName(PlayerData[playerid][pTransfer]), AccountData[PlayerData[playerid][pTransfer]][pIP]));
+        //Discord_Log(TRANSFERLOG, sprintf("%s (%s) has transferred %s to %s (%s).", ReturnName(playerid), AccountData[playerid][pIP], FormatNumber(amount), ReturnName(PlayerData[playerid][pTransfer]), AccountData[PlayerData[playerid][pTransfer]][pIP]));
+    }
+    return 1;
+}
+Dialog:Transfer(playerid, response, listitem, inputtext[])
+{
+    if(!IsPlayerInBank(playerid) && ATM_Nearest(playerid) == -1)
+        return 0;
+
+    if(response)
+    {
+        static
+            userid;
+
+        //if(PlayerData[playerid][pScore] < 2) return SendErrorMessage(playerid, "You must be level 2.");
+
+        if(sscanf(inputtext, "u", userid))
+            return Dialog_Show(playerid, Transfer, DIALOG_STYLE_INPUT, "Make a transfer", "Your bank account's balance: %s\n\nPlease enter the name or ID of the player below:", "Continue", "Back", FormatNumber(PlayerData[playerid][pBankMoney]));
+
+        if(userid == INVALID_PLAYER_ID)
+            return Dialog_Show(playerid, Transfer, DIALOG_STYLE_INPUT, "Make a transfer", "Error: Invalid player specified.\n\nYour bank account's balance: %s\n\nPlease enter the name or ID of the player below:", "Continue", "Back", FormatNumber(PlayerData[playerid][pBankMoney]));
+
+        if(userid == playerid)
+            return Dialog_Show(playerid, Transfer, DIALOG_STYLE_INPUT, "Make a transfer", "Error: You can't transfer funds to yourself.\n\nYour bank account's balance: %s\n\nPlease enter the name or ID of the player below:", "Continue", "Back", FormatNumber(PlayerData[playerid][pBankMoney]));
+
+        PlayerData[playerid][pTransfer] = userid;
+        Dialog_Show(playerid, TransferCash, DIALOG_STYLE_INPUT, "Make a transfer", "Your bank account's balance: %s\n\nPlease enter the amount of money to transfer to %s:", "Continue", "Back", FormatNumber(PlayerData[playerid][pBankMoney]), ReturnName(PlayerData[playerid][pTransfer], 0));
+    }
+    return 1;
+}
+
+Dialog:TransferCash(playerid, response, listitem, inputtext[])
+{
+    if(!IsPlayerInBank(playerid) && ATM_Nearest(playerid) == -1)
+        return 0;
+
+    if(response)
+    {
+        new amount = strval(inputtext);
+
+        if(isnull(inputtext))
+            return Dialog_Show(playerid, TransferCash, DIALOG_STYLE_INPUT, "Make a transfer", "Your bank account's balance: %s\n\nPlease enter the amount of money to transfer to %s:", "Continue", "Back", FormatNumber(PlayerData[playerid][pBankMoney]), ReturnName(PlayerData[playerid][pTransfer], 0));
+
+        if(amount < 1 || amount > PlayerData[playerid][pBankMoney])
+            return Dialog_Show(playerid, TransferCash, DIALOG_STYLE_INPUT, "Make a transfer", "Error: Insufficient funds!\n\nYour bank account's balance: %s\n\nPlease enter the amount of money to transfer to %s:", "Continue", "Back", FormatNumber(PlayerData[playerid][pBankMoney]), ReturnName(PlayerData[playerid][pTransfer], 0));
+
+        if(!strcmp(AccountData[playerid][pIP], AccountData[PlayerData[playerid][pTransfer]][pIP])) {
+            SendAdminMessage(X11_TOMATO_1, "AdmWarn: %s (%s) has transferred %s to %s (%s).", ReturnName(playerid, 0), AccountData[playerid][pIP], FormatNumber(amount), ReturnName(PlayerData[playerid][pTransfer], 0), AccountData[playerid][pIP]);
+        }
+        PlayerData[playerid][pBankMoney] -= amount;
+        PlayerData[PlayerData[playerid][pTransfer]][pBankMoney] += amount;
+        PlayerTextDrawSetString(playerid, BankMoneyVisual[playerid], sprintf("%s", FormatNumber(PlayerData[playerid][pBankMoney])));
+        SendServerMessage(playerid, "You have transferred %s to %s's bank account.", FormatNumber(amount), ReturnName(PlayerData[playerid][pTransfer], 0));
+        SendServerMessage(PlayerData[playerid][pTransfer], "%s has transferred %s into your bank account.", ReturnName(playerid, 0), FormatNumber(amount));
+
+        Log_Save(E_LOG_TRANSFER, sprintf("[%s] %s (%s) has transferred %s to %s (%s).", ReturnDate(), ReturnName(playerid), AccountData[playerid][pIP], FormatNumber(amount), ReturnName(PlayerData[playerid][pTransfer]), AccountData[PlayerData[playerid][pTransfer]][pIP]));
+        //Discord_Log(TRANSFERLOG, sprintf("%s (%s) has transferred %s to %s (%s).", ReturnName(playerid), AccountData[playerid][pIP], FormatNumber(amount), ReturnName(PlayerData[playerid][pTransfer]), AccountData[PlayerData[playerid][pTransfer]][pIP]));
+    }
+    return 1;
+}
+
+Dialog:Deposit(playerid, response, listitem, inputtext[])
+{
+    if(!IsPlayerInBank(playerid) && ATM_Nearest(playerid) == -1)
+        return 0;
+
+    if(response)
+    {
+        new amount = strval(inputtext);
+
+        if(isnull(inputtext))
+            return Dialog_Show(playerid, Deposit, DIALOG_STYLE_INPUT, "Deposit funds", "Your bank account's balance: %s\n\nPlease enter the amount of money you wish to deposit:", "Deposit", "Back", FormatNumber(PlayerData[playerid][pBankMoney]));
+
+        if(amount < 1 || amount > GetMoney(playerid))
+            return Dialog_Show(playerid, Deposit, DIALOG_STYLE_INPUT, "Deposit funds", "Error: You don't have that much.\n\nYour bank account's balance: %s\n\nPlease enter the amount of money you wish to deposit:", "Deposit", "Back", FormatNumber(PlayerData[playerid][pBankMoney]));
+
+        PlayerData[playerid][pBankMoney] += amount;
+        GiveMoney(playerid, -amount);
+
+        SendServerMessage(playerid, "You have deposited %s into your bank account.", FormatNumber(amount));
+
+        Log_Save(E_LOG_DEPOSIT, sprintf("[%s] %s deposit for %s, current bank: %s.", ReturnDate(), ReturnName(playerid), FormatNumber(amount), FormatNumber(PlayerData[playerid][pBankMoney])));
+        //Discord_Log(DEPOSITLOG, sprintf("%s deposit for %s, current bank: %s.", ReturnName(playerid), FormatNumber(amount), FormatNumber(PlayerData[playerid][pBankMoney])));
+
+        Dialog_Show(playerid, Deposit, DIALOG_STYLE_INPUT, "Deposit funds", "Your bank account's balance: %s\n\nPlease enter the amount of money you wish to deposit:", "Deposit", "Back", FormatNumber(PlayerData[playerid][pBankMoney]));
+    }
+    return 1;
+}
+
+Dialog:FAQ1(playerid, response, listitem, inputtext[])
+{
+    if(!response)
+        cmd_faq(playerid, "\1");
+
+    return 1;
+}
+
+Dialog:FAQ(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        switch (listitem)
+        {
+            case 0: Dialog_Show(playerid, FAQ1, DIALOG_STYLE_MSGBOX, inputtext, ""WHITE"Anda dapat akses "YELLOW"/gps"WHITE" untuk mengethaui lokasi yang harus anda kunjungi. Disarankan penuhi kebutuhan handphone, GPS dan SIMCard, lalu ke JOB.", "OK", "Back");
+            case 1: Dialog_Show(playerid, FAQ1, DIALOG_STYLE_MSGBOX, inputtext, ""WHITE"Anda bisa masuk ke dalam ruangan dengan menekan tombol "YELLOW"'F'"WHITE" di keyboard mu.", "OK", "Back");
+            case 2: Dialog_Show(playerid, FAQ1, DIALOG_STYLE_MSGBOX, inputtext, ""WHITE"Cukup menekan "YELLOW"'Y'"WHITE" di keyboard mu.\nAnda juga bisa menggunakan printah "YELLOW"/inventory"WHITE" untuk melihat inventory.", "OK", "Back");
+            case 3: Dialog_Show(playerid, FAQ1, DIALOG_STYLE_MSGBOX, inputtext, ""WHITE"Anda bisa mengambil item hanya dengan menekan "YELLOW"'N'"WHITE" di keyboarmu.\nAnda harus jongkok "YELLOW"'C'"WHITE" terlebih dahulu.", "OK", "Back");
+            case 4: Dialog_Show(playerid, FAQ1, DIALOG_STYLE_MSGBOX, inputtext, ""WHITE"Di screen anda terlihat ada gambar skin yang berarti skin yang karakter pakai saat ini\n"YELLOW"HUNGER Bar:"WHITE" Bar ini mempermudah untuk mengatur kesehatan dari karakter itu sendiri,\njika hunger lemah dan berwarna merah, berarti ada efek lain yang akan mempengaruhi.", "OK", "Back");
+            case 5: Dialog_Show(playerid, FAQ1, DIALOG_STYLE_MSGBOX, inputtext, ""WHITE"Anda bisa mengisi hunger dengan membeli makanan di bisnis "YELLOW"Fast Food"WHITE".\nUntuk memasak, anda cukup "YELLOW"/cook"WHITE" di rumah.\nAnda bisa membeli Froozen Food di bisnis "YELLOW"Retail Store"WHITE".", "OK", "Back");
+            case 6: Dialog_Show(playerid, FAQ1, DIALOG_STYLE_MSGBOX, inputtext, ""WHITE"Anda bisa mudah mencari lokasi yang tidak anda ketahui sebelumnya hanya dengan membeli "YELLOW"GPS System"WHITE".\nAnda bisa membeli GPS System di bisnis "YELLOW"Electronic Store"WHITE".", "OK", "Back");
+            case 7: Dialog_Show(playerid, FAQ1, DIALOG_STYLE_MSGBOX, inputtext, ""WHITE"Ketik perintah "YELLOW"/disablecp"WHITE" untuk menonaktivkan saat melakukan berbagai pekerjaan, seperti trucker, dll.\nJika anda membawa box, cukup "YELLOW"/stoploading"WHITE" untuk menyelesaikan\nJika ingin keluar dari pekerjaan cukup menggunakan printah "YELLOW"/quitjob.", "OK", "Back");
+            case 8: Dialog_Show(playerid, FAQ1, DIALOG_STYLE_MSGBOX, inputtext, ""WHITE"Anda harus mengambil item weapon dari inventory dengan meggunakan opsi "YELLOW"Use Item.\n"WHITE"Di saat anda memegang senjata, anda harus memiliki magazine untuk pelurunya..\n\nAnda bisa membelinya di "YELLOW"Weapon Shop.\n"WHITE"Anda juga bisa menekan "YELLOW"'N'"WHITE" untuk meletakkan kembali weapon yang di pegang.", "OK", "Back");
+            case 9: Dialog_Show(playerid, FAQ1, DIALOG_STYLE_MSGBOX, inputtext, ""WHITE"Berbagai furniture saat di beli akan di letakkan ke dalam inventory.\nTekan "YELLOW"'Y'"WHITE", pilih item furniture dan pilih "YELLOW"Use Item"WHITE" untuk meletakkan item.\n\nJika ingin melihat item furniture yang ada di rumah cukup menggunakan printah "YELLOW"/furniture"WHITE" di dalam rumah.\nPilih item yang tersedia, nantinya anda akan di perintahkan untuk mengedit posisi atau menghilangkan item furniture.", "OK", "Back");
+        }
+    }
+    return 1;
+}
+
+Dialog:TeleportInterior(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        SetPlayerInterior(playerid, g_arrInteriorData[listitem][e_InteriorID]);
+        SetPlayerPos(playerid, g_arrInteriorData[listitem][e_InteriorX], g_arrInteriorData[listitem][e_InteriorY], g_arrInteriorData[listitem][e_InteriorZ]);
+    }
+    return 1;
+}
+
+Dialog:Inventory(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new
+            itemid = PlayerData[playerid][pInventoryItem],
+            string[64];
+
+        strunpack(string, InventoryData[playerid][itemid][invItem]);
+
+        switch (listitem)
+        {
+            case 0:
+            {
+                CallLocalFunction("OnPlayerUseInvItem", "dds", playerid, itemid, string);
+            }
+            case 1:
+            {
+                if(!strcmp(string, "Kunci Gubuk"))
+                    return 0;
+
+                if(!strcmp(string, "Mask") && PlayerData[playerid][pMaskOn])
+                    return SendErrorMessage(playerid, "Lepas terlebih dahulu masker yang anda gunakan.");
+
+                PlayerData[playerid][pInventoryItem] = itemid;
+                Dialog_Show(playerid, GiveItem, DIALOG_STYLE_INPUT, "Give Item", "Please enter the name or the ID of the player:", "Submit", "Cancel");
+            }
+            case 2:
+            {
+                new id = -1;
+
+                for (new i = 0; i < sizeof(g_aInventoryItems); i ++) if(!strcmp(g_aInventoryItems[i][e_InventoryItem], string, true)) {
+                    if(g_aInventoryItems[i][e_InventoryDrop] == false) return SendErrorMessage(playerid, "You can't drop this item (%s).", string);
+                }
+
+                if(!strcmp(string, "Mask") && PlayerData[playerid][pMaskOn])
+                    return SendErrorMessage(playerid, "Lepas terlebih dahulu masker yang anda gunakan.");
+
+                if(IsPlayerInAnyVehicle(playerid) || !IsPlayerSpawned(playerid) || PlayerData[playerid][pJailTime])
+                    return SendErrorMessage(playerid, "You can't drop items right now.");
+
+                /*else if(!strcmp(string, "Backpack"))
+                    return cmd_dropbackpack(playerid, "\1");*/
+
+                else if((id = Garbage_Nearest(playerid)) != -1)
+                {
+                    if(GarbageData[id][garbageCapacity] >= 10)
+                        return SendErrorMessage(playerid, "This garbage bin is full of trash.");
+
+                    GarbageData[id][garbageCapacity]++;
+                    Garbage_Save(id);
+
+                    Inventory_Remove(playerid, string);
+                    SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s throws a \"%s\" into the garbage bin.", ReturnName(playerid, 0), string);
+                }
+                else if(InventoryData[playerid][itemid][invQuantity] == 1) DropPlayerItem(playerid, itemid);
+                else Dialog_Show(playerid, DropItem, DIALOG_STYLE_INPUT, "Drop Item", "Item: %s - Quantity: %d\n\nPlease specify how much of this item you wish to drop:", "Drop", "Cancel", string, InventoryData[playerid][itemid][invQuantity]);
+            }
+        }
+    }
+    return 1;
+}
+
+Dialog:DropItem(playerid, response, listitem, inputtext[])
+{
+    new
+        itemid = PlayerData[playerid][pInventoryItem],
+        string[32];
+
+    strunpack(string, InventoryData[playerid][itemid][invItem]);
+
+    if(response)
+    {
+        if(isnull(inputtext))
+            return Dialog_Show(playerid, DropItem, DIALOG_STYLE_INPUT, "Drop Item", "Item: %s - Quantity: %d\n\nPlease specify how much of this item you wish to drop:", "Drop", "Cancel", string, InventoryData[playerid][itemid][invQuantity]);
+
+        if(strval(inputtext) < 1 || strval(inputtext) > InventoryData[playerid][itemid][invQuantity])
+            return Dialog_Show(playerid, DropItem, DIALOG_STYLE_INPUT, "Drop Item", "Error: Insufficient amount specified.\n\nItem: %s - Quantity: %d\n\nPlease specify how much of this item you wish to drop:", "Drop", "Cancel", string, InventoryData[playerid][itemid][invQuantity]);
+
+        DropPlayerItem(playerid, itemid, strval(inputtext));
+    }
+    return 1;
+}
+
+Dialog:RandNumber(playerid, response, listitem, inputtext[])
+{
+    new string[128], number[150];
+
+    if(response)
+    {
+        PlayerData[playerid][pPhone] = strval(inputtext);
+
+        format(string, sizeof(string), "Your new number is ~p~%d.", PlayerData[playerid][pPhone]);
+        ShowPlayerFooter(playerid, string);
+
+        SendServerMessage(playerid, "Your new number is %d.", PlayerData[playerid][pPhone]);
+    }
+    else
+    {
+        for(new i; i != 10; i++)
+        {
+            format(number, sizeof(number), "%s{%s}%d\n", number, ((i+1) % 2 == 0) ? ("C0C0C0") : ("FFFFFF") , (random(90000)+10000));
+        }
+        Dialog_Show(playerid, RandNumber, DIALOG_STYLE_LIST, "Phone Number", number, "Select", "Refresh");
+    }
+    return 1;
+}
+
+Dialog:BusinessBuy(playerid, response, listitem, inputtext[])
+{
+    static
+        bizid = -1,
+        price;
+    new playeroffer = GetPVarInt(playerid, "OfferedPlayerID");
+    if((bizid = Business_Inside(playerid)) != -1 && response)
+    {
+        price = BusinessData[bizid][bizPrices][listitem];
+
+        if(GetMoney(playerid) < price)
+            return SendErrorMessage(playerid, "You have insufficient funds for the purchase.");
+
+        if(BusinessData[bizid][bizProducts] < 1)
+            return SendErrorMessage(playerid, "This business is out of stock.");
+
+        if(BusinessData[bizid][bizType] == 1)
+        {
+            switch (listitem)
+            {
+                case 0:
+                {
+                    if(Inventory_Add(playerid, "Spray Can", 365) != -1)
+                    {
+                        GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought spray can");
+                        SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a can of spray paint.", ReturnName(playerid, 0), FormatNumber(price));
+
+                        BusinessData[bizid][bizProducts]--;
+                        BusinessData[bizid][bizVault] += price;
+                        Business_Save(bizid);
+                    }
+                }
+                case 1:
+                {
+                    if(PlayerData[playerid][pLottery])
+                        return SendErrorMessage(playerid, "You have a lottery ticket already.");
+
+                    Dialog_Show(playerid, LotteryNumber, DIALOG_STYLE_INPUT, "Lottery Number", "Please enter your desired lottery number below (from 1-60):", "Submit", "Cancel");
+                }
+                case 2:
+                {
+                    if(Inventory_Add(playerid, "First Aid", 1580) != -1)
+                    {
+                        GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought first aid");
+                        SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a first aid kit.", ReturnName(playerid, 0), FormatNumber(price));
+
+                        BusinessData[bizid][bizProducts]--;
+                        BusinessData[bizid][bizVault] += price;
+                        Business_Save(bizid);
+                    }
+                }
+                case 3:
+                {
+                    if(Inventory_Add(playerid, "Frozen Pizza", 2814) != -1)
+                    {
+                        GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought frozen pizza");
+                        SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a box of frozen pizza.", ReturnName(playerid, 0), FormatNumber(price));
+
+                        BusinessData[bizid][bizProducts]--;
+                        BusinessData[bizid][bizVault] += price;
+                        Business_Save(bizid);
+                    }
+                }
+                case 4:
+                {
+                    if(Inventory_HasItem(playerid, "Mask"))
+                        return SendErrorMessage(playerid, "You have a mask already.");
+
+                    if(Inventory_Add(playerid, "Mask", 19036) != -1)
+                    {
+                        GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought mask");
+                        SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a mask.", ReturnName(playerid, 0), FormatNumber(price));
+
+                        BusinessData[bizid][bizProducts]--;
+                        BusinessData[bizid][bizVault] += price;
+                        Business_Save(bizid);
+                    }
+
+                }
+                case 5:
+                {
+                    if(Inventory_Add(playerid, "Water", 1484) != -1)
+                    {
+                        GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought water");
+                        SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a water.", ReturnName(playerid, 0), FormatNumber(price));
+
+                        BusinessData[bizid][bizProducts]--;
+                        BusinessData[bizid][bizVault] += price;
+                        Business_Save(bizid);
+                    }
+
+                }
+                case 6:
+                {
+                        GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought phone credits");
+                        PlayerData[playerid][pCredits] += 5000;
+                        SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a 5000 Phone Credits.", ReturnName(playerid, 0), FormatNumber(price));
+
+                        BusinessData[bizid][bizProducts]--;
+                        BusinessData[bizid][bizVault] += price;
+                        Business_Save(bizid);
+                }
+                case 7:
+                {
+                    if(Inventory_Add(playerid, "Campfire", 19632) != -1)
+                    {
+                        GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought campfire");
+                        SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a campfire!.", ReturnName(playerid, 0), FormatNumber(price));
+
+                        BusinessData[bizid][bizProducts]--;
+                        BusinessData[bizid][bizVault] += price;
+                        Business_Save(bizid);
+                    }
+                }
+                case 8:
+                {
+                    if(Inventory_Add(playerid, "Cigarettes", 19896, 20) != -1)
+                    {
+                        GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought cigarettes");
+                        SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a pack of cigarettes!.", ReturnName(playerid, 0), FormatNumber(price));
+
+                        BusinessData[bizid][bizProducts]--;
+                        BusinessData[bizid][bizVault] += price;
+                        Business_Save(bizid);
+                    }
+                }
+            }
+        }
+        else if(BusinessData[bizid][bizType] == 6)
+        {
+            switch(listitem)
+            {
+                case 0:
+                {
+                    if(Inventory_Add(playerid, "Fuel Can", 1650) != -1)
+                    {
+                        GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought fuel can");
+                        SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a can of fuel.", ReturnName(playerid, 0), FormatNumber(price));
+
+                        BusinessData[bizid][bizProducts]--;
+                        BusinessData[bizid][bizVault] += price;
+                        Business_Save(bizid);
+                    }
+                }
+                case 1:
+                {
+                    if(Inventory_Add(playerid, "Snack", 2768) != -1)
+                    {
+                        GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought snack");
+                        SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a snack.", ReturnName(playerid, 0), FormatNumber(price));
+
+                        BusinessData[bizid][bizProducts]--;
+                        BusinessData[bizid][bizVault] += price;
+                        Business_Save(bizid);
+                    }
+
+                }
+                case 2:
+                {
+                    if(Inventory_Add(playerid, "Frozen Burger", 2768) != -1)
+                    {
+                        GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought frozen burger");
+                        SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a frozen burger.", ReturnName(playerid, 0), FormatNumber(price));
+
+                        BusinessData[bizid][bizProducts]--;
+                        BusinessData[bizid][bizVault] += price;
+                        Business_Save(bizid);
+                    }
+                }
+                case 3:
+                {
+                    if(Inventory_Add(playerid, "Water", 1484) != -1)
+                    {
+                        GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought water");
+                        SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a Water.", ReturnName(playerid, 0), FormatNumber(price));
+
+                        BusinessData[bizid][bizProducts]--;
+                        BusinessData[bizid][bizVault] += price;
+                        Business_Save(bizid);
+                    }
+                }
+                case 4:
+                {
+                    if(Inventory_Add(playerid, "Cigarettes", 19896, 20) != -1)
+                    {
+                        GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought cigarettes");
+                        SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a pack of cigarettes.", ReturnName(playerid, 0), FormatNumber(price));
+
+                        BusinessData[bizid][bizProducts]--;
+                        BusinessData[bizid][bizVault] += price;
+                        Business_Save(bizid);
+                    }
+                }
+            }
+        }
+        else if(BusinessData[bizid][bizType] == 8)
+        {
+            switch(listitem)
+            {
+                case 0:
+                {
+                    if(Inventory_HasItem(playerid, "Cellphone"))
+                        return SendErrorMessage(playerid, "You have a cellphone already.");
+
+                    if(Inventory_Add(playerid, "Cellphone", 330) != -1)
+                    {
+                        PlayerData[playerid][pPhone] = 0;
+
+                        GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought cellphone");
+                        SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a cellphone.", ReturnName(playerid, 0), FormatNumber(price));
+
+                        BusinessData[bizid][bizProducts]--;
+                        BusinessData[bizid][bizVault] += price;
+                        Business_Save(bizid);
+                    }
+                }
+                case 1:
+                {
+                    if(Inventory_HasItem(playerid, "GPS System"))
+                        return SendErrorMessage(playerid, "You have a GPS system already.");
+
+                    if(Inventory_Add(playerid, "GPS System", 18875) != -1)
+                    {
+                        GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought gps system");
+                        SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a GPS System.", ReturnName(playerid, 0), FormatNumber(price));
+
+                        BusinessData[bizid][bizProducts]--;
+                        BusinessData[bizid][bizVault] += price;
+                        Business_Save(bizid);
+                    }
+                }
+                case 2:
+                {
+                    if(Inventory_HasItem(playerid, "Portable Radio"))
+                        return SendErrorMessage(playerid, "You have this item already.");
+
+                    if(Inventory_Add(playerid, "Portable Radio", 18868) != -1)
+                    {
+                        GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought portable radio");
+                        SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a portable radio.", ReturnName(playerid, 0), FormatNumber(price));
+
+                        BusinessData[bizid][bizProducts]--;
+                        BusinessData[bizid][bizVault] += price;
+                        Business_Save(bizid);
+                    }
+                }
+                case 3:
+                {
+                    if(PlayerHasWeapon(playerid, 5))
+                        return SendErrorMessage(playerid, "You have this item already.");
+
+                    if(IsPlayerDuty(playerid))
+                        return SendErrorMessage(playerid, "Off duty first to buy this baseball bat!");
+
+                    if(PlayerHasWeaponInSlot(playerid, 5))
+                        return SendErrorMessage(playerid, "You already have the weapon in the same slot.");
+
+                    GivePlayerWeaponEx(playerid, 5, 1, _, "None");
+
+                    GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought baseball bat");
+                    SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a baseball bat.", ReturnName(playerid, 0), FormatNumber(price));
+
+                    BusinessData[bizid][bizProducts]--;
+                    BusinessData[bizid][bizVault] += price;
+                    Business_Save(bizid);
+                }
+                case 4:
+                {
+                    if(PlayerHasWeapon(playerid, 43))
+                        return SendErrorMessage(playerid, "You have this item already.");
+
+                    if(IsPlayerDuty(playerid))
+                        return SendErrorMessage(playerid, "Off duty first to buy this Camera!");
+
+                    if(PlayerHasWeaponInSlot(playerid, 43))
+                        return SendErrorMessage(playerid, "You already have the weapon in the same slot.");
+
+                    GivePlayerWeaponEx(playerid, 43, 1, _, "None");
+
+                    GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought camera");
+                    SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a Camera.", ReturnName(playerid, 0), FormatNumber(price));
+
+                    BusinessData[bizid][bizProducts]--;
+                    BusinessData[bizid][bizVault] += price;
+                    Business_Save(bizid);
+                }
+                case 5:
+                {
+                    if(!Inventory_HasItem(playerid, "Cellphone"))
+                        return SendErrorMessage(playerid, "You don't have a cellphone.");
+
+                    new number[150];
+
+                    for(new i; i != 10; i++)
+                    {
+                        format(number, sizeof(number), "%s{%s}%d\n", number, ((i+1) % 2 == 0) ? ("C0C0C0") : ("FFFFFF"), (random(90000)+10000));
+                    }
+                    Dialog_Show(playerid, RandNumber, DIALOG_STYLE_LIST, "Phone Number", number, "Select", "Refresh");
+
+                    BusinessData[bizid][bizProducts]--;
+                    BusinessData[bizid][bizVault] += price;
+
+                    GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought phone number");
+                    Business_Save(bizid);
+
+                    SendServerMessage(playerid, "Select the number on dialog list, you can refresh newest number with click 'Refresh' or Press 'ESC' on keyboard.");
+                }
+                case 6:
+                {
+                    if(Inventory_HasItem(playerid, "Laptop"))
+                        return SendErrorMessage(playerid, "You have this item already.");
+
+                    if(Inventory_Add(playerid, "Laptop", 19893) != -1)
+                    {
+                        GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought laptop");
+                        SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a Laptop.", ReturnName(playerid, 0), FormatNumber(price));
+
+                        BusinessData[bizid][bizProducts]--;
+                        BusinessData[bizid][bizVault] += price;
+                        Business_Save(bizid);
+                    }
+                }
+                case 7:
+                {
+                        GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought phone credit");
+                        PlayerData[playerid][pCredits] += 5000;
+                        SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a 5000 Phone Credits.", ReturnName(playerid, 0), FormatNumber(price));
+
+                        BusinessData[bizid][bizProducts]--;
+                        BusinessData[bizid][bizVault] += price;
+                        Business_Save(bizid);
+                }
+                case 8:
+                {
+                    if(Inventory_HasItem(playerid, "MP3 Player"))
+                        return SendErrorMessage(playerid, "You have this item already.");
+
+                    if(Inventory_Add(playerid, "MP3 Player", 18875) != -1)
+                    {
+                        GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought mp3 player");
+                        SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a MP3 Player.", ReturnName(playerid, 0), FormatNumber(price));
+
+                        BusinessData[bizid][bizProducts]--;
+                        BusinessData[bizid][bizVault] += price;
+                        Business_Save(bizid);
+                    }
+                }
+            }
+        }
+        else if(BusinessData[bizid][bizType] == 2)
+        {
+            if(PlayerData[playerid][pFirearmLicenseExpired] < 1)
+                return SendErrorMessage(playerid, "This store only sells to people with a firearm license.");
+
+            new serial[64], weapon_name[32], str[64];
+            format(serial, sizeof(serial), "%d%d%d", RandomEx(20, 90), RandomEx(15, 90), GetPlayerSQLID(playerid));
+            
+            switch (listitem)
+            {
+                case 0:
+                {
+                    if(Inventory_Count(playerid, "Armored Vest") >= 1)
+                        return SendErrorMessage(playerid, "You have 1 armored vests, you can't buy anymore.");
+
+                    format(weapon_name, sizeof(weapon_name), "Armored Vest");
+                    Inventory_Add(playerid, "Armored Vest", 19142);
+                    SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received an armored vest.", ReturnName(playerid, 0), FormatNumber(price));
+                }
+                case 1:
+                {
+                    if(PlayerData[playerid][pScore] < 2)
+                        return SendErrorMessage(playerid, "You must level 2 to use this.");
+
+                    if(PlayerHasWeaponInSlot(playerid, 24))
+                        return SendErrorMessage(playerid, "You have a weapon in the same slot!");
+
+                    format(weapon_name, sizeof(weapon_name), "Desert Eagle");
+                    GivePlayerWeaponEx(playerid, 24, 50, 50, serial);
+                    SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a Desert Eagle.", ReturnName(playerid, 0), FormatNumber(price));
+                }
+                case 2: // Silenced
+                {
+                    if(PlayerHasWeaponInSlot(playerid, 23))
+                        return SendErrorMessage(playerid, "You have a weapon in the same slot!");
+
+                    format(weapon_name, sizeof(weapon_name), "Silenced Pistol");
+                    GivePlayerWeaponEx(playerid, 23, 50, 50, serial);
+                    SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a Silenced Pistol.", ReturnName(playerid, 0), FormatNumber(price));
+                }
+                case 3: // 9mm
+                {
+                    if(PlayerData[playerid][pScore] < 2)
+                        return SendErrorMessage(playerid, "You must level 2 to use this.");
+
+                    if(PlayerHasWeaponInSlot(playerid, 22))
+                        return SendErrorMessage(playerid, "You have a weapon in the same slot!");
+
+                    format(weapon_name, sizeof(weapon_name), "9mm Pistol");
+                    GivePlayerWeaponEx(playerid, 22, 50, 50, serial);
+                    SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a 9mm Pistol.", ReturnName(playerid, 0), FormatNumber(price));
+                }
+                case 4:
+                {
+                    if(PlayerHasWeaponInSlot(playerid, 4))
+                        return SendErrorMessage(playerid, "You have a weapon in the same slot!");
+
+                    format(weapon_name, sizeof(weapon_name), "hunting knife");
+                    GivePlayerWeaponEx(playerid, 4, 1, 1, serial);
+                    SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a hunting knife.", ReturnName(playerid, 0), FormatNumber(price));
+                }
+            }
+
+            format(str, sizeof(str), "bought %s", weapon_name);
+            GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, str);
+            BusinessData[bizid][bizProducts]--;
+            BusinessData[bizid][bizVault] += price;
+            Business_Save(bizid);
+        }
+        else if(BusinessData[bizid][bizType] == 3)
+        {
+            new models[50] = {-1, ... },
+                count;
+
+            switch (listitem)
+            {
+                case 0:
+                {
+                    PlayerData[playerid][pClothesType] = 1;
+                    PlayerTemp[playerid][temp_realskin] = PlayerData[playerid][pSkin];
+                    PlayerTemp[playerid][temp_selectskin] = 0;
+
+                    PlayerData[playerid][pWorld] = GetPlayerVirtualWorld(playerid);
+                    SetPlayerVirtualWorld(playerid, playerid+MAX_PLAYERS);
+                    TogglePlayerControllable(playerid, false);
+
+                    ShowClothesTextdraw(playerid);
+
+                    SetPlayerSkinEx(playerid, (PlayerData[playerid][pGender] == 1) ? g_aMaleSkins[PlayerTemp[playerid][temp_selectskin]] : g_aFemaleSkins[PlayerTemp[playerid][temp_selectskin]]);
+                    PlayerTextDrawSetString(playerid, PlayerTextdraws[playerid][textdraw_clothes][5], sprintf("Skin:_%d/%d", PlayerTemp[playerid][temp_selectskin], ((PlayerData[playerid][pGender] == 1) ? sizeof(g_aMaleSkins) : sizeof(g_aFemaleSkins))));
+
+                    SelectTextDrawEx(playerid, -1);
+
+                    SendServerMessage(playerid, "Tekan "YELLOW"'ESCAPE' "WHITE"di keyboard untuk keluar dari menu ini.");
+                }
+                case 1:
+                {
+                    if(Aksesoris_GetCount(playerid) > MAX_ACC)
+                        return SendErrorMessage(playerid, "Slot untuk aksesoris sudah penuh.");
+
+                    PlayerData[playerid][pClothesType] = 2;
+
+                    for (new id; id < sizeof(accList); id++) if(accList[id][accListType] == 1) {
+                        models[count++] = accList[id][accListModel];
+                    }
+                    ShowCustomSelection(playerid, "Cap List", MODEL_SELECTION_AKSESORIS, models, count);
+                }
+                case 2:
+                {
+                    if(Aksesoris_GetCount(playerid) > MAX_ACC)
+                        return SendErrorMessage(playerid, "Slot untuk aksesoris sudah penuh.");
+
+                    PlayerData[playerid][pClothesType] = 3;
+
+                    for (new id; id < sizeof(accList); id++) if(accList[id][accListType] == 2) {
+                        models[count++] = accList[id][accListModel];
+                    }
+                    ShowCustomSelection(playerid, "Bandana List", MODEL_SELECTION_AKSESORIS, models, count);
+                }
+                case 3:
+                {
+                    if(Aksesoris_GetCount(playerid) > MAX_ACC)
+                        return SendErrorMessage(playerid, "Slot untuk aksesoris sudah penuh.");
+
+                    PlayerData[playerid][pClothesType] = 4;
+
+                    for (new id; id < sizeof(accList); id++) if(accList[id][accListType] == 3) {
+                        models[count++] = accList[id][accListModel];
+                    }
+                    ShowCustomSelection(playerid, "Mask List", MODEL_SELECTION_AKSESORIS, models, count);
+                }
+                case 4:
+                {
+                    if(Aksesoris_GetCount(playerid) > MAX_ACC)
+                        return SendErrorMessage(playerid, "Slot untuk aksesoris sudah penuh.");
+
+                    PlayerData[playerid][pClothesType] = 5;
+
+                    for (new id; id < sizeof(accList); id++) if(accList[id][accListType] == 4) {
+                        models[count++] = accList[id][accListModel];
+                    }
+                    ShowCustomSelection(playerid, "Helmet List", MODEL_SELECTION_AKSESORIS, models, count);
+                }
+                case 5:
+                {
+                    if(Aksesoris_GetCount(playerid) > MAX_ACC)
+                        return SendErrorMessage(playerid, "Slot untuk aksesoris sudah penuh.");
+
+                    PlayerData[playerid][pClothesType] = 6;
+
+                    for (new id; id < sizeof(accList); id++) if(accList[id][accListType] == 5) {
+                        models[count++] = accList[id][accListModel];
+                    }
+                    ShowCustomSelection(playerid, "Watch List", MODEL_SELECTION_AKSESORIS, models, count);
+                }
+                case 6:
+                {
+                    if(Aksesoris_GetCount(playerid) > MAX_ACC)
+                        return SendErrorMessage(playerid, "Slot untuk aksesoris sudah penuh.");
+
+                    PlayerData[playerid][pClothesType] = 7;
+
+                    for (new id; id < sizeof(accList); id++) if(accList[id][accListType] == 6) {
+                        models[count++] = accList[id][accListModel];
+                    }
+                    ShowCustomSelection(playerid, "Glasses List", MODEL_SELECTION_AKSESORIS, models, count);
+                }
+                case 7:
+                {
+                    if(Aksesoris_GetCount(playerid) > MAX_ACC)
+                        return SendErrorMessage(playerid, "Slot untuk aksesoris sudah penuh.");
+
+                    PlayerData[playerid][pClothesType] = 8;
+
+                    for (new id; id < sizeof(accList); id++) if(accList[id][accListType] == 7) {
+                        models[count++] = accList[id][accListModel];
+                    }
+                    ShowCustomSelection(playerid, "Misc List", MODEL_SELECTION_AKSESORIS, models, count);
+                }
+            }
+        }
+        else if(BusinessData[bizid][bizType] == 4)
+        {
+            // if(PlayerData[playerid][pHunger] > 90)
+            //     return SendErrorMessage(playerid, "You are not hungry right now.");
+
+            new str[64];
+
+            switch (listitem)
+            {
+                case 0:
+                {
+                    SetPlayerHunger(playerid, PlayerData[playerid][pHunger]+12);
+                    SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received some french fries.", ReturnName(playerid, 0), FormatNumber(price));
+                    ApplyAnimation(playerid, "FOOD", "EAT_Burger", 4.1, 0, 0, 0, 0, 0, 1);
+                    format(str, sizeof(str), "bought french fries");
+                }
+                case 1:
+                {
+                    SetPlayerHunger(playerid, PlayerData[playerid][pHunger]+20);
+                    SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a cheeseburger.", ReturnName(playerid, 0), FormatNumber(price));
+                    ApplyAnimation(playerid, "FOOD", "EAT_Burger", 4.1, 0, 0, 0, 0, 0, 1);
+                    format(str, sizeof(str), "bought cheeseburger");
+                }
+                case 2:
+                {
+                    SetPlayerHunger(playerid, PlayerData[playerid][pHunger]+26);
+                    SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a chicken burger.", ReturnName(playerid, 0), FormatNumber(price));
+                    ApplyAnimation(playerid, "FOOD", "EAT_Burger", 4.1, 0, 0, 0, 0, 0, 1);
+                    format(str, sizeof(str), "bought chicken burger");
+                }
+                case 3:
+                {
+                    SetPlayerHunger(playerid, PlayerData[playerid][pHunger]+30);
+                    SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received some chicken nuggets.", ReturnName(playerid, 0), FormatNumber(price));
+                    ApplyAnimation(playerid, "FOOD", "EAT_Burger", 4.1, 0, 0, 0, 0, 0, 1);
+                    format(str, sizeof(str), "bought chicken nugget");
+                }
+                case 4:
+                {
+                    SetPlayerHunger(playerid, PlayerData[playerid][pHunger]+35);
+                    SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a salad.", ReturnName(playerid, 0), FormatNumber(price));
+                    ApplyAnimation(playerid, "FOOD", "EAT_Burger", 4.1, 0, 0, 0, 0, 0, 1);
+                    format(str, sizeof(str), "bought salad");
+                }
+                case 5:
+                {
+                    SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DRINK_SPRUNK);
+                    SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a sprunk.", ReturnName(playerid, 0), FormatNumber(price));                    
+                    format(str, sizeof(str), "bought sprunk");
+                }
+            }
+            new 
+                rand = random(500);
+            if(listitem < 5 && rand <= 10 && BusinessData[bizid][bizDurability] < 70)
+            {
+                SetBusinessOnFire(playerid, bizid);
+            }
+            GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, str);
+            BusinessData[bizid][bizProducts]--;
+            BusinessData[bizid][bizDurability]--;
+
+            if(BusinessData[bizid][bizDurability] <= 0)
+                BusinessData[bizid][bizDurability] = 0;
+
+            BusinessData[bizid][bizVault] += price;
+            Business_Save(bizid);
+        }
+        else if(BusinessData[bizid][bizType] == 9)
+        {
+            // if(PlayerData[playerid][pHunger] > 90)
+            //     return SendErrorMessage(playerid, "You are not hungry right now.");
+
+            new str[64];
+
+            switch (listitem)
+            {
+                case 0:
+                {//Beer Wine Sprunk French Fies Beef Steak
+                    SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DRINK_BEER);
+                    SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a beer.", ReturnName(playerid, 0), FormatNumber(price)); 
+                    format(str, sizeof(str), "bought beer");                   
+                }
+                case 1:
+                {
+                    SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DRINK_WINE);
+                    SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a wine.", ReturnName(playerid, 0), FormatNumber(price));                    
+                    format(str, sizeof(str), "bought wine");
+                }
+                case 2:
+                {
+                    SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DRINK_SPRUNK);
+                    SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a sprunk.", ReturnName(playerid, 0), FormatNumber(price));                    
+                    format(str, sizeof(str), "bought sprunk");
+                }
+                case 3:
+                {
+                    SetPlayerHunger(playerid, PlayerData[playerid][pHunger]+30);
+                    SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received some french fries.", ReturnName(playerid, 0), FormatNumber(price));
+                    ApplyAnimation(playerid, "FOOD", "EAT_Burger", 4.1, 0, 0, 0, 0, 0, 1);
+                    format(str, sizeof(str), "bought french fries");
+                }
+                case 4:
+                {
+                    SetPlayerHunger(playerid, PlayerData[playerid][pHunger]+35);
+                    SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a beef steak.", ReturnName(playerid, 0), FormatNumber(price));
+                    ApplyAnimation(playerid, "FOOD", "EAT_Burger", 4.1, 0, 0, 0, 0, 0, 1);
+                    format(str, sizeof(str), "bought beef steak");
+                }
+            }
+            GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, str);
+            BusinessData[bizid][bizProducts]--;
+            BusinessData[bizid][bizVault] += price;
+            Business_Save(bizid);
+        }
+        else if(BusinessData[bizid][bizType] == 7)
+        {
+            new
+                items[400] = {-1, ...},
+                count;
+
+            for (new i = 0; i < sizeof(g_aFurnitureData); i ++) if(g_aFurnitureData[i][e_FurnitureType] == listitem + 1) {
+                items[count++] = g_aFurnitureData[i][e_FurnitureModel];
+            }
+            PlayerData[playerid][pFurnitureType] = listitem;
+
+            if(listitem == 3) {
+                ShowModelSelectionMenu(playerid, "Furniture", MODEL_SELECTION_FURNITURE, items, count, -12.0, 0.0, 0.0);
+            }
+            else {
+                ShowModelSelectionMenu(playerid, "Furniture", MODEL_SELECTION_FURNITURE, items, count);
+            }
+        }
+
+        if(playeroffer != INVALID_PLAYER_ID)
+        {
+            GiveMoney(playeroffer, 20);
+            GiveMoney(playerid, -20);
+            SendClientMessageEx(playerid, COLOR_WHITE, "you give"GREEN" $20 "WHITE"as a tip to the employee after buying something from the business!", ReturnName(playerid));
+            SendClientMessageEx(playeroffer, COLOR_WHITE, "%s give you "GREEN" $20 "WHITE"as a tip after buying something from the business!", ReturnName(playerid));
+            PlayerData[playerid][pExp] += 5;
+            PlayerData[playeroffer][pExp] += 5;
+            if(PlayerData[playeroffer][pExp] >= 100)
+            {
+                PlayerData[playeroffer][pPlayingHours]++;
+                PlayerData[playeroffer][pExp] = 0;
+            }
+            if(PlayerData[playerid][pExp] >= 100)
+            {
+                PlayerData[playerid][pPlayingHours]++;
+                PlayerData[playerid][pExp] = 0;
+            }
+            SetPVarInt(playerid, "OfferedPlayerID", INVALID_PLAYER_ID);
+        }
+    }
+    return 1;
+}
+Dialog:LotteryNumber(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new bizid = Business_Inside(playerid);
+
+        if(bizid != -1)
+        {
+            if(isnull(inputtext) || (strval(inputtext) < 1 || strval(inputtext) > 60)) {
+                return Dialog_Show(playerid, LotteryNumber, DIALOG_STYLE_INPUT, "Lottery Number", "Please enter your desired lottery number below (from 1-60):", "Submit", "Cancel");
+            }
+            PlayerData[playerid][pLottery] = strval(inputtext);
+            PlayerData[playerid][pLotteryB] = 1;
+
+            GiveMoney(playerid, -BusinessData[bizid][bizPrices][6], ECONOMY_ADD_SUPPLY, "bought lottery ticket");
+            SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid %s and received a lottery ticket.", ReturnName(playerid, 0), FormatNumber(BusinessData[bizid][bizPrices][6]));
+
+            BusinessData[bizid][bizProducts]--;
+            BusinessData[bizid][bizVault] += BusinessData[bizid][bizPrices][6];
+            Business_Save(bizid);
+        }
+    }
+    return 1;
+}
+
+Dialog:EditProduct(playerid, response, listitem, inputtext[])
+{
+    static
+        bizid = -1;
+
+    if((bizid = Business_Inside(playerid)) != -1 && Business_IsOwner(playerid, bizid))
+    {
+        if(response)
+        {
+            static
+                item[24];
+
+            strmid(item, inputtext, 0, strfind(inputtext, "-") - 1);
+            strpack(PlayerData[playerid][pEditingItem], item, 32 char);
+
+            PlayerData[playerid][pProductModify] = listitem;
+            Dialog_Show(playerid, PriceSet, DIALOG_STYLE_INPUT, "Business: Set Price", "Please enter the new product price for \"%s\":", "Modify", "Back", item);
+        }
+        else
+            return cmd_bm(playerid, "\0");
+    }
+    return 1;
+}
+
+Dialog:PriceSet(playerid, response, listitem, inputtext[])
+{
+    static
+        bizid = -1,
+        item[32];
+
+    if((bizid = Business_Inside(playerid)) != -1 && Business_IsOwner(playerid, bizid))
+    {
+        if(response)
+        {
+            strunpack(item, PlayerData[playerid][pEditingItem]);
+
+            if(isnull(inputtext))
+                return Dialog_Show(playerid, PriceSet, DIALOG_STYLE_INPUT, "Business: Set Price", "Please enter the new product price for \"%s\":", "Modify", "Back", item);
+
+            if(strval(inputtext) < 1 || strval(inputtext) > 8000)
+                return Dialog_Show(playerid, PriceSet, DIALOG_STYLE_INPUT, "Business: Set Price", "Please enter the new product price for \"%s\" ($1 to $8,000):", "Modify", "Back", item);
+
+            if(BusinessData[bizid][bizType] == 6 && PlayerData[playerid][pProductModify] == 5 && strval(inputtext) > 10) //Bensin limiter price
+                return Dialog_Show(playerid, PriceSet, DIALOG_STYLE_INPUT, "Business: Set Price", "Please enter the new product price for \"%s\" ($1 to $10):", "Modify", "Back", item);
+
+            BusinessData[bizid][bizPrices][PlayerData[playerid][pProductModify]] = strval(inputtext);
+            Business_Save(bizid);
+
+            SendServerMessage(playerid, "You have adjusted the price of \"%s\" to: %s!", item, FormatNumber(strval(inputtext)));
+            Business_ProductMenu(playerid, bizid);
+        }
+        else
+        {
+            Business_ProductMenu(playerid, bizid);
+        }
+    }
+    return 1;
+}
+
+Dialog:HouseWeapons(playerid, response, listitem, inputtext[])
+{
+    new
+        houseid;
+
+    if((houseid = House_Inside(playerid)) != -1 && (House_IsOwner(playerid, houseid) || GetAdminLevel(playerid) >= 5))
+    {
+        if(response)
+        {
+            if(HouseData[houseid][houseWeapons][listitem] != 0)
+            {
+                if(IsPlayerDuty(playerid))
+                    return SendErrorMessage(playerid, "Duty faction tidak dapat mengambil senjata.");
+
+                if(PlayerHasWeapon(playerid, HouseData[houseid][houseWeapons][listitem]))
+                    return SendErrorMessage(playerid, "Kamu sudah memiliki senjata yang sama.");
+
+                if(PlayerHasWeaponInSlot(playerid, HouseData[houseid][houseWeapons][listitem]))
+                    return SendErrorMessage(playerid, "Senjata ini berada satu slot dengan senjata yang kamu punya.");
+
+                new serial[64];
+                valstr(serial, HouseData[houseid][houseSerial][listitem]);
+
+                GivePlayerWeaponEx(playerid, HouseData[houseid][houseWeapons][listitem], HouseData[houseid][houseAmmo][listitem], HouseData[houseid][houseDurability][listitem], serial);
+                mysql_tquery(g_iHandle, sprintf("DELETE FROM `weapon_houses` WHERE `houseid` = '%d' AND `ammo`='%d' AND `weaponid`='%d' AND `durability`='%d' AND `slot` = '%d';", HouseData[houseid][houseID], HouseData[houseid][houseAmmo][listitem], HouseData[houseid][houseWeapons][listitem], HouseData[houseid][houseDurability][listitem], HouseData[houseid][houseWeaponSlot][listitem]));
+
+
+                SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has taken a \"%s\" from their weapon storage.", ReturnName(playerid, 0), ReturnWeaponName(HouseData[houseid][houseWeapons][listitem]));
+
+                Log_Save(E_LOG_HOUSE_ITEMS, sprintf("[%s] %s has taken (w: %s a: %d, d: %d) from house id: %d (owned: %s).", ReturnDate(), ReturnName(playerid, 0), ReturnWeaponName(HouseData[houseid][houseWeapons][listitem]), HouseData[houseid][houseAmmo][listitem], HouseData[houseid][houseDurability][listitem], HouseData[houseid][houseID], (House_IsOwner(playerid, houseid)) ? ("Yes") : ("No")));
+                //Discord_Log(HOUSEITEMSLOG, sprintf("%s has taken (w: %s a: %d, d: %d) from house id: %d (owned: %s).", ReturnName(playerid, 0), ReturnWeaponName(HouseData[houseid][houseWeapons][listitem]), HouseData[houseid][houseAmmo][listitem], HouseData[houseid][houseDurability][listitem], HouseData[houseid][houseID], (House_IsOwner(playerid, houseid)) ? ("Yes") : ("No")));
+
+                HouseData[houseid][houseWeapons][listitem]      = 0;
+                HouseData[houseid][houseAmmo][listitem]         = 0;
+                HouseData[houseid][houseDurability][listitem]   = 0;
+                HouseData[houseid][houseWeaponSlot][listitem]   = -1;
+                HouseData[houseid][houseSerial][listitem]       = 0;
+
+                House_WeaponStorage(playerid, houseid);
+            }
+            else
+            {
+                new
+                    weaponid = GetWeapon(playerid),
+                    ammo = ReturnWeaponAmmo(playerid, weaponid),
+                    durability = ReturnWeaponDurability(playerid, weaponid),
+                    serialnumber = ReturnWeaponSerial(playerid, weaponid)
+                ;
+
+                if(!House_IsOwner(playerid, houseid))
+                    return SendErrorMessage(playerid, "Hanya pemilik rumah yang dapat meletakkan senjata!");
+
+                if(IsPlayerDuty(playerid))
+                    return SendErrorMessage(playerid, "Duty faction tidak dapat menyimpan senjata.");
+
+                if(!weaponid)
+                    return SendErrorMessage(playerid, "You are not holding any weapon!");
+
+                HouseData[houseid][houseWeapons][listitem] = weaponid;
+                HouseData[houseid][houseAmmo][listitem] = ammo;
+                HouseData[houseid][houseDurability][listitem] = durability;
+                HouseData[houseid][houseWeaponSlot][listitem] = listitem;
+                HouseData[houseid][houseSerial][listitem] = serialnumber;
+
+                mysql_tquery(g_iHandle, sprintf("INSERT INTO `weapon_houses`(`houseid`, `weaponid`, `ammo`, `durability`, `slot`, `serial`) VALUES ('%d','%d','%d','%d', '%d', '%d');", HouseData[houseid][houseID], weaponid, ammo, durability, listitem, serialnumber));
+
+                ResetWeaponID(playerid, weaponid);
+                House_WeaponStorage(playerid, houseid);
+
+                SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has stored a \"%s\" into their weapon storage.", ReturnName(playerid, 0), ReturnWeaponName(weaponid));
+
+                Log_Save(E_LOG_HOUSE_ITEMS, sprintf("[%s] %s has stored (w: %s a: %d, d: %d) from house id: %d (owned: %s).", ReturnDate(), ReturnName(playerid, 0), ReturnWeaponName(weaponid), ammo, durability, HouseData[houseid][houseID], (House_IsOwner(playerid, houseid)) ? ("Yes") : ("No")));
+                //Discord_Log(HOUSEITEMSLOG, sprintf("%s has stored (w: %s a: %d, d: %d) from house id: %d (owned: %s).", ReturnName(playerid, 0), ReturnWeaponName(weaponid), ammo, durability, HouseData[houseid][houseID], (House_IsOwner(playerid, houseid)) ? ("Yes") : ("No")));
+            }
+        }
+        else House_OpenStorage(playerid, houseid);
+    }
+    return 1;
+}
+
+Dialog:HouseDeposit(playerid, response, listitem, inputtext[])
+{
+    new
+        houseid,
+        string[32];
+
+    if((houseid = House_Inside(playerid)) != -1)
+    {
+        if(!House_IsOwner(playerid, houseid))
+            return SendErrorMessage(playerid, "Hanya pemilik rumah yang dapat menyimpan uang!");
+
+        strunpack(string, InventoryData[playerid][PlayerData[playerid][pInventoryItem]][invItem]);
+
+        if(response)
+        {
+            new amount = strval(inputtext);
+
+            if(amount < 1 || amount > InventoryData[playerid][PlayerData[playerid][pInventoryItem]][invQuantity])
+                return Dialog_Show(playerid, HouseDeposit, DIALOG_STYLE_INPUT, "House Deposit", "Item: %s (Quantity: %d)\n\nPlease enter the quantity that you wish to store for this item:", "Store", "Back", string, InventoryData[playerid][PlayerData[playerid][pInventoryItem]][invQuantity]);
+
+            House_AddItem(houseid, string, InventoryData[playerid][PlayerData[playerid][pInventoryItem]][invModel], amount);
+            Inventory_Remove(playerid, string, amount);
+
+            House_ShowItems(playerid, houseid);
+            SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has stored a \"%s\" into their house storage.", ReturnName(playerid, 0), string);
+
+            Log_Save(E_LOG_HOUSE_ITEMS, sprintf("[%s] %s has stored %d \"%s\" from their house storage id: %d (owned: %s).", ReturnDate(), ReturnName(playerid, 0), amount, string, HouseData[houseid][houseID], (House_IsOwner(playerid, houseid)) ? ("Yes") : ("No")));
+            //Discord_Log(HOUSEITEMSLOG, sprintf("%s has stored %d \"%s\" from their house storage id: %d (owned: %s).", ReturnName(playerid, 0), amount, string, HouseData[houseid][houseID], (House_IsOwner(playerid, houseid)) ? ("Yes") : ("No")));
+        }
+        else House_OpenStorage(playerid, houseid);
+    }
+    return 1;
+}
+
+Dialog:HouseTake(playerid, response, listitem, inputtext[])
+{
+    new
+        houseid,
+        string[32];
+
+    if((houseid = House_Inside(playerid)) != -1 && (House_IsOwner(playerid, houseid) || GetAdminLevel(playerid) >= 5))
+    {
+        strunpack(string, HouseStorage[houseid][PlayerData[playerid][pStorageItem]][hItemName]);
+
+        if(response)
+        {
+            new amount = strval(inputtext);
+
+            if(amount < 1 || amount > HouseStorage[houseid][PlayerData[playerid][pStorageItem]][hItemQuantity])
+                return Dialog_Show(playerid, HouseTake, DIALOG_STYLE_INPUT, "House Take", "Item: %s (Quantity: %d)\n\nPlease enter the quantity that you wish to take for this item:", "Take", "Back", string, HouseStorage[houseid][PlayerData[playerid][pInventoryItem]][hItemQuantity]);
+
+            for (new i = 0; i < sizeof(g_aInventoryItems); i ++) if(!strcmp(g_aInventoryItems[i][e_InventoryItem], string, true)) {
+                if((Inventory_Count(playerid, g_aInventoryItems[i][e_InventoryItem])+amount) > g_aInventoryItems[i][e_InventoryMax])
+                    return Dialog_Show(playerid, HouseTake, DIALOG_STYLE_INPUT, "House Take", "Item: %s (Quantity: %d)\n\nPlease enter the quantity that you wish to take for this item:\n(You can take %d %s now!)", "Take", "Back", string, HouseStorage[houseid][PlayerData[playerid][pInventoryItem]][hItemQuantity], (g_aInventoryItems[i][e_InventoryMax]-Inventory_Count(playerid, g_aInventoryItems[i][e_InventoryItem])), string);
+            }
+
+            if(Inventory_Add(playerid, string, HouseStorage[houseid][PlayerData[playerid][pStorageItem]][hItemModel], amount) != -1)
+            {
+                House_RemoveItem(houseid, string, amount);
+                SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has taken a \"%s\" from their house storage.", ReturnName(playerid, 0), string);
+
+                House_ShowItems(playerid, houseid);
+
+                Log_Save(E_LOG_HOUSE_ITEMS, sprintf("[%s] %s has taken %d \"%s\" from their house storage id: %d (owned: %s).", ReturnDate(), ReturnName(playerid, 0), amount, string, HouseData[houseid][houseID], (House_IsOwner(playerid, houseid)) ? ("Yes") : ("No")));
+                //Discord_Log(HOUSEITEMSLOG, sprintf("%s has taken %d \"%s\" from their house storage id: %d (owned: %s).", ReturnName(playerid, 0), amount, string, HouseData[houseid][houseID], (House_IsOwner(playerid, houseid)) ? ("Yes") : ("No")));
+            }
+        }
+        else House_OpenStorage(playerid, houseid);
+    }
+    return 1;
+}
+
+Dialog:HouseWithdrawCash(playerid, response, listitem, inputtext[])
+{
+    new
+        houseid;
+
+    if((houseid = House_Inside(playerid)) != -1 && (House_IsOwner(playerid, houseid) || GetAdminLevel(playerid) >= 5))
+    {
+        if(response)
+        {
+            new amount = strval(inputtext);
+
+            if(isnull(inputtext))
+                return Dialog_Show(playerid, HouseWithdrawCash, DIALOG_STYLE_INPUT, "Withdraw from safe", "Safe Balance: %s\n\nPlease enter how much money you wish to withdraw from the safe:", "Withdraw", "Back", FormatNumber(HouseData[houseid][houseMoney]));
+
+            if(amount < 1 || amount > HouseData[houseid][houseMoney])
+                return Dialog_Show(playerid, HouseWithdrawCash, DIALOG_STYLE_INPUT, "Withdraw from safe", "Error: Insufficient funds.\n\nSafe Balance: %s\n\nPlease enter how much money you wish to withdraw from the safe:", "Withdraw", "Back", FormatNumber(HouseData[houseid][houseMoney]));
+
+            HouseData[houseid][houseMoney] -= amount;
+            GiveMoney(playerid, amount);
+
+            House_Save(houseid);
+            House_OpenStorage(playerid, houseid);
+
+            SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has withdrawn %s from their house safe.", ReturnName(playerid, 0), FormatNumber(amount));
+
+            Log_Save(E_LOG_HOUSE_SAFE, sprintf("[%s] %s has withdrawn \"%s\" (current safe: %s) from their house id: %d.", ReturnDate(), ReturnName(playerid, 0), FormatNumber(amount), FormatNumber(HouseData[houseid][houseMoney]), HouseData[houseid][houseID]));
+            //Discord_Log(HOUSESAFELOG, sprintf("%s has withdrawn \"%s\" (current safe: %s) from their house id: %d.", ReturnName(playerid, 0), FormatNumber(amount), FormatNumber(HouseData[houseid][houseMoney]), HouseData[houseid][houseID]));
+        }
+        else Dialog_Show(playerid, HouseMoney, DIALOG_STYLE_LIST, "Money Safe", "Withdraw from safe\nDeposit into safe", "Select", "Back");
+    }
+    return 1;
+}
+
+Dialog:HouseDepositCash(playerid, response, listitem, inputtext[])
+{
+    new
+        houseid;
+
+    if((houseid = House_Inside(playerid)) != -1 && House_IsOwner(playerid, houseid))
+    {
+        if(response)
+        {
+            new amount = strval(inputtext);
+
+            if(isnull(inputtext))
+                return Dialog_Show(playerid, HouseDepositCash, DIALOG_STYLE_INPUT, "Deposit into safe", "Safe Balance: %s\n\nPlease enter how much money you wish to deposit into the safe:", "Withdraw", "Back", FormatNumber(HouseData[houseid][houseMoney]));
+
+            if(amount < 1 || amount > GetMoney(playerid))
+                return Dialog_Show(playerid, HouseDepositCash, DIALOG_STYLE_INPUT, "Deposit into safe", "Error: Insufficient funds.\n\nSafe Balance: %s\n\nPlease enter how much money you wish to deposit into the safe:", "Withdraw", "Back", FormatNumber(HouseData[houseid][houseMoney]));
+
+            HouseData[houseid][houseMoney] += amount;
+            GiveMoney(playerid, -amount);
+
+            House_Save(houseid);
+            House_OpenStorage(playerid, houseid);
+
+            SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has deposited %s into their house safe.", ReturnName(playerid, 0), FormatNumber(amount));
+            Log_Save(E_LOG_HOUSE_SAFE, sprintf("[%s] %s has deposited \"%s\" (current safe: %s) into their house id: %d.", ReturnDate(), ReturnName(playerid, 0), FormatNumber(amount), FormatNumber(HouseData[houseid][houseMoney]), HouseData[houseid][houseID]));
+            //Discord_Log(HOUSESAFELOG, sprintf("%s has deposited \"%s\" (current safe: %s) into their house id: %d.", ReturnName(playerid, 0), FormatNumber(amount), FormatNumber(HouseData[houseid][houseMoney]), HouseData[houseid][houseID]));
+        }
+        else Dialog_Show(playerid, HouseMoney, DIALOG_STYLE_LIST, "Money Safe", "Withdraw from safe\nDeposit into safe", "Select", "Back");
+    }
+    return 1;
+}
+
+Dialog:HouseMoney(playerid, response, listitem, inputtext[])
+{
+    new
+        houseid;
+
+    if((houseid = House_Inside(playerid)) != -1 && House_IsOwner(playerid, houseid) || GetAdminLevel(playerid) >= 8)
+    {
+        if(response)
+        {
+            switch (listitem)
+            {
+                case 0: Dialog_Show(playerid, HouseWithdrawCash, DIALOG_STYLE_INPUT, "Withdraw from safe", "Safe Balance: %s\n\nPlease enter how much money you wish to withdraw from the safe:", "Withdraw", "Back", FormatNumber(HouseData[houseid][houseMoney]));
+                case 1: Dialog_Show(playerid, HouseDepositCash, DIALOG_STYLE_INPUT, "Deposit into safe", "Safe Balance: %s\n\nPlease enter how much money you wish to deposit into the safe:", "Withdraw", "Back", FormatNumber(HouseData[houseid][houseMoney]));
+            }
+        }
+        else House_OpenStorage(playerid, houseid);
+    }
+    return 1;
+}
+
+Dialog:HouseItems(playerid, response, listitem, inputtext[])
+{
+    new
+        houseid,
+        string[64];
+
+    if((houseid = House_Inside(playerid)) != -1 && (House_IsOwner(playerid, houseid) || GetAdminLevel(playerid) >= 5))
+    {
+        if(response)
+        {
+            if(HouseStorage[houseid][listitem][hItemExists])
+            {
+                PlayerData[playerid][pStorageItem] = listitem;
+                PlayerData[playerid][pInventoryItem] = listitem;
+
+                strunpack(string, HouseStorage[houseid][listitem][hItemName]);
+
+                format(string, sizeof(string), "%s (Quantity: %d)", string, HouseStorage[houseid][listitem][hItemQuantity]);
+                Dialog_Show(playerid, StorageOptions, DIALOG_STYLE_LIST, string, "Take Item\nStore Item", "Select", "Back");
+            }
+            else
+            {
+                if(!House_IsOwner(playerid, houseid))
+                    return SendErrorMessage(playerid, "Hanya pemilik rumah yang dapat meletakkan item!");
+
+                OpenInventory(playerid);
+                PlayerData[playerid][pStorageSelect] = 1;
+            }
+        }
+        else House_OpenStorage(playerid, houseid);
+    }
+    return 1;
+}
+
+Dialog:HouseStorage(playerid, response, listitem, inputtext[])
+{
+    new
+        houseid = -1;
+
+    if((houseid = House_Inside(playerid)) != -1 && (House_IsOwner(playerid, houseid) || GetAdminLevel(playerid) >= 5 || GetFactionType(playerid) == FACTION_POLICE))
+    {
+        if(response)
+        {
+            if(listitem == 0)
+            {
+                House_ShowItems(playerid, houseid);
+            }
+            else if(listitem == 1)
+            {
+                if(PlayerData[playerid][pScore] < 2)
+                    return SendErrorMessage(playerid, "You're not allowed to accese this storage if you're not level 2.");
+
+                House_WeaponStorage(playerid, houseid);
+            }
+            else if(listitem == 2)
+            {
+                Dialog_Show(playerid, HouseMoney, DIALOG_STYLE_LIST, "Money Safe", "Withdraw from safe\nDeposit into safe", "Select", "Back");
+            }
+        }
+    }
+    else SendServerMessage(playerid, "Hanya dapat melihat isi penyimpanan, tidak dapat mengoperasikan isi didalamnya!");
+
+    return 1;
+}
+
+Dialog:StorageOptions(playerid, response, listitem, inputtext[])
+{
+    new
+        houseid = -1,
+        itemid = -1,
+//        backpack = -1,
+        string[32];
+
+    if((houseid = House_Inside(playerid)) != -1 && (House_IsOwner(playerid, houseid) || GetAdminLevel(playerid) >= 5))
+    {
+        itemid = PlayerData[playerid][pStorageItem];
+
+        strunpack(string, HouseStorage[houseid][itemid][hItemName]);
+
+        if(response)
+        {
+            switch (listitem)
+            {
+                case 0:
+                {
+                    if(HouseStorage[houseid][itemid][hItemQuantity] == 1)
+                    {
+                        if(!strcmp(string, "Backpack") && Inventory_HasItem(playerid, "Backpack"))
+                            return SendErrorMessage(playerid, "You already have a backpack in your inventory.");
+
+                        for (new i = 0; i < sizeof(g_aInventoryItems); i ++) if(!strcmp(g_aInventoryItems[i][e_InventoryItem], string, true)) {
+                            if((Inventory_Count(playerid, g_aInventoryItems[i][e_InventoryItem])+1) > g_aInventoryItems[i][e_InventoryMax])
+                                return SendErrorMessage(playerid, "You're limited %d for %s.", g_aInventoryItems[i][e_InventoryMax], string);
+                        }
+
+                        if(Inventory_Add(playerid, string, HouseStorage[houseid][itemid][hItemModel], 1) != -1)
+                        {
+                            House_RemoveItem(houseid, string);
+                            SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has taken a \"%s\" from their house storage.", ReturnName(playerid, 0), string);
+
+                            House_ShowItems(playerid, houseid);
+                            Log_Save(E_LOG_STORAGE, sprintf("[%s] %s has taken \"%s\" from house ID: %d.", ReturnDate(), ReturnName(playerid, 0), string, houseid));
+                        }
+                    }
+                    else
+                    {
+                        Dialog_Show(playerid, HouseTake, DIALOG_STYLE_INPUT, "House Take", "Item: %s (Quantity: %d)\n\nPlease enter the quantity that you wish to take for this item:", "Take", "Back", string, HouseStorage[houseid][itemid][hItemQuantity]);
+                    }
+                }
+                case 1:
+                {
+                    if(!House_IsOwner(playerid, houseid))
+                        return SendErrorMessage(playerid, "Hanya pemilik rumah yang dapat meletakkan item!");
+
+                    new id = Inventory_GetItemID(playerid, string);
+
+                    if(id == -1) {
+                        House_ShowItems(playerid, houseid);
+
+                        return SendErrorMessage(playerid, "You don't have anymore of this item to store!");
+                    }
+                    else if(InventoryData[playerid][id][invQuantity] == 1)
+                    {
+                        House_AddItem(houseid, string, InventoryData[playerid][id][invModel]);
+                        Inventory_Remove(playerid, string);
+
+                        SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has stored a \"%s\" into their house storage.", ReturnName(playerid, 0), string);
+                        Log_Save(E_LOG_STORAGE, sprintf("[%s] %s has stored \"%s\" into their house ID: %d.", ReturnDate(), ReturnName(playerid, 0), string, houseid));
+                        House_ShowItems(playerid, houseid);
+                    }
+                    else if(InventoryData[playerid][id][invQuantity] > 1) {
+                        PlayerData[playerid][pInventoryItem] = id;
+
+                        Dialog_Show(playerid, HouseDeposit, DIALOG_STYLE_INPUT, "House Deposit", "Item: %s (Quantity: %d)\n\nPlease enter the quantity that you wish to store for this item:", "Store", "Back", string, InventoryData[playerid][id][invQuantity]);
+                    }
+                }
+            }
+        }
+        else
+        {
+            House_ShowItems(playerid, houseid);
+        }
+    }
+    return 1;
+}
+
+Dialog:RegisterScreen(playerid, response, listitem, inputtext[])
+{
+    if(!response) {
+        SendServerMessage(playerid, "Gagal melakukan registrasi, anda keluar dari server.");
+        KickEx(playerid);
+    }
+    else 
+    {
+        if(strlen(inputtext) < 8 || strlen(inputtext) > 32)
+            return Dialog_Show(playerid, RegisterScreen, DIALOG_STYLE_PASSWORD, "Mendaftarkan akun", ""WHITE"Selamat datang di Acropolize "YELLOW"%s"WHITE".\n\nMasukkan password untuk mendaftarkan akun: (password minimal 8 sampai dengan 32 karakter).\n\n"COL_GREY"ERROR: Password terlalu singkat, masukkan dengan minimal 8 karakter.", "Daftarkan", "Keluar", ReturnName(playerid));
+
+        for (new i; i < 64; i++)
+            AccountData[playerid][pSalt][i] = random(79) + 47;
+
+        SHA256_PassHash(inputtext, AccountData[playerid][pSalt], AccountData[playerid][pPassword], 64);
+        Dialog_Show(playerid, KonfirmasiPassword, DIALOG_STYLE_PASSWORD, "Konfirmasi password anda", ""WHITE"Masukkan password yang anda masukkan di kolom sebelumnya:", "Konfirmasi", "Kembali");
+    }
+    return 1;
+}
+
+Dialog:KonfirmasiPassword(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new hash[65];
+        SHA256_PassHash(inputtext, AccountData[playerid][pSalt], hash, sizeof(hash));
+
+        if(strcmp(hash, AccountData[playerid][pPassword]))
+            return Dialog_Show(playerid, KonfirmasiPassword, DIALOG_STYLE_PASSWORD, "Konfirmasi password anda salah", ""WHITE"Masukkan password yang anda masukkan di kolom sebelumnya:\n\n"COL_GREY"ERROR: Password tidak sesuai, masukkan ulang password atau anda dapat ...\n... mengubahnya dengan password baru dengan menekan opsi 'Kembali'", "Konfirmasi", "Kembali");
+
+        AccountData[playerid][pRegisterDate] = gettime();
+
+        GetPlayerIp(playerid, AccountData[playerid][pIP], 16);
+        GetPlayerName(playerid, AccountData[playerid][pUsername], MAX_PLAYER_NAME + 1);
+
+        new query[500];
+        mysql_format(g_iHandle, query, sizeof(query), "UPDATE `accounts` SET `Username` = '%s', `Password` = '%s', `Salt` = '%s', `IP` = '%s', `RegisterDate` = '%i', `Registered` = '1' WHERE `Username` = '%s'", AccountData[playerid][pUsername], SQL_ReturnEscaped(AccountData[playerid][pPassword]), SQL_ReturnEscaped(AccountData[playerid][pSalt]), AccountData[playerid][pIP], AccountData[playerid][pRegisterDate], ReturnName(playerid));
+        mysql_query(g_iHandle, query, false);
+
+        format(query, sizeof(query), "SELECT * FROM `characters` WHERE `Username` = '%s' LIMIT %d;", ReturnName(playerid), MAX_CHARACTERS);
+        mysql_tquery(g_iHandle, query, "OnQueryFinished", "dd", playerid, THREAD_LIST_CHARACTERS);
+    }
+    else Dialog_Show(playerid, RegisterScreen, DIALOG_STYLE_PASSWORD, "Mendaftarkan akun", ""WHITE"Selamat datang "YELLOW"%s"WHITE".\n\nMasukkan password untuk mendaftarkan akun: (password minimal 8 sampai dengan 32 karakter)", "Daftarkan", "Keluar", ReturnName(playerid));
+    return 1;
+}
+
+Dialog:PutEmail(playerid, response, listitem, inputtext[])
+{
+    new
+        email_query[128];
+
+    if (!response)
+        return KickEx(playerid);
+
+    if (!IsValidEmail(inputtext)) {
+        SendErrorMessage(playerid, "Email yang anda masukkan tidak valid.");
+        return Dialog_Show(playerid, PutEmail, DIALOG_STYLE_INPUT, "Email", WHITE"Tolong masukkan email dibawah ini untuk melakukan konfirmasi akun\nCek folder INBOX/SPAM untuk melihat kode verifikasi\n\nEmail valid: "YELLOW"@gmail.com, @hotmail.com", "Enter", "Quit");
+    }
+
+    format(AccountData[playerid][pMail], 32, inputtext);
+    format(email_query, sizeof(email_query), "SELECT * FROM `accounts` WHERE `Email` = '%s' LIMIT 1;", SQL_ReturnEscaped(inputtext));
+    mysql_tquery(g_iHandle, email_query, "OnQueryFinished", "dd", playerid, THREAD_VERIFY_EMAIL);
+    return 1;
+}
+
+Dialog:PutCode(playerid, response, listitem, inputtext[])
+{
+    if(strcmp(AccountData[playerid][pVerifyCode], inputtext))
+    {
+        SendErrorMessage(playerid, "Kode Verifikasi salah, mohon di cek kembali.");
+        return Dialog_Show(playerid, PutCode, DIALOG_STYLE_INPUT, "Kode Verifikasi", WHITE"Isi kode disini untuk memverifikasi akun kamu\n(kode sudah dikirimkan ke Direct Message discord oleh BOT CP:RP):", "Verifikasi", "Kembali");
+    }
+
+    SendClientMessage(playerid, X11_LIGHTBLUE, "ACCOUNT: {FFFFFF}Your ACP successfully activated!");
+    new query[128];
+    mysql_format(g_iHandle, query, 128, "UPDATE `accounts` SET `Active` = 1 WHERE `Username` = '%e'", ReturnName(playerid));
+    mysql_tquery(g_iHandle, query);
+    SQL_CheckAccount(playerid);
+    return 1;
+}
+
+Dialog:LoginScreen(playerid, response, listitem, inputtext[])
+{
+    if(!response)
+        return KickEx(playerid);
+
+    if(isnull(inputtext))
+        return Dialog_Show(playerid, LoginScreen, DIALOG_STYLE_PASSWORD, "LOGIN", ""WHITE"Selamat datang kembali "YELLOW"%s\n"WHITE"Versi Server: "COL_GREEN"%s\n\n"WHITE"Anda di beri waktu "YELLOW"5 menit "WHITE"untuk login, atau akan di keluarkan dari server.\nSilahkan login dengan memasukkan password ke kolom di bawah ini\n\nWARNING: Masukkan password dengan benar, anda baru saja tidak memasukkan password.", "Masuk", "Keluar", ReturnName(playerid,0), SERVER_REVISION);
+
+    new hash[65];
+    SHA256_PassHash(inputtext, AccountData[playerid][pSalt], hash, sizeof(hash));
+
+    if(strcmp(hash, AccountData[playerid][pPassword]))
+    {
+        if(++AccountData[playerid][pLoginAttempts] >= 3) {
+            AccountData[playerid][pLoginAttempts] = 0;
+            SendClientMessage(playerid, X11_TOMATO_1, "Notice: Anda telah di kick karena kesalahan 3 kali memasukkan password.");
+            KickEx(playerid);
+        }
+        else {
+            Dialog_Show(playerid, LoginScreen, DIALOG_STYLE_PASSWORD, "LOGIN", ""WHITE"Selamat datang kembali "YELLOW"%s\n"WHITE"Versi Server: "COL_GREEN"%s\n\n"WHITE"Anda di beri waktu "YELLOW"5 menit "WHITE"untuk login, atau akan di keluarkan dari server.\nSilahkan login dengan memasukkan password ke kolom di bawah ini\n\n"COL_LIGHTRED"SECURITY: "WHITE"Kesempatan login tersisa "YELLOW"%d"WHITE"/"COL_RED"3 "WHITE"kali lagi.", "Masuk", "Keluar", ReturnName(playerid,0), SERVER_REVISION, AccountData[playerid][pLoginAttempts]);
+            ShowPlayerFooter(playerid, "Password salah, coba lagi.", 1000);
+        }
+        return 1;
+    }
+
+    new
+        query[128];
+
+    AccountData[playerid][pLogged] = 1;
+
+    format(query, sizeof(query), "SELECT `Character` FROM `characters` WHERE `Username` = '%s' LIMIT %d;", AccountData[playerid][pUsername], MAX_CHARACTERS);
+    mysql_tquery(g_iHandle, query, "OnQueryFinished", "dd", playerid, THREAD_LIST_CHARACTERS);
+
+    stop AccountData[playerid][pLoginTimer];
+
+    return 1;
+}
+
+Dialog:Personal(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        switch(listitem)
+        {
+            case 0: Dialog_Show(playerid, Gender, DIALOG_STYLE_LIST, "Jenis Kelamin", "Laki-laki\nPerempuan", "Select", "Cancel");
+            case 1: Dialog_Show(playerid, DateBirth, DIALOG_STYLE_INPUT, "Tanggal Lahir", "Masukkan tanggal lahir dengan mengikuti format (DD/MM/YYYY):", "Submit", "Cancel");
+            case 2: Dialog_Show(playerid, Origin, DIALOG_STYLE_INPUT, "Asal Karakter", "Silahkan memasukkan asal geografi dari karakter anda:", "Submit", "Cancel");
+            case 3:
+            {
+                if(!strlen(PlayerData[playerid][pBirthdate]))
+                    return SendErrorMessage(playerid, "Tanggal lahir belum di isi!.");
+
+                else if(!strlen(PlayerData[playerid][pOrigin]))
+                    return SendErrorMessage(playerid, "Asal karakter belum di isi.");
+
+                else
+                {
+                    for (new i = 0; i < 10; i ++) {
+                        PlayerTextDrawHide(playerid, PlayerTextdraws[playerid][textdraw_registrasi][i]);
+                    }
+                    switch (PlayerData[playerid][pGender])
+                    {
+                        case 1: ShowModelSelectionMenu(playerid, "Pilih Pakaian Karakter", MODEL_SELECTION_SKIN, g_aMaleSkins, sizeof(g_aMaleSkins), -16.0, 0.0, -55.0);
+                        case 2: ShowModelSelectionMenu(playerid, "Pilih Pakaian Karakter", MODEL_SELECTION_SKIN, g_aFemaleSkins, sizeof(g_aFemaleSkins), -16.0, 0.0, -55.0);
+                    }
+                }
+            }
+        }
+    }
+    return 1;
+}
+
+Dialog:Gender(playerid, response, listitem, inputtext[])
+{
+    if(!response) return SetTimerEx("SelectTD", 100, false, "d", playerid);
+    if(response)
+    {
+        PlayerData[playerid][pGender] = listitem + 1;
+        switch (listitem) {
+            case 0: {
+                PlayerTextDrawSetString(playerid, PlayerTextdraws[playerid][textdraw_registrasi][4], "~b~~h~Jenis Kelamin~n~~w~Anda seorang ~r~laki-laki");
+                PlayerTextDrawSetPreviewModel(playerid, PlayerTextdraws[playerid][textdraw_registrasi][2], 98);
+
+                PlayerTextDrawHide(playerid, PlayerTextdraws[playerid][textdraw_registrasi][4]);
+                PlayerTextDrawShow(playerid, PlayerTextdraws[playerid][textdraw_registrasi][4]);
+            }
+            case 1: {
+                PlayerTextDrawSetString(playerid, PlayerTextdraws[playerid][textdraw_registrasi][4], "~b~~h~Jenis Kelamin~n~~w~Anda seorang ~r~perempuan");
+                PlayerTextDrawSetPreviewModel(playerid, PlayerTextdraws[playerid][textdraw_registrasi][2], 233);
+
+                PlayerTextDrawHide(playerid, PlayerTextdraws[playerid][textdraw_registrasi][4]);
+                PlayerTextDrawShow(playerid, PlayerTextdraws[playerid][textdraw_registrasi][4]);
+            }
+        }
+        PlayerData[playerid][pSkin] = (listitem) ? (233) : (98);
+        SetPlayerSkinEx(playerid,PlayerData[playerid][pSkin]);
+        SetTimerEx("SelectTD", 200, false, "d", playerid);
+    }
+    else SetTimerEx("SelectTD", 200, false, "d", playerid);
+    return 1;
+}
+
+Dialog:DateBirth(playerid, response, listitem, inputtext[])
+{
+    if(!response) return SetTimerEx("SelectTD", 100, false, "d", playerid);
+    if(response)
+    {
+        new
+            iDay,
+            iMonth,
+            iYear,
+            str[64],
+            day,
+            month,
+            year;
+
+        getdate(year, month, day);
+
+        static const
+                arrMonthDays[] = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
+        if(sscanf(inputtext, "p</>ddd", iDay, iMonth, iYear)) {
+            Dialog_Show(playerid, DateBirth, DIALOG_STYLE_INPUT, "Tanggal Lahir", "Error: Tidak sesuai format, gunakan / di setiap tanggal/bulan/tahun!\n\nMasukkan tanggal lahir dengan mengikuti format (DD/MM/YYYY):", "Submit", "Cancel");
+        }
+        else if(iYear < 1900 || iYear > year) {
+            Dialog_Show(playerid, DateBirth, DIALOG_STYLE_INPUT, "Tanggal Lahir", "Error: Takun tidak sesuai!\n\nMasukkan tanggal lahir dengan mengikuti format (DD/MM/YYYY):", "Submit", "Cancel");
+        }
+        else if(iMonth < 1 || iMonth > 12) {
+            Dialog_Show(playerid, DateBirth, DIALOG_STYLE_INPUT, "Tanggal Lahir", "Error: Bulan tidak sesuai!\n\nMasukkan tanggal lahir dengan mengikuti format (DD/MM/YYYY):", "Submit", "Cancel");
+        }
+        else if(iDay < 1 || iDay > arrMonthDays[iMonth - 1]) {
+            Dialog_Show(playerid, DateBirth, DIALOG_STYLE_INPUT, "Tanggal Lahir", "Error: Hari tidak sesuai!\n\nMasukkan tanggal lahir dengan mengikuti format (DD/MM/YYYY):", "Submit", "Cancel");
+        }
+        else {
+            format(PlayerData[playerid][pBirthdate], 24, inputtext);
+
+            format(str, sizeof(str), "~b~~h~Tanggal lahir~n~~w~%s", inputtext);
+            PlayerTextDrawSetString(playerid, PlayerTextdraws[playerid][textdraw_registrasi][5], str);
+        }
+    }
+    else SetTimerEx("SelectTD", 100, false, "d", playerid);
+    return 1;
+}
+
+Dialog:Origin(playerid, response, listitem, inputtext[])
+{
+    if(!response) return SetTimerEx("SelectTD", 100, false, "d", playerid);
+    if(response)
+    {
+        new str[64];
+
+        if(isnull(inputtext) || strlen(inputtext) <= 3 || strlen(inputtext) > 32)
+            return Dialog_Show(playerid, Origin, DIALOG_STYLE_INPUT, "Asal Karakter", "Silahkan memasukkan asal geografi dari karakter anda:", "Submit", "Cancel");
+
+        for (new i = 0, len = strlen(inputtext); i != len; i ++) {
+            if((inputtext[i] >= 'A' && inputtext[i] <= 'Z') || (inputtext[i] >= 'a' && inputtext[i] <= 'z') || (inputtext[i] >= '0' && inputtext[i] <= '9') || (inputtext[i] == ' ') || (inputtext[i] == ',') || (inputtext[i] == '.'))
+                continue;
+
+            else return Dialog_Show(playerid, Origin, DIALOG_STYLE_INPUT, "Asal Karakter", "Error: Tidak dapat memasukkan data selain huruf dan angka.\n\nSilahkan memasukkan asal geografi dari karakter anda:", "Submit", "Cancel");
+        }
+
+        format(PlayerData[playerid][pOrigin], 32, inputtext);
+        format(str, sizeof(str), "~b~~h~Asal Karakter~n~~w~%s", inputtext);
+        PlayerTextDrawSetString(playerid, PlayerTextdraws[playerid][textdraw_registrasi][6], str);
+    }
+    else SetTimerEx("SelectTD", 100, false, "d", playerid);
+    return 1;
+}
+
+Dialog:ChangePassword(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        if(isnull(inputtext))
+            return cmd_changepass(playerid, "\0");
+
+        new hash[65];
+        SHA256_PassHash(inputtext, AccountData[playerid][pSalt], hash, sizeof(hash));
+
+        if(strcmp(hash, AccountData[playerid][pPassword])) {
+            cmd_changepass(playerid, "\0");
+            SendServerMessage(playerid, "Password tidak sesuai, coba lagi");
+        }
+        else Dialog_Show(playerid, NewPass, DIALOG_STYLE_PASSWORD, "Password Baru", WHITE"Masukkan password barumu!\n\nMasukkan password yang sulit untuk diketahui orang lain.", "Ganti", "Keluar");
+    }
+    return 1;
+}
+
+Dialog:NewPass(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        if(isnull(inputtext))
+            return Dialog_Show(playerid, NewPass, DIALOG_STYLE_PASSWORD, "Password Baru", WHITE"Masukkan password barumu!\n\nMasukkan password yang sulit untuk diketahui orang lain.", "Ganti", "Keluar");
+
+        if(strlen(inputtext) < 8 || strlen(inputtext) > 32)
+            return Dialog_Show(playerid, NewPass, DIALOG_STYLE_PASSWORD, "Password Baru", WHITE"Masukkan password barumu!\n\nMasukkan password yang sulit untuk diketahui orang lain\n\nPassword minimal 8 karakter hingga 32 karakter!.", "Ganti", "Keluar");
+
+        SHA256_PassHash(inputtext, AccountData[playerid][pSalt], AccountData[playerid][pPassword], 65);
+
+        new output[400];
+        format(output, sizeof output, "UPDATE `accounts` SET `Password` = '%s' WHERE `ID` = '%d';", AccountData[playerid][pPassword], GetUCPSQLID(playerid));
+        mysql_tquery(g_iHandle, output);
+
+        for(new i = 0; i != strlen(inputtext); i++)
+            inputtext[i] = '*';
+
+        SendServerMessage(playerid, "Sukses mengganti password ACPmu. [P: %s]", inputtext);
+    }
+    return 1;
+}
+
+Dialog:Aksesoris(playerid, response, listitem, inputtext[])
+{
+    new string[24];
+    for (new id = 0; id != MAX_ACC; id++)
+    if(response)
+    {
+        PlayerData[playerid][pAksesoris] = ListedAcc[playerid][listitem];
+
+        format(string,sizeof(string),"Edit Accessory (#%d)",PlayerData[playerid][pAksesoris]);
+        Dialog_Show(playerid, AksesorisEdit, DIALOG_STYLE_LIST, string, "Place %s\nChange Bone\nChange Placement\nChange Color 1\nChange Color 2\nRemove from list\nGive Accesories", "Select", "Exit", IsPlayerAttachedObjectSlotUsed(playerid, PlayerData[playerid][pAksesoris]) ? ("Off") : ("On"));
+    }
+    return 1;
+}
+
+Dialog:AksesorisEdit(playerid, response, listitem, inputtext[])
+{
+    new id = PlayerData[playerid][pAksesoris];
+    if(response)
+    {
+        switch(listitem)
+        {
+            case 0:
+            {
+                if(IsPlayerAttachedObjectSlotUsed(playerid, id))
+                {
+                    RemovePlayerAttachedObject(playerid, id);
+                    AccData[playerid][id][accShow] = 0;
+                    Aksesoris_Save(playerid, id);
+                }
+                else 
+                {
+                    Aksesoris_Attach(playerid, id);
+                }
+            }
+            case 1:
+            {
+                new string[256+1];
+                for(new i; i < sizeof(accBones); i++)
+                {
+                    format(string,sizeof(string),"%s%s\n",string,accBones[i]);
+                }
+                Dialog_Show(playerid, AksesorisBone, DIALOG_STYLE_LIST, "Edit Bone",string,"Select","Close");
+            }
+            case 2:
+            {
+                if (EditingWeapon[playerid])
+                    return SendClientMessage(playerid, -1, "You are on editing mode.");
+
+                if(IsPlayerAttachedObjectSlotUsed(playerid, id))
+                {
+                    SendServerMessage(playerid, "Use "YELLOW"~k~~PED_SPRINT~"WHITE" to look around.");
+                    EditAttachedObject(playerid, id);
+                }
+                else return SendCustomMessage(playerid, "ACCESORY","This accessory is not attached.");
+            }
+            case 3:
+            {
+                if(!IsPlayerAttachedObjectSlotUsed(playerid, id))
+                    return SendCustomMessage(playerid, "ACCESORY","This accessory is not attached.");
+
+                Dialog_Show(playerid, WarnaAksesoris, DIALOG_STYLE_INPUT, "Accessory Color 1",color_string, "Choose","Close");
+                SetPVarInt(playerid, "Color", 1);
+            }
+            case 4:
+            {
+                if(!IsPlayerAttachedObjectSlotUsed(playerid, id))
+                    return SendCustomMessage(playerid, "ACCESORY","This accessory is not attached.");
+
+                Dialog_Show(playerid, WarnaAksesoris, DIALOG_STYLE_INPUT, "Accessory Color 2",color_string, "Choose","Close");
+                SetPVarInt(playerid, "Color", 2);
+            }
+            case 5:
+            {
+                new string[128];
+                AccData[playerid][id][accExists] = 0;
+                AccData[playerid][id][accModel] = 0;
+
+                if(IsPlayerAttachedObjectSlotUsed(playerid, id))
+                {
+                    RemovePlayerAttachedObject(playerid, id);
+                    AccData[playerid][id][accShow] = 0;
+                    Aksesoris_Save(playerid, id);
+                }
+                format(string,sizeof(string),"DELETE FROM `aksesoris` WHERE `ID`='%d'", AccData[playerid][id][accID]);
+                mysql_tquery(g_iHandle, string);
+
+                SendCustomMessage(playerid, "ACCESORY","You have removed accessory index #%d.", id);
+            }
+            case 6://Give Accesories
+            {
+                SetPVarInt(playerid, "ACCESORIES_ID", id);
+                Dialog_Show(playerid, ACC_GIVE, DIALOG_STYLE_INPUT, "Accesories Give", "Input the player id that you want to give the accesories", "Give", "Close");
+            }
+        }
+    }
+    return 1;
+}
+RemovePlayerAccesories(playerid, slot)
+{
+    new 
+        string[128];
+
+    AccData[playerid][slot][accExists] = 0;
+    AccData[playerid][slot][accModel] = 0;
+
+    if(IsPlayerAttachedObjectSlotUsed(playerid, slot))
+    {
+        RemovePlayerAttachedObject(playerid, slot);
+        AccData[playerid][slot][accShow] = 0;
+        Aksesoris_Save(playerid, slot);
+    }
+    format(string,sizeof(string),"DELETE FROM `aksesoris` WHERE `ID`='%d'", AccData[playerid][slot][accID]);
+    mysql_tquery(g_iHandle, string);
+
+    SendCustomMessage(playerid, "ACCESORY","You have give accessory index #%d.", slot);
+    return 1;
+}
+GiveAccesoriesToPlayer(playerid, userid, slot)
+{
+    if(Aksesoris_GetCount(userid) > MAX_ACC)
+    {
+        return SendErrorMessage(playerid, "Slot aksesoris player ini sudah penuh.");
+    }
+
+    new 
+        query[255]
+    ;
+
+    for (new i = 0; i != MAX_ACC; i++)
+    { 
+        if(!AccData[userid][i][accExists]) 
+        {
+            AccData[userid][i][accExists] = 1;
+
+            format(AccData[userid][i][accName], 32, AccData[playerid][slot][accName]);
+
+            AccData[userid][i][accModel] = AccData[playerid][slot][accModel];
+
+            AccData[userid][i][accBone] = 1;
+
+            PlayerData[userid][pAksesoris] = i;
+            AccData[userid][i][accColor1][0] = AccData[userid][i][accColor1][1] = AccData[userid][i][accColor1][2] = 255;
+            AccData[userid][i][accColor2][0] = AccData[userid][i][accColor2][1] = AccData[userid][i][accColor2][2] = 255;
+
+            AccData[userid][i][accScale][0] = AccData[userid][i][accScale][1] = AccData[userid][i][accScale][2] = 1.0;
+
+            RemovePlayerAccesories(playerid, slot);
+
+            format(query,sizeof(query),"INSERT INTO `aksesoris` (`accID`) VALUES (%d)", PlayerData[userid][pID]);
+            mysql_tquery(g_iHandle, query, "OnAksesorisCreated", "dd", userid, i);
+            return i;
+        }
+    }
+    return 1;
+}
+Dialog:ACC_GIVE(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new 
+            id = GetPVarInt(playerid, "ACCESORIES_ID"),
+            userid = strval(inputtext),
+            string[255]
+        ;
+        if(userid == INVALID_PLAYER_ID)
+            return Dialog_Show(playerid, ACC_GIVE, DIALOG_STYLE_INPUT, "Accesories Give", "ERROR : Invalid player id\n\nInput the player id that you want to give the accesories", "Give", "Close");
+
+        if(IsPlayerNearPlayer(playerid, userid, 5.0))
+        {
+            SetPVarInt(userid, "OFFERED_ACC", playerid);
+            SendServerMessage(playerid, "You offer %s for your %s", ReturnName(userid), AccData[playerid][id][accName]);
+            format(string, sizeof(string), "%s want to give their %s to your inventory", ReturnName(playerid), AccData[playerid][id][accName]);
+            Dialog_Show(userid, ACC_ACCEPT, DIALOG_STYLE_MSGBOX, "Give Accesories", string, "Accept", "Decline");
+        }
+        else SendErrorMessage(playerid, "This player is not near you!");
+    }
+    return 1;
+}
+Dialog:ACC_ACCEPT(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new 
+            userid = GetPVarInt(playerid, "OFFERED_ACC"),
+            id = GetPVarInt(userid, "ACCESORIES_ID");
+
+        GiveAccesoriesToPlayer(userid, playerid, id);
+    }
+    return 1;
+}
+Dialog:WarnaAksesoris(playerid, response, listitem, inputtext[])
+{
+    new id = PlayerData[playerid][pAksesoris];
+    if(response)
+    {
+        new color = strval(inputtext);
+
+        if(!(0 <= color <= sizeof(ColorList)-1))
+            return SendErrorMessage(playerid, "Invalid color ID.");
+
+        switch(GetPVarInt(playerid, "Color"))
+        {
+            case 1: GetRGB(ColorList[color], AccData[playerid][id][accColor1][0], AccData[playerid][id][accColor1][1], AccData[playerid][id][accColor1][2]);
+            case 2: GetRGB(ColorList[color], AccData[playerid][id][accColor2][0], AccData[playerid][id][accColor2][1], AccData[playerid][id][accColor2][2]);
+        }
+        Aksesoris_Attach(playerid, id);
+    }
+    return 1;
+}
+
+Dialog:AksesorisBone(playerid, response, listitem, inputtext[])
+{
+    new id = PlayerData[playerid][pAksesoris];
+    if(response)
+    {
+        AccData[playerid][id][accBone] = listitem+1;
+        if(IsPlayerAttachedObjectSlotUsed(playerid, id))
+        {
+            RemovePlayerAttachedObject(playerid, id);
+            AccData[playerid][id][accScale][0] = AccData[playerid][id][accScale][1] = AccData[playerid][id][accScale][2] = 1.0;
+            AccData[playerid][id][accOffset][0] = AccData[playerid][id][accOffset][1] = AccData[playerid][id][accOffset][2] = 0.0;
+            AccData[playerid][id][accRot][0] = AccData[playerid][id][accRot][1] = AccData[playerid][id][accRot][2] = 0.0;
+
+            Aksesoris_Attach(playerid, id);
+            EditAttachedObject(playerid, id);
+        }
+        SendCustomMessage(playerid, "ACCESORY","You have been changed accessory bone index #%d to %s", id, accBones[listitem]);
+    }
+    return 1;
+}
+Dialog:LaptopMenu(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        switch(listitem)
+        {
+            case 0:
+            {
+                GetWarehouseStatus(playerid);
+            }
+            case 1:
+            {
+                Dialog_Show(playerid, eBank, DIALOG_STYLE_LIST, "E-Banking", "Bank Status\nCheck Salary\nTransfer\nBuy Phone Credits", "Choose", "Close");
+            }
+            case 2:
+            {
+                ShowAds(playerid);
+            }
+            case 3:
+            {
+                new vehicleid = Vehicle_Nearest(playerid, 5);
+                static index;
+                if((index = Vehicle_ReturnID(vehicleid)) != -1 && Vehicle_IsOwned(playerid, index))
+                {
+                    if(VehicleData[index][vehTurbo] == 0)
+                        return SendErrorMessage(playerid, "You don't have any turbo installed on this vehicle");
+
+                    if(VehicleData[index][vehTurbo] == 3)
+                    {
+                        Dialog_Show(playerid, ChangeSpeed, DIALOG_STYLE_LIST, "V-Engine Tuning", "Disable Turbo\nChange to Level 1 Turbo\nChange to Level 2 Turbo\nChange to Level 3 Turbo", "Change", "Close");
+                    }
+
+                    if(VehicleData[index][vehTurbo] == 2)
+                    {
+                        Dialog_Show(playerid, ChangeSpeed, DIALOG_STYLE_LIST, "V-Engine Tuning", "Disable Turbo\nChange to Level 1 Turbo\nChange to Level 2 Turbo", "Change", "Close");
+                    }
+
+                    if(VehicleData[index][vehTurbo] == 1)
+                    {
+                        Dialog_Show(playerid, ChangeSpeed, DIALOG_STYLE_LIST, "V-Engine Tuning", "Disable Turbo\nChange to Level 1 Turbo", "Change", "Close");
+                    }
+                }
+                else SendErrorMessage(playerid, "You're not near your vehicle!");
+            }
+            case 4:
+            {
+                SendClientMessage(playerid, COLOR_WHITE, "Disabled for temporary");
+            }
+            case 5:
+            {
+                SendClientMessage(playerid, COLOR_WHITE, "Disabled for temporary");
+            }
+            case 6:
+            {
+                if(GetFactionType(playerid) != FACTION_GANG)
+                    return SendErrorMessage(playerid, "Kamu tidak bergabung dalam official family.");
+
+                Dialog_Show(playerid, Laptop, DIALOG_STYLE_LIST, "Laptop", "Informasi Pengiriman\nImport Materials\nImport Drugs\nImport Guns", "Select", "Close");
+            }
+        }
+    }
+    return 1;
+}
+Dialog:ChangeSpeed(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new vehicleid = Vehicle_Nearest(playerid, 5);
+        static index;
+        switch(listitem)
+        {
+            case 0:
+            {
+                if((index = Vehicle_ReturnID(vehicleid)) != -1 && Vehicle_IsOwned(playerid, index))
+                {
+                    DisableTurbo[vehicleid] = true;
+                    SendClientMessage(playerid, COLOR_WHITE, "You "RED"disabled "WHITE"your turbo charge!");
+                }
+                else SendErrorMessage(playerid, "You're not near your vehicle!");
+            }    
+            case 1:
+            {
+                if((index = Vehicle_ReturnID(vehicleid)) != -1 && Vehicle_IsOwned(playerid, index))
+                {
+                    DisableTurbo[vehicleid] = false;
+                    ChangeTurboOne[vehicleid] = true;
+                    ChangeTurboTwo[vehicleid] = false;
+                    ChangeTurboThree[vehicleid] = false;
+                    SendClientMessage(playerid, COLOR_WHITE, "[Turbo] You "GREEN"enabled "WHITE"level 1 turbo charge!");
+                }
+                else SendErrorMessage(playerid, "You're not near your vehicle!");
+            } 
+            case 2:
+            {
+                if((index = Vehicle_ReturnID(vehicleid)) != -1 && Vehicle_IsOwned(playerid, index))
+                {
+                    DisableTurbo[vehicleid] = false;
+                    ChangeTurboOne[vehicleid] = true;
+                    ChangeTurboTwo[vehicleid] = true;
+                    ChangeTurboThree[vehicleid] = false;
+                    SendClientMessage(playerid, COLOR_WHITE, "[Turbo] You "GREEN"enabled "WHITE"level 2 turbo charge!");
+                }
+                else SendErrorMessage(playerid, "You're not near your vehicle!");
+            } 
+            case 3:
+            {
+                if((index = Vehicle_ReturnID(vehicleid)) != -1 && Vehicle_IsOwned(playerid, index))
+                {
+                    DisableTurbo[vehicleid] = false;
+                    ChangeTurboOne[vehicleid] = true;
+                    ChangeTurboTwo[vehicleid] = true;
+                    ChangeTurboThree[vehicleid] = true;
+                    SendClientMessage(playerid, COLOR_WHITE, "[Turbo] You "GREEN"enabled "WHITE"level 3 turbo charge!");
+                }
+                else SendErrorMessage(playerid, "You're not near your vehicle!");
+            } 
+        }
+    }
+    return 1;
+
+}
+Dialog:eBank(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        switch(listitem)
+        {
+            case 0:
+            {
+                new 
+                    dialog_string[100],
+                    bankmoney = PlayerData[playerid][pBankMoney],
+                    interest = (PlayerData[playerid][pBankMoney]/1000)
+                ;
+                format(dialog_string, sizeof(dialog_string), "%s"WHITE"Account Balance: "GREEN"%s\n", dialog_string, FormatNumber(bankmoney));
+                format(dialog_string, sizeof(dialog_string), "%s"WHITE"Bank Interest: "GREEN"%s\n", dialog_string, FormatNumber(interest));
+                Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_LIST, "Bank Account", dialog_string, "Close", "");
+            }
+            case 1:
+            {
+                ShowPlayerSalary(playerid);
+            }
+            case 2:
+            {
+                Dialog_Show(playerid, eTransfer, DIALOG_STYLE_INPUT, "Make a transfer", "Your bank account's balance: %s\n\nPlease enter the name or ID of the player below:", "Continue", "Back", FormatNumber(PlayerData[playerid][pBankMoney]));    
+            }
+            case 3:
+            {
+                Dialog_Show(playerid, ePhoneCredits, DIALOG_STYLE_INPUT, "Phone Credits", "Your bank account's balance: %s\n\nIt will cost you $500 for 11000 Phone Credits\n\nPlease enter the phone number:", "Continue", "Back", FormatNumber(PlayerData[playerid][pBankMoney]));    
+            }
+        }
+    }
+}
+Dialog:ePhoneCredits(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        static targetid;
+        if((targetid = GetNumberOwner(strval(inputtext))) != INVALID_PLAYER_ID && PlayerData[playerid][pBankMoney] >= 1000)
+        {
+            PlayerData[targetid][pCredits] += 11000;
+            PlayerData[playerid][pBankMoney] -= 500;
+            SendClientMessageEx(targetid, COLOR_WHITE, "%s just send you "YELLOW"11000 "WHITE"Phone Credits", ReturnName(playerid));
+            SendClientMessageEx(playerid, COLOR_WHITE, "You just send %d phone number 11000 Credits, your bank balance now : %d", strval(inputtext), PlayerData[playerid][pBankMoney]);
+        }
+    }
+    return 1;
+}
+Dialog:Laptop(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new amount = strval(inputtext);
+        switch(listitem)
+        {
+            case 0:
+            {
+                for (new i = 0; i < MAX_DROP; i ++)
+                {
+                    if(importData[i][importOrdered])
+                    {
+                        new string[1024];
+                        format(string, COLOR_WHITE, "Nama Faction : %s\nNama : %s\nBarang : %s\nJumlah : %d\nEstimasi Drop : %d Menit\nLokasi Drop : %s\n", importData[i][importFactionName],importData[i][importUsername], importData[i][importTypeName], importData[i][importJumlah], (importData[i][importTime]/60), importData[i][importLocName]);
+                        Dialog_Show(playerid, importInfo, DIALOG_STYLE_MSGBOX, "Order Information", string, "Close", "");
+                        return 1;
+                    }
+                }
+                SendErrorMessage(playerid, "Tidak ada family/gang yang sedang melakukan import");
+                return 1;
+            }
+            case 1:
+            {
+                if(PlayerData[playerid][pFactionRank] < FactionData[PlayerData[playerid][pFaction]][factionRanks] - 3) return SendErrorMessage(playerid, "You must be at least rank %d.", FactionData[PlayerData[playerid][pFaction]][factionRanks] - 1);
+                for (new i = 0; i != MAX_DROP; i ++) if(importData[i][importOrdered]) {
+                    return SendErrorMessage(playerid, "There's an import on progress currently.");
+                }
+	            if((Inventory_Count(playerid, "Materials")+amount) > 50000)
+	    	    return SendErrorMessage(playerid, "Kamu hanya dapat mengorder %d material kosongkan tas kamu terlebih dahulu jika ingin lebih.", (50000-Inventory_Count(playerid, "Materials")));
+
+                Dialog_Show(playerid, importMaterials, DIALOG_STYLE_INPUT, "Materials Order", "Jumlah Order $10/Materials : ", "Order", "Cancel");
+                return 1;
+            }
+            case 2:
+            {
+                if(PlayerData[playerid][pFactionRank] < FactionData[PlayerData[playerid][pFaction]][factionRanks] - 3) return SendErrorMessage(playerid, "You must be at least rank %d.", FactionData[PlayerData[playerid][pFaction]][factionRanks] - 1);
+                for (new i = 0; i != MAX_DROP; i ++) if(importData[i][importOrdered]) {
+                    return SendErrorMessage(playerid, "There's an import on progress currently.");
+                }
+                new output[255];
+                strcat(output, ""WHITE"Drugs\tPrice/grams\tMinimal Buy\n");
+                strcat(output, "Marijuana\t$25/grams\t25 grams\n");
+                strcat(output, "Heroin\t$35/grams\t25 grams\n");
+                strcat(output, "Cocaine\t$45/grams\t50 grams");
+
+                Dialog_Show(playerid, BuyDrugs, DIALOG_STYLE_TABLIST_HEADERS, "Drugs Order", output, "Choose", "Close");
+            }
+            case 3:
+            {
+                if(PlayerData[playerid][pFactionRank] < FactionData[PlayerData[playerid][pFaction]][factionRanks] - 3) return SendErrorMessage(playerid, "You must be at least rank %d.", FactionData[PlayerData[playerid][pFaction]][factionRanks] - 1);
+                for (new i = 0; i != MAX_DROP; i ++) if(importData[i][importOrdered]) {
+                    return SendErrorMessage(playerid, "There's an import on progress currently.");
+                }
+                new output[255];
+                strcat(output, ""WHITE"Weapons\tDurability/Ammo\tPrice\n");
+                strcat(output, "Micro SMG\t700/700\t$60.000\n");
+                strcat(output, "Carbine Rifle\t1000/1000\t$85.000\n");
+                strcat(output, "Combat Shotgun\t500/500\t$120.000\n");
+                strcat(output, "Sniper Rifle\t100/100\t$450.000\n");
+                strcat(output, "Kevlar Vest\t100/100\t$2.000\n");
+
+                Dialog_Show(playerid, BuyGuns, DIALOG_STYLE_TABLIST_HEADERS, "Weapons Order", output, "Choose", "Close");
+            }
+        }
+    }
+    return 1;
+}
+Dialog:BuyGuns(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        switch(listitem)
+        {
+            case 0:
+            {
+                for(new i=0; i < MAX_DROP; i++)
+                {  
+                    if(!importData[i][importOrdered])
+                    {
+                        if(PlayerData[playerid][pBankMoney] < MICRO_PRICE)
+                            return SendErrorMessage(playerid, "Uang yang kamu miliki dibank kurang untuk membeli Micro SMG!.");
+
+                        importData[i][importType] = 5;
+                        importCreate(playerid, 1);
+                        SendClientMessageEx(playerid, COLOR_WHITE, ""YELLOW"[LAPTOP] "WHITE"kamu telah mengorder "YELLOW"Micro SMG "WHITE"data lengkap silahkan check laptop!");
+                        SendServerMessage(playerid, "Berhasil mengorder "YELLOW"Micro SMG "WHITE"dengan total harga "GREEN"$60.000.");
+                        PlayerData[playerid][pBankMoney] -= MICRO_PRICE;
+                        return 1;
+                    }
+                }
+                return SendErrorMessage(playerid, "There's an import on progress currently.");                                
+            }
+            case 1:
+            {
+                for(new i=0; i < MAX_DROP; i++)
+                {  
+                    if(!importData[i][importOrdered])
+                    {
+                        if(PlayerData[playerid][pBankMoney] < M4_PRICE)
+                            return SendErrorMessage(playerid, "Uang yang kamu miliki dibank kurang untuk membeli Carbine Rifle!.");
+
+                        importData[i][importType] = 6;
+                        importCreate(playerid, 1);
+                        SendClientMessageEx(playerid, COLOR_WHITE, ""YELLOW"[LAPTOP] "WHITE"kamu telah mengorder "YELLOW"Carbine Rifle "WHITE"data lengkap silahkan check laptop!");
+                        SendServerMessage(playerid, "Berhasil mengorder "YELLOW"Carbine Rifle "WHITE"dengan total harga "GREEN"$85.000.");
+                        PlayerData[playerid][pBankMoney] -= M4_PRICE;
+                        return 1;
+                    }
+                }
+                return SendErrorMessage(playerid, "There's an import on progress currently.");                                
+            }
+            case 2:
+            {
+                for(new i=0; i < MAX_DROP; i++)
+                {  
+                    if(!importData[i][importOrdered])
+                    {
+                
+                        if(PlayerData[playerid][pBankMoney] < COMBAT_PRICE)
+                            return SendErrorMessage(playerid, "Uang yang kamu miliki dibank kurang untuk membeli Combat Shotgun!.");
+
+                        importData[i][importType] = 7;
+                        importCreate(playerid, 1);
+                        SendClientMessageEx(playerid, COLOR_WHITE, ""YELLOW"[LAPTOP] "WHITE"kamu telah mengorder "YELLOW"Combat Shotgun "WHITE"data lengkap silahkan check laptop!");
+                        SendServerMessage(playerid, "Berhasil mengorder "YELLOW"Combat Shotgun "WHITE"dengan total harga "GREEN"$125.000.");
+                        PlayerData[playerid][pBankMoney] -= COMBAT_PRICE;
+                        return 1;
+                    }
+                }
+                return SendErrorMessage(playerid, "There's an import on progress currently.");                                
+            }
+            case 3:
+            {
+                for(new i=0; i < MAX_DROP; i++)
+                {  
+                    if(!importData[i][importOrdered])
+                    {
+                        if(PlayerData[playerid][pBankMoney] < SNIPER_PRICE)
+                            return SendErrorMessage(playerid, "Uang yang kamu miliki dibank kurang untuk membeli Sniper Rifle!.");
+
+                        importData[i][importType] = 8;
+                        importCreate(playerid, 1);
+                        SendClientMessageEx(playerid, COLOR_WHITE, ""YELLOW"[LAPTOP] "WHITE"kamu telah mengorder "YELLOW"Sniper Rifle "WHITE"data lengkap silahkan check laptop!");
+                        SendServerMessage(playerid, "Berhasil mengorder "YELLOW"Sniper Rifle "WHITE"dengan total harga "GREEN"$450.000.");
+                        PlayerData[playerid][pBankMoney] -= SNIPER_PRICE;
+                        return 1;
+                    }
+                }
+                return SendErrorMessage(playerid, "There's an import on progress currently.");                                
+            }
+            case 4:
+            {
+                new amount = strval(inputtext);
+                if(PlayerData[playerid][pFactionRank] < FactionData[PlayerData[playerid][pFaction]][factionRanks] - 3) return SendErrorMessage(playerid, "You must be at least rank %d.", FactionData[PlayerData[playerid][pFaction]][factionRanks] - 1);
+                for (new i = 0; i != MAX_DROP; i ++) if(importData[i][importOrdered]) {
+                    return SendErrorMessage(playerid, "There's an import on progress currently.");
+                }
+	            if((Inventory_Count(playerid, "Kevlar Vest")+amount) > 10)
+	    	    return SendErrorMessage(playerid, "Kamu hanya dapat mengorder %d armour kosongkan tas kamu terlebih dahulu jika ingin lebih.", (10-Inventory_Count(playerid, "Kevlar Vest")));
+
+                Dialog_Show(playerid, importArmour, DIALOG_STYLE_INPUT, "Armour Order", "Jumlah Order $2000/Armour\n\n Max 10 Armour : ", "Order", "Cancel");                            
+            }
+        }
+    }
+    return 1;    
+}
+Dialog:importArmour(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        if(isnull(inputtext)) return Dialog_Show(playerid, importArmour, DIALOG_STYLE_INPUT, "Armour Order", "Jumlah Order $2000/Armour\n\n Max 10 Armored Vest : ", "Order", "Cancel");
+        if(!IsNumeric(inputtext)) return Dialog_Show(playerid, importArmour, DIALOG_STYLE_INPUT, "Armour Order", "Jumlah Order $2000/Armour\n\n Max 10 Armored Vest : ", "Order", "Cancel");
+        if(strval(inputtext) < 1 || strval(inputtext) > 10) return SendErrorMessage(playerid, "Kamu hanya bisa mengorder minimal 1 - maximal 10 Armored Vest!");
+        if(PlayerData[playerid][pBankMoney] < (ARMOUR_PRICE*strval(inputtext)))
+            return SendErrorMessage(playerid, "Uang yang kamu miliki dibank kurang untuk membeli %d Armored vest (%s).", strval(inputtext), FormatNumber(ARMOUR_PRICE*strval(inputtext)));
+
+        SendClientMessageEx(playerid, COLOR_WHITE, ""YELLOW"[LAPTOP] "WHITE"kamu telah mengorder "YELLOW"%d Armored vest "WHITE"data lengkap silahkan check laptop!", strval(inputtext));
+        
+        for(new i=0; i < MAX_DROP; i++)
+        {  
+            if(!importData[i][importOrdered])
+            {
+                importData[i][importType] = 9;
+                importCreate(playerid, strval(inputtext));
+                SendClientMessageEx(playerid, COLOR_WHITE, ""YELLOW"[LAPTOP] "WHITE"kamu telah mengorder "YELLOW"Armored Vest "WHITE"data lengkap silahkan check laptop!");
+                SendServerMessage(playerid, "Berhasil mengorder "YELLOW"Armored Vest "WHITE"dengan total harga "GREEN"%s.", FormatNumber(ARMOUR_PRICE*strval(inputtext)));
+                PlayerData[playerid][pBankMoney] -= (ARMOUR_PRICE*strval(inputtext));
+                return 1;
+            }
+        }
+        SendErrorMessage(playerid, "There's an import on progress currently.");
+        return 1;    
+    }
+    return 1;
+}
+Dialog:importMaterials(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        if(isnull(inputtext)) return Dialog_Show(playerid, importMaterials, DIALOG_STYLE_INPUT, "Laptop Order", "Jumlah Order harga $2/Materials : ","Order", "Cancel");
+        if(!IsNumeric(inputtext)) return Dialog_Show(playerid, importMaterials, DIALOG_STYLE_INPUT, "Laptop Order", "Jumlah Order $2/Materials: ","Order", "Cancel");
+        if(strval(inputtext) < 100 || strval(inputtext) > 50000) return SendErrorMessage(playerid, "Kamu hanya bisa mengorder minimal 100 - maximal 50000 materials!");
+        if(PlayerData[playerid][pBankMoney] < (MULTIPLE_MATERIAL*strval(inputtext)))
+            return SendErrorMessage(playerid, "Uang yang kamu miliki dibank kurang untuk membeli %d material (%s).", strval(inputtext), FormatNumber(MULTIPLE_MATERIAL*strval(inputtext)));
+
+        SendClientMessageEx(playerid, COLOR_WHITE, ""YELLOW"[LAPTOP] "WHITE"kamu telah mengorder "YELLOW"%d materials "WHITE"data lengkap silahkan check laptop!", strval(inputtext));
+
+        for(new i=0; i < MAX_DROP; i++)
+        {  
+            if(!importData[i][importOrdered])
+            {
+                importData[i][importType] = 1;
+                importCreate(playerid, strval(inputtext));
+                SendServerMessage(playerid, "Berhasil mengorder "YELLOW"%d material "WHITE"dengan total harga "GREEN"%s.", strval(inputtext), FormatNumber((MULTIPLE_MATERIAL*strval(inputtext))));
+                PlayerData[playerid][pBankMoney] -= (MULTIPLE_MATERIAL*strval(inputtext));
+                return 1;
+            }
+        }
+        SendErrorMessage(playerid, "There's an import on progress currently.");
+        return 1;
+    }
+    return 1;
+}
+Dialog:Help(playerid, response, listitem, inputtext[]) {
+    if(response) {
+        switch(listitem) {
+            case 0:
+            {
+                SendClientMessage(playerid, X11_LIGHTGREEN, "HELP >> Account Commands:");
+                SendCustomMessage(playerid, "ACCOUNT", "/changepass, /lastlogged, /properties, /showidcard, /levels.");
+            }
+            case 1:
+            {
+                SendClientMessage(playerid, X11_LIGHTGREEN, "HELP >> Bank Commands:");
+                SendCustomMessage(playerid,"/balance", "Memperlihatkan jumlah uang yang ada di bank.");
+                SendCustomMessage(playerid,"/deposit", "Menyimpan uang di bank.");
+                SendCustomMessage(playerid,"/withdraw", "Menarik uang yang ada di dalam sampanan bank.");
+            }
+            case 2:
+            {
+                SendClientMessage(playerid, X11_LIGHTGREEN, "HELP >> Business Commands:");
+                SendCustomMessage(playerid, "BUSINESSES", "/buy, /abandon, /bm, /lock, /bshipment, /refillgas.");
+                SendCustomMessage(playerid, "BUSINESSES", "/leavejob To leave your job as business employee after taking a job from yellow page.");
+                SendCustomMessage(playerid, "BUSINESSES", "/offermenu to give a customer menu list of business if you're working inside the business.");
+                SendCustomMessage(playerid, "BUSINESSES", "/dutyshift to start working as employee inside the business.");
+                SendClientMessage(playerid, X11_LIGHTGREEN, "HELP >> Business Employee Commands:");
+                SendCustomMessage(playerid,"SALARY!", "Anda akan mendapatkan salary anda setiap jamnya $1500");
+                SendCustomMessage(playerid,"ROLEPLAY", "Utamakan Roleplay sebelum offermenu!");
+                SendCustomMessage(playerid,"EXP", "Anda akan mendapatkan Roleplay Experience di /stats ketika kalian /offermenu ke player!");
+                SendCustomMessage(playerid,"/dutyshift", "Anda diharuskan untuk duty shift sebelum bekerja di dalam business");
+                SendCustomMessage(playerid,"/offermenu", "ketika anda sudah dutyshift anda bisa /offermenu kepada player untuk memberi list menu");
+                SendCustomMessage(playerid,"/bm", "anda bisa melihat management bisnis");
+            }
+            case 3:
+            {
+                SendClientMessage(playerid, X11_LIGHTGREEN, "HELP >> Chat Commands:");
+                SendCustomMessage(playerid, "CHAT", "/s(hout), /l(ow), /me, /do, /ame, /ado, /o(oc), /live.");
+                SendCustomMessage(playerid, "CHAT", "/me(low), /do(low), /pr(low).");
+            }
+            case 4: {
+                if(PlayerData[playerid][pFactionMod])
+                    SendCustomMessage(playerid, "FACTION", "/createfaction, /editfaction, /destroyfaction.");
+
+                if(PlayerData[playerid][pFaction] != -1)
+                {
+                    SendCustomMessage(playerid, "FACTION", "/online, /(f)ac, /flocker, /fdivname");
+
+                    if(PlayerData[playerid][pFactionRank] >= FactionData[PlayerData[playerid][pFaction]][factionRanks] - 2)
+                        SendCustomMessage(playerid, "FACTION", "/finvite, /fremove, /frank, /offlineremove, /fmotd, /setdiv, /fdivname, /frankname");
+
+                    if(GetFactionType(playerid) == FACTION_POLICE) {
+                        SendCustomMessage(playerid, "FACTION", "/tazer, /cuff, /uncuff, /drag, /detain, /mdc, /trace, /arrest, /dept, (/plant seize).");
+                        SendCustomMessage(playerid, "FACTION", "/ticket, /spike, /roadblock, /fingerprint, /impound, /revokeweapon, /icp(installcustomplate).");
+                        SendCustomMessage(playerid, "FACTION", "/take, /kickdoor, /togsiren, /callsign, /checkseatbelt, /grantweapon, /revokelumber, /grantlumber");
+                        SendCustomMessage(playerid, "FACTION", "/board, /f(action)r(adio), /odept, /(o)database /charge, /togspeedtrap");
+                    }
+                    else if(GetFactionType(playerid) == FACTION_NEWS)
+                        SendCustomMessage(playerid, "FACTION", "/broadcast, /bc, /inviteguest, /removeguest, /board, /f(action)r(adio), /odept, /setdiv.");
+
+                    else if(GetFactionType(playerid) == FACTION_MEDIC) {
+                        SendCustomMessage(playerid, "FACTION", "/dept, /bandage, /loadinjured, /dropinjured /r(adio), /odept, /cure, /database.");
+                        SendCustomMessage(playerid, "FACTION", "/inspect, /takepills, /setdiv, /togsiren, /grantbls, /revokebls.");
+                    }
+                    else if(GetFactionType(playerid) == FACTION_GOV) {
+                        SendCustomMessage(playerid, "FACTION", "/seal ,/unseal, /dept, /board, /f(action)r(adio), /odept, /database.");
+                        SendCustomMessage(playerid, "FACTION", "/givelicenses, /givecarlic, /setdiv.");
+                    }
+                    else if(GetFactionType(playerid) == FACTION_SADOC)
+                    {
+                        SendCustomMessage(playerid, "FACTION", "/tazer, /cuff, /uncuff, /drag, /detain, /mdc, /dept");
+                        SendCustomMessage(playerid, "FACTION", "/r, /or, /pr, /radio, /oocradio, /odept");
+                    }
+                }
+                else SendClientMessageEx(playerid, X11_GREY_60,"You're not in any faction");
+            }
+            case 5:
+            {
+                SendClientMessage(playerid, X11_LIGHTGREEN, "HELP >> Fishing / Hunting Commands:");
+                SendCustomMessage(playerid, "FISHING","/fish, /cancelfish, /myfish, /sellfish, /buyrod, /buybait");
+                SendCustomMessage(playerid, "HUNTING","Beli hunting knife di ammunation store dan beli senjata api untuk hunting");
+                SendCustomMessage(playerid, "HUNTING","Tembak 2x pada hewan ketika sudah mati /gut untuk mengambil dagingnya");
+                SendCustomMessage(playerid, "HUNTING","Jual dagingnya di butcher /gps!");
+            }
+            case 6:
+            {
+                SendClientMessage(playerid, X11_LIGHTGREEN, "HELP >> General Commands:");
+                SendCustomMessage(playerid, "GENERAL", "/stats, /report, /atalk, /acc, /inventory, /seatbelt, /helmet.");
+                SendCustomMessage(playerid, "GENERAL", "/approve, /sell, /cook, /vest, /usekit, /phone, /tickets, /payticket, /vote.");
+                SendCustomMessage(playerid, "GENERAL", "/id, /call, /hangup, /text, /factions, /crates, /fill, /pay, /gps, /usedrug.");
+                SendCustomMessage(playerid, "GENERAL", "/animhelp, /boombox, /channel, /disablecp, /stopanim, /weapons, /weapon.");
+                SendCustomMessage(playerid, "GENERAL", "/shakehand, /showlicense, /frisk, /givegun, /picklock, /listafk, /bansrecord.");
+                SendCustomMessage(playerid, "GENERAL", "/usepills, /givepills, /damages, /examine, /buymaterials, /refuel, /renthelp");
+                SendCustomMessage(playerid, "GENERAL", "/relationship, /laptop, /getitem, /time, /buymaterials, /refuel, /renthelp");
+                SendCustomMessage(playerid, "GENERAL", "/setfq /switchfq /breakcuff");         
+            }
+            case 7: {
+                SendClientMessage(playerid, X11_LIGHTGREEN, "HELP >> House Commands:");
+                SendCustomMessage(playerid, "HOUSES", "/buy, /sell, /abandon, /lock, /storage");
+                SendCustomMessage(playerid, "HOUSES", "/doorbell, /switch, /furniture");
+                SendCustomMessage(playerid, "HOUSES", "/hpark /hunpark /sharehousekey /removehousekey");
+            }
+            case 8: {
+                switch (PlayerData[playerid][pJob])
+                {
+                    case JOB_COURIER:
+                    {
+                        SendClientMessageEx(playerid, X11_GREEN_YELLOW, "Perintah pekerjaan yang tersedia:");
+                        SendCustomMessage(playerid,"/cargo", "Membeli box, menjual, meletakkan, dan sebagainya dan dapat di gunakan dengan 1 perintah utama yaitu '/cargo'.");
+                        SendCustomMessage(playerid,"/shipments", "Membantu melihat bisnis yang akan di restock (hanya dapat di lakukan dalam kendaraan kerja).");
+                        SendCustomMessage(playerid,"/cancelshipment", "Menolak shipment yang telah di pilih sebelumnya.");
+                    }
+                    case JOB_MECHANIC:
+                    {
+                        SendClientMessageEx(playerid, X11_GREEN_YELLOW, "Perintah pekerjaan yang tersedia:");
+                        SendCustomMessage(playerid,"/jobduty", "Memulai maupun berhenti melakukan pekerjaan. (hanya dapat di lakukan dalam mechanic center)");
+                        SendCustomMessage(playerid,"/mechanicmenu", "Memperlihatkan menu mekanik yang akan di kerjakan seperti repair, fix body, repair tires dan lainnya.");
+                        SendCustomMessage(playerid,"/paintcar", "Mengganti warna kendaraan.");
+                        SendCustomMessage(playerid,"/acceptcall", "Melihat penelpon yang membutuhkan jasa mekanik (dapat di lakukan jika job-duty).");
+                        SendCustomMessage(playerid,"NOTE", "Kendaraan tow dapat di sewa ataupun di beli, gunakan perintah '"YELLOW"/v tow"WHITE"' untuk menggunakannya.");
+                        SendCustomMessage(playerid,"NOTE", "Jika Anda job-duty dan meninggalkan mechanic center akan otomatis off-duty.");
+                    }
+                    case JOB_TAXI:
+                    {
+                        SendClientMessageEx(playerid, X11_GREEN_YELLOW, "Perintah pekerjaan yang tersedia:");
+                        SendCustomMessage(playerid,"/jobduty", "Memulai maupun berhenti melakukan pekerjaan.");
+                        SendCustomMessage(playerid,"/acceptcall", "Melihat penelpon yang membutuhkan jasa TAXI (dapat di lakukan jika job-duty).");
+                    }
+                    case JOB_UNLOADER: SendCustomMessage(playerid,"JOBS", "/loadcrate.");
+                    case JOB_MINER: 
+                    {
+                        SendCustomMessage(playerid,"JOBS", "Ketik /mine di daerah mining area , anda akan di beri crowbar untuk menghancurkan stone.");
+                        SendCustomMessage(playerid,"JOBS", "Klik kiri mouse kalian di daerah mining ketika kalian sudah /mine.");
+                        SendCustomMessage(playerid,"JOBS", "Tekan N untuk menjatuhkan atau membuah batu yang sudah kalian tambang.");
+                    }
+                    case JOB_FOOD_VENDOR:
+                    {
+                        SendClientMessageEx(playerid, X11_GREEN_YELLOW, "Perintah pekerjaan yang tersedia:");
+                        SendCustomMessage(playerid,"/sellfood", "Menjual berbagai makanan, hanya dapat dilakukan dalam mobil truck makanan.");
+                        SendCustomMessage(playerid,"/buyfood", "Membeli stock makanan dan di letakkan dalam kendaraan.");
+                        SendCustomMessage(playerid,"/checkfood", "Memeriksa stock yang tersedia dalam kendaraan.");
+                    }
+                    case JOB_ARMS_DEALER:
+                    {
+                        SendClientMessageEx(playerid, X11_GREEN_YELLOW, "Perintah pekerjaan yang tersedia:");
+                        SendCustomMessage(playerid,"/creategun", "Membuat senjata, dapat dilakukan di Blackmarket.");
+                        SendCustomMessage(playerid,"/createammo", "Menambah amunisi dari senjata yang di miliki.");
+                    }
+                    case JOB_FARMER:
+                    {
+                        SendClientMessageEx(playerid, X11_GREEN_YELLOW, "Perintah pekerjaan yang tersedia:");
+                        SendCustomMessage(playerid,"FARMER", "Kamu menanam, harvest dan memulai perawatan tanaman di ladang, apa bila kamu relog tanaman kamu hilang.");
+                        SendCustomMessage(playerid,"FARMER", "Kamu wajib memiliki traktor untuk melakukan pekerjaan ini!.");
+                        SendCustomMessage(playerid,"/plantwheat", "Menanam padi di ladang.");
+                        SendCustomMessage(playerid,"/harvestwheat", "Mencabut padi yang sudah siap di harvest.");
+                        SendCustomMessage(playerid,"/startfarming", "Memulai perawatan plant di ladang.");
+                    }
+                    case JOB_SORTER: SendCustomMessage(playerid,"JOBS", "/sorting.");
+                    case JOB_LUMBERJACK:
+                    {
+                        SendClientMessageEx(playerid, X11_GREEN_YELLOW, "Perintah pekerjaan yang tersedia:");
+                        SendCustomMessage(playerid,"/buychainsaw", "Anda diharuskan untuk membeli chainwas terlebih dahulu, belilah di job point lumberjack seharga "COL_GREEN"$50.");
+                        SendCustomMessage(playerid,"/loadtree", "Memasukkan pohon yang telah di tebang ke dalam mobil, mobil dapat di beli ataupun di sewa.");
+                        SendCustomMessage(playerid,"/unloadtree", "Menjual pohon hasil tebang pada job point lumberjack dan di hargai "COL_GREEN"$50 "WHITE"per batang pohon.");
+                        SendCustomMessage(playerid,"NOTE", "Anda dapat dengan mudah mencari pohon yang tersebar dengan menggunakan perintah '/gps > Find Tree'.");
+                        SendCustomMessage(playerid,"NOTE", "Dilarang menyalah gunakan chainsaw untuk berbuat yang melanggar rules, jika ketahuan akan di "COL_RED"BANNED "WHITE"selama "YELLOW"3 hari.");
+                    }
+                    case JOB_HAULER:
+                    {
+                        SendClientMessageEx(playerid, X11_GREEN_YELLOW, "Perintah pekerjaan yang tersedia:");
+                        SendCustomMessage(playerid,"/loadcomponent", "Anda diharuskan untuk membeli truck terlebih dahulu, lalu pergi ke warehouse trucker");
+                        SendCustomMessage(playerid,"/loadwoods", "Anda diharuskan untuk membeli truck terlebih dahulu, lalu pergi ke warehouse lumberjack");
+                        SendCustomMessage(playerid,"/deliverstock", "Anda diharuskan untuk berada di dalam kendaraan, lalu antar ke check point, maximal kapasitas kendaraan 50 package");
+                        SendCustomMessage(playerid,"/checktruck", "Anda diharuskan untuk berada di luar kendaraan, lalu gunakan command ini untuk melihat isi kapasitas truck");
+                        SendCustomMessage(playerid,"HURUF Y", "Ketika anda membawa barang yang di ambil, tekan Y dekat truck kalian untuk memasukan ke dalam truck");
+                        SendCustomMessage(playerid,"HURUF N ", "Ketika anda membawa barang yang di ambil, tekan N untuk membuang item yang kalian pegang");
+
+                    }
+                    case JOB_NONE: 
+                    {
+                        SendErrorMessage(playerid, "You are unemployed at the moment.");
+                    }
+                }
+            }
+            case 9:
+            {
+                SendClientMessage(playerid, X11_LIGHTGREEN, "HELP >> Property Commands:");
+                SendCustomMessage(playerid, "PROPERTY", "/buy, /sell, /abandon, /lock, /housecmds, /bizcmds.");
+            }
+            case 10:
+            {
+                SendClientMessage(playerid, X11_LIGHTGREEN, "HELP >> Vehicle Commands:");
+                SendCustomMessage(playerid, "VEHICLE", "/v [engine] [lock] [lights] [hood] [trunk] [track] [list]");
+                SendCustomMessage(playerid, "VEHICLE", "/v [checkstorage] [sell] [unmod] [registration] [speedometer] [tow]");
+                SendCustomMessage(playerid, "RENTAL VEHICLE", "/rentvehicle, /unrentvehicle, /rentinfo, /renthelp");
+                SendCustomMessage(playerid, "VEHICLE", "/sharekey, /removekey, /removeallkeys, /dropkey, /lockpick, /handbrake");
+                SendCustomMessage(playerid, "VEHICLE", "/buyvacc /vehacc");
+                SendCustomMessage(playerid, "VEHICLE", "Tekan "COL_RED"[Y] "WHITE"didalam kendaraan untuk mengoperasikan (engine, lock, dll).");
+            }
+            case 11:
+            {
+                SendClientMessage(playerid, X11_LIGHTGREEN, "HELP >> Workshop Commands:");
+                SendCustomMessage(playerid, "WORKSHOP", "/workshopmenu (/wm), /abandon, /sell.");
+            }
+            case 12:
+            {
+                SendClientMessage(playerid, X11_LIGHTGREEN, "HELP >> Keyboard Shortcut:");
+                SendCustomMessage(playerid, "KEYS", ""YELLOW"Y (dalam kendaraan): "WHITE"Untuk membuka menu kendaraan.");
+                SendCustomMessage(playerid, "KEYS", ""YELLOW"C Tahan: "WHITE"Untuk animasi duduk. "YELLOW"C + SPACE: "WHITE"Untuk animasi mengangkat tangan.");
+                SendCustomMessage(playerid, "KEYS", ""YELLOW"H: "WHITE"Untuk masuk/keluar entrance/business/dan lainnya. "YELLOW"C (jongkok) + N: "WHITE"Untuk mengambil item yang ada di dekatmu.");
+            }
+            case 13: Dialog_Show(playerid, SidejobGuide, DIALOG_STYLE_LIST, "Select Sidejob", "Trashmaster\nSweeper\nBus", "Select", "Close");
+            case 14: cmd_viphelp(playerid, "\0");
+            case 15:
+            {
+                SendClientMessage(playerid, X11_LIGHTGREEN, "HELP >> Apartment Commands:");
+                SendCustomMessage(playerid, "APARTMENT", "/buy, /sell, /abandon, /lock, /astorage");
+                SendCustomMessage(playerid, "APARTMENT", "/doorbell, /switch");
+                SendCustomMessage(playerid, "APARTMENT", "/apark /aunpark");
+            }
+            case 16:
+            {
+                SendClientMessage(playerid, X11_LIGHTGREEN, "HELP >> Animation Commands:");
+                SendCustomMessage(playerid, "ANIMATIONS", "/animlibs -> Pilih library animasi -> Pilih Animasi -> Save Animation -> Masukan Slot");
+                SendCustomMessage(playerid, "ANIMATIONS", "/anim, /anim [slot] -> Masukan slot animasi yang sudah kamu simpan tadi!");
+            }
+        }
+    }
+    return 1;
+}
+
+Dialog:SidejobGuide(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        switch(listitem)
+        {
+            case 0: Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_MSGBOX, "Trashmaster Sidejob", ""WHITE"Pekerjaan trashmaster bertujuan untuk membersikhan sampah yang ada dikota ini.\n\n\
+                Anda bisa menemukan pekerjaan dengan menggunakan GPS (/gps).\n\n\
+                "COL_LIGHTGREEN"Langkah-langkah:"WHITE"\n\
+                * Pergi ke lokasi kerja.\n\
+                * Baca dialog yang di berikan untuk melihat peraturan sebelum memulai pekerjaan.\n\
+                * Jika setuju dengan aturan, kendarai mobil ke arah yang di tandai di radar map anda.\n\
+                * Anda akan melihat tampilan di sebelah kiri layar, tampilan itu sebagai indikator (bantuan)-\n  \
+                  untuk melihat jumlah sampah yang ada di mobil anda.\n\
+                * Kumpul lah sampah sebanyak mungkin, setelah itu bawa kembali ke lokasi kerja untuk-\n  \
+                  menukarkan dengan bonus.\n\n\
+                "COL_LIGHTGREEN"Perintah:"WHITE"\n\
+                * /collecttrash: mengambil sampah dan menaruhnya dimobil.\n\
+                * /droptrash: menukarkan sampah untuk mendapatkan bonus.\n\n\
+                "COL_LIGHTGREEN"Penting:"WHITE"\n\
+                * Saat berada dalam mobil, jangan coba untuk turun sebelum anda menghentikan pekerjaan-\n  \
+                  itu akan membuat anda gagal dan tidak mendapatkan bonus.\n\
+                * Anda akan delay 15 menit setelah melakukan pekerjaan ini, termasuk gagal saat bekerja.", "Close", "");
+        }
+    }
+    return 1;
+}
+
+Dialog:FurnitureHouse(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        SetPlayerPosEx(playerid, arrHouseInteriors[listitem][eHouseX], arrHouseInteriors[listitem][eHouseY], arrHouseInteriors[listitem][eHouseZ]);
+        SetPlayerFacingAngle(playerid, arrHouseInteriors[listitem][eHouseAngle]);
+        SetPlayerInterior(playerid, arrHouseInteriors[listitem][eHouseInterior]);
+
+        SendServerMessage(playerid,"You have teleport to %s", arrHouseInteriors[listitem][eHouseDesc]);
+    }
+    return 1;
+}
+
+Dialog:BM_WeaponMenu(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new index = -1;
+
+        if((index = Return_CategoryID(inputtext)) != -1)
+        {
+            selectCategory[playerid] = index;
+            ShowWeapons(playerid);
+        }
+        else SendErrorMessage(playerid, "Anda memilih kategori yang salah");
+    }
+    return 1;
+}
+
+Dialog:BM_Category(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        if(isnull(inputtext)) return Dialog_Show(playerid, BM_Category, DIALOG_STYLE_INPUT, "Add Category", "Nama tidak boleh kosong\nMaksukkan nama kategory di bawah ini:", "Create", "Close");
+
+        new Cache:check;
+        check = mysql_query(g_iHandle, sprintf("SELECT `Name` FROM `category` WHERE `Name`='%s'", inputtext));
+
+        if(!cache_num_rows())
+        {
+            mysql_tquery(g_iHandle, sprintf("INSERT INTO `category` (`ID`, `Name`) VALUES (NULL, '%s')", SQL_ReturnEscaped(inputtext)));
+            SendServerMessage(playerid, "Sukses melakukan penambahan kategori pada marketplace (%s).", inputtext);
+        }
+        else SendErrorMessage(playerid, "Kategori sudah terdaftar dengan nama yang sama.");
+
+        cache_delete(check);
+    }
+    return 1;
+}
+
+Dialog:BM_Weaplist(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new weaponid = listitem+1;
+        if(weaponid >= 19 && weaponid < 22)
+        {
+            SendErrorMessage(playerid, "Invalid weapon.");
+            ShowWeaponList(playerid);
+            return 1;
+        }
+
+        SetPVarInt(playerid, "addingWeaponID", weaponid);
+        Dialog_Show(playerid, BM_AddAmmo, DIALOG_STYLE_INPUT, "Add Weapon > Ammo", ""WHITE"Berapa banyak amunisi untuk senjata "YELLOW"%s"WHITE":", "Next", "Close", ReturnWeaponName(weaponid));
+    }
+    return 1;
+}
+
+Dialog:BM_AddAmmo(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        if(isnull(inputtext)) return Dialog_Show(playerid, BM_AddAmmo, DIALOG_STYLE_INPUT, "Add Weapon > Ammo", ""WHITE"Amunisi harus di isi.\n\nBerapa banyak amunisi untuk senjata "YELLOW"%s"WHITE":", "Next", "Back", ReturnWeaponName(GetPVarInt(playerid, "addingWeaponID")));
+        if(!IsNumeric(inputtext)) return Dialog_Show(playerid, BM_AddAmmo, DIALOG_STYLE_INPUT, "Add Weapon > Ammo", ""WHITE"Masukkan angka tidak huruf maupun simbol.\n\nBerapa banyak amunisi untuk senjata "YELLOW"%s"WHITE":", "Next", "Back", ReturnWeaponName(GetPVarInt(playerid, "addingWeaponID")));
+        SetPVarInt(playerid, "addingWeaponAmmo", strval(inputtext));
+        Dialog_Show(playerid, BM_Price, DIALOG_STYLE_INPUT, "Add Weapon > Price", ""WHITE"Harga untuk senjata "YELLOW"%s (%d)"WHITE":", "Next", "Back", ReturnWeaponName(GetPVarInt(playerid, "addingWeaponID")), strval(inputtext));
+    }
+    else ShowWeaponList(playerid);
+    return 1;
+}
+
+Dialog:BM_Price(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        if(isnull(inputtext)) return Dialog_Show(playerid, BM_Price, DIALOG_STYLE_INPUT, "Add Weapon > Price", ""WHITE"Price can't be null\nHarga untuk senjata "YELLOW"%s (%d)"WHITE":", "Next", "Back", ReturnWeaponName(GetPVarInt(playerid, "addingWeaponID")), GetPVarInt(playerid, "addingWeaponAmmo"));
+        if(!IsNumeric(inputtext)) return Dialog_Show(playerid, BM_Price, DIALOG_STYLE_INPUT, "Add Weapon > Price", ""WHITE"Price must be numeric\nHarga untuk senjata "YELLOW"%s (%d)"WHITE":", "Next", "Back", ReturnWeaponName(GetPVarInt(playerid, "addingWeaponID")), GetPVarInt(playerid, "addingWeaponAmmo"));
+        SetPVarInt(playerid, "addingWeaponPrice", strval(inputtext));
+        Dialog_Show(playerid, BM_Type, DIALOG_STYLE_LIST, "Add Weapon > Type", "Normal Player\nOfficial Family\nVerified Member", "Next", "Back");
+    }
+    else Dialog_Show(playerid, BM_AddAmmo, DIALOG_STYLE_INPUT, "Add Weapon > Ammo", ""WHITE"Berapa banyak amunisi untuk senjata "YELLOW"%s"WHITE":", "Next", "Back", ReturnWeaponName(GetPVarInt(playerid, "addingWeaponID")));
+    return 1;
+}
+
+Dialog:BM_Type(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        SetPVarInt(playerid, "addingWeaponType", listitem);
+        Dialog_Show(playerid, BM_Day, DIALOG_STYLE_LIST, "Add Weapon > Day", ""COL_RED"Minggu\n"WHITE"Senin\nSelasa\nRabu\nKamis\nJum'at\nSabtu", "Next", "Back");
+    }
+    else Dialog_Show(playerid, BM_Price, DIALOG_STYLE_INPUT, "Add Weapon > Price", ""WHITE"Harga untuk senjata "YELLOW"%s (%d)"WHITE":", "Next", "Back", ReturnWeaponName(GetPVarInt(playerid, "addingWeaponID")), GetPVarInt(playerid, "addingWeaponAmmo"));
+    return 1;
+}
+
+Dialog:BM_Day(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        SetPVarInt(playerid, "addingWeaponDay", listitem+1);
+        ShowCategories(playerid, 3);
+    }
+    else Dialog_Show(playerid, BM_Type, DIALOG_STYLE_LIST, "Add Weapon > Type", "Normal Player\nOfficial Family\nVarified Member", "Next", "Back");
+    return 1;
+}
+
+Dialog:BM_ChooseCategory(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new index = -1;
+
+        if((index = Return_CategoryID(inputtext)) != -1)
+        {
+            new
+                weapon = GetPVarInt(playerid, "addingWeaponID"),
+                ammo = GetPVarInt(playerid, "addingWeaponAmmo"),
+                price = GetPVarInt(playerid, "addingWeaponPrice"),
+                type = GetPVarInt(playerid, "addingWeaponType"),
+                day = GetPVarInt(playerid, "addingWeaponDay"),
+                query[255];
+
+            format(query, sizeof(query), "INSERT INTO `weapons` (`WeaponID`, `Ammo`, `Price`, `Authority`, `Day`, `Category`, `Enable`) VALUES ('%d', '%d', '%d', '%d', '%d', '%d', '0')",
+                weapon,
+                ammo,
+                price,
+                type,
+                day,
+                index
+            );
+            mysql_tquery(g_iHandle, query);
+
+            SendServerMessage(playerid, "Sukses meletakkan senjata ke dalam kategori.");
+        }
+    }
+    else Dialog_Show(playerid, BM_Price, DIALOG_STYLE_INPUT, "Add Weapon > Price", ""WHITE"Harga untuk senjata "YELLOW"%s (%d)"WHITE":", "Next", "Back", ReturnWeaponName(GetPVarInt(playerid, "addingWeaponID")), GetPVarInt(playerid, "addingWeaponAmmo"));
+    return 1;
+}
+
+Dialog:BM_RemoveCategory(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new index = -1;
+
+        if((index = Return_CategoryID(inputtext)) != -1)
+        {
+            mysql_tquery(g_iHandle, sprintf("DELETE FROM `category` WHERE ID = '%d'", index));
+            mysql_tquery(g_iHandle, sprintf("DELETE FROM `weapons` WHERE `Category` = '%d'", index));
+
+            SendServerMessage(playerid, "Sukses melakukan penghapusan kategory \"%s\".", inputtext);
+        }
+        else SendErrorMessage(playerid, "Anda memilih kategori yang salah");
+    }
+    return 1;
+}
+
+Dialog:BM_RenameCategory(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new index = -1;
+
+        if((index = Return_CategoryID(inputtext)) != -1)
+        {
+            SetPVarInt(playerid, "renameCategory", index);
+            Dialog_Show(playerid, "BM_RenameCategory1", DIALOG_STYLE_INPUT, "Rename Category",""WHITE"Category: %s\nMasukkan nama baru:", "Rename", "Close", inputtext);
+        }
+        else SendErrorMessage(playerid, "Anda memilih kategori yang salah");
+    }
+    return 1;
+}
+
+Dialog:BM_RenameCategory1(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        if(isnull(inputtext)) Dialog_Show(playerid, "BM_RenameCategory1", DIALOG_STYLE_INPUT, "Rename Category",""WHITE"Nama harus di isi\nMasukkan nama baru:", "Rename", "Close");
+        mysql_tquery(g_iHandle, sprintf("UPDATE `category` SET Name='%s' WHERE ID=%d", inputtext, GetPVarInt(playerid, "renameCategory")));
+        DeletePVar(playerid, "renameCategory");
+
+        SendServerMessage(playerid, "Sukses menamai kategori dengan nama baru.");
+    }
+    return 1;
+}
+
+Dialog:BM_RemoveWeapon(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new index = -1;
+
+        if((index = Return_CategoryID(inputtext)) != -1)
+        {
+            selectCategory[playerid] = index;
+
+            ShowWeapons(playerid, 1, 1);
+        }
+        else SendErrorMessage(playerid, "Anda memilih kategori yang salah");
+    }
+    return 1;
+}
+
+Dialog:BM_RemoveFinal(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new weapon, price, ammo, authority;
+        if(Category_GetWeaponData(selectCategory[playerid], listitem, weapon, ammo, price, authority))
+        {
+            mysql_tquery(g_iHandle, sprintf("DELETE FROM weapons WHERE WeaponID='%d' AND Ammo='%d' AND Price='%d' AND Authority='%d' AND Category='%d'", weapon, ammo, price, authority, selectCategory[playerid]));
+            selectCategory[playerid] = -1;
+            SendServerMessage(playerid, "Weapon removed!");
+        }
+        else SendErrorMessage(playerid, "Tidak ada senjata dalam kategori ini.");
+    }
+    return 1;
+}
+
+Dialog:BM_BuyWeapon(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        selectIndex[playerid] = listitem;
+
+        new weapon, ammo, price, authority;
+        if(Category_GetWeaponData(selectCategory[playerid], selectIndex[playerid], weapon, ammo, price, authority)) {
+            if(price > GetMoney(playerid)) return SendErrorMessage(playerid, "Uang anda tidak cukup.");
+            switch(authority)
+            {
+                case 1:
+                {
+                    if(GetFactionType(playerid) != FACTION_GANG)
+                        return SendErrorMessage(playerid, "This weapon authority for official member.");
+                }
+                case 2:
+                {
+                    if(!PlayerData[playerid][pGunAuthority])
+                        return SendErrorMessage(playerid, "This weapon authority for verified member.");
+                }
+            }
+
+            switch(weapon)
+            {
+                case 1 .. 18, 46:
+                {
+                    new str[96];
+                    format(str, sizeof(str), "bought %s from black market", ReturnWeaponName(weapon));
+
+                    GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, str);
+                    GivePlayerWeaponEx(playerid, weapon, ammo);
+
+                    SendCustomMessage(playerid, "Black Market", "Pembelian selesai");
+                    SendCustomMessage(playerid, "Black Market", "%s "WHITE"bayaran untuk {F1C40F}%s "WHITE"dengan {F1C40F}%d "WHITE"amunisi", FormatNumber(price), ReturnWeaponName(weapon), ammo);
+
+                    mysql_tquery(g_iHandle, sprintf("UPDATE weapons SET Enable=1 WHERE WeaponID='%d' AND Ammo='%d' AND Price='%d' AND Category='%d'", weapon, ammo, price, selectCategory[playerid]));
+                }
+                default: Dialog_Show(playerid, BM_BuyFinal, DIALOG_STYLE_INPUT, "Marketplace > Buy Weapon", ""WHITE"Anda akan membeli sebuah {F1C40F}%s "WHITE"dengan {F1C40F}%d "WHITE"amunisi.\n\nHarga: {2ECC71}%s\n\n"WHITE"Berapa banyak kelipatan yang akan anda beli dengan item ini?", "Buy", "Close", ReturnWeaponName(weapon), ammo, FormatNumber(price));
+            }
+        }
+        else SendErrorMessage(playerid, "Tidak ada senjata dalam kategori ini.");
+    }
+    return 1;
+}
+//Dialog Fightstyle
+//KickPunch Style $250\nBoxing Style $350\nKungfu Style $450\nKneehead Style $650\n Grabkick Style $850\n Elbow Style $1500
+Dialog:fightStyle(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        switch(listitem)
+        {
+            case 0: {
+                if(PlayerData[playerid][pMoney] < 250) return SendCustomMessage(playerid, "Gym Center", "Kamu tidak punya cukup uang untuk training ini!");
+                SetPlayerFightingStyle(playerid, FIGHT_STYLE_NORMAL);//0
+                SendCustomMessage(playerid, "Gym Center", "Training selesai, kamu telah mempelajari bela diri kick and punch");
+				PlayerData[playerid][pFightStyle] = 0;
+				GiveMoney(playerid, -250, ECONOMY_ADD_SUPPLY, "training gym");
+			}
+            case 1: {
+                if(PlayerData[playerid][pMoney] < 350) return SendCustomMessage(playerid, "Gym Center", "Kamu tidak punya cukup uang untuk training ini!");
+                SetPlayerFightingStyle(playerid, FIGHT_STYLE_BOXING);//1
+                SendCustomMessage(playerid, "Gym Center", "Training selesai, kamu telah mempelajari bela diri boxing");
+                PlayerData[playerid][pFightStyle] = 1;
+                GiveMoney(playerid, -350, ECONOMY_ADD_SUPPLY, "training gym");
+			}
+            case 2: {
+                if(PlayerData[playerid][pMoney] < 450) return SendCustomMessage(playerid, "Gym Center", "Kamu tidak punya cukup uang untuk training ini!");
+                SetPlayerFightingStyle(playerid, FIGHT_STYLE_KUNGFU);//2
+                SendCustomMessage(playerid, "Gym Center", "Training selesai, kamu telah mempelajari bela diri kungfu");
+                PlayerData[playerid][pFightStyle] = 2;
+                GiveMoney(playerid, -450, ECONOMY_ADD_SUPPLY, "training gym");
+			}
+            case 3: {
+                if(PlayerData[playerid][pMoney] < 650) return SendCustomMessage(playerid, "Gym Center", "Kamu tidak punya cukup uang untuk training ini!");
+                SetPlayerFightingStyle(playerid, FIGHT_STYLE_KNEEHEAD);//3
+                SendCustomMessage(playerid, "Gym Center", "Training selesai, kamu telah mempelajari bela diri kneehead");
+                PlayerData[playerid][pFightStyle] = 3;
+                GiveMoney(playerid, -650, ECONOMY_ADD_SUPPLY, "training gym");
+			}
+            case 4: {
+                if(PlayerData[playerid][pMoney] < 850) return SendCustomMessage(playerid, "Gym Center", "Kamu tidak punya cukup uang untuk training ini!");
+                SetPlayerFightingStyle(playerid, FIGHT_STYLE_GRABKICK);//4
+                SendCustomMessage(playerid, "Gym Center", "Training selesai, kamu telah mempelajari bela diri grab and kick");
+                PlayerData[playerid][pFightStyle] = 4;
+                GiveMoney(playerid, -850, ECONOMY_ADD_SUPPLY, "training gym");
+			}
+        }
+    }
+    return 1;
+}
+Dialog:BM_BuyFinal(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new times = strval(inputtext);
+        if(!(0 < times <= 5)) return SendErrorMessage(playerid, "Anda hanya bisa membeli antara 0 sampai dengan 5.");
+
+        new weapon, ammo, price, type;
+        if(Category_GetWeaponData(selectCategory[playerid], selectIndex[playerid], weapon, ammo, price, type)) {
+            price = (price * times);
+            ammo = (ammo * times);
+            if(price > GetMoney(playerid)) return SendErrorMessage(playerid, "Uang anda tidak cukup.");
+
+            new str[64];
+            format(str, sizeof(str), "bought %s ammo from black market", ReturnWeaponName(weapon));
+
+            GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, str);
+            GivePlayerWeaponEx(playerid, weapon, ammo);
+
+            SendCustomMessage(playerid, "Black Market", "Pembelian selesai");
+            SendCustomMessage(playerid, "Black Market", "%s "WHITE"bayaran untuk {F1C40F}%s "WHITE"dengan {F1C40F}%d "WHITE"amunisi", FormatNumber(price), ReturnWeaponName(weapon), ammo);
+
+            mysql_tquery(g_iHandle, sprintf("UPDATE weapons SET Enable=1 WHERE WeaponID='%d' AND Ammo='%d' AND Price='%d' AND Category='%d'", weapon, ammo, price, selectCategory[playerid]));
+        }
+        else SendErrorMessage(playerid, "Tidak ada senjata dalam kategori ini.");
+    }
+    return 1;
+}
+
+//--------------------------
+Dialog:BuyCrate(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        static
+            id = -1;
+
+        switch(listitem)
+        {
+            case 0: {
+                GiveMoney(playerid, -300, ECONOMY_ADD_SUPPLY, "bought crate");
+                id = Crate_Create(playerid,(listitem+1), -2157.2009,-246.4058,36.5156,182.1140);
+                if(id == -1) return SendErrorMessage(playerid, "The server has reached the limit for crates.");
+                SendServerMessage(playerid, "You have successfully order a crate, now the crate in near table in back you.");
+                SetPlayerWaypoint(playerid, "Crate Spawn", -2157.2009,-246.4058,36.5156);
+            }
+            case 1: {
+                GiveMoney(playerid, -700, ECONOMY_ADD_SUPPLY, "bought crate");
+                id = Crate_Create(playerid,(listitem+1), -2160.7009,-246.4058,36.5156,182.1140);
+                if(id == -1) return SendErrorMessage(playerid, "The server has reached the limit for crates.");
+                SendServerMessage(playerid, "You have successfully order a crate, now the crate in near table in back you.");
+                SetPlayerWaypoint(playerid, "Crate Spawn", -2160.7009,-246.4058,36.5156);
+            }
+            case 2: {
+                GiveMoney(playerid, -1200, ECONOMY_ADD_SUPPLY, "bought crate");
+                id = Crate_Create(playerid,(listitem+1), -2164.2009,-246.4058,36.5156,182.1140);
+                if(id == -1) return SendErrorMessage(playerid, "The server has reached the limit for crates.");
+                SendServerMessage(playerid, "You have successfully order a crate, now the crate in near table in back you.");
+                SetPlayerWaypoint(playerid, "Crate Spawn", -2164.2009,-246.4058,36.5156);
+            }
+            case 3: {
+                GiveMoney(playerid, -800, ECONOMY_ADD_SUPPLY, "bought crate");
+                id = Crate_Create(playerid,(listitem+1), -2174.7009,-246.6339,36.5156,182.1140);
+                if(id == -1) return SendErrorMessage(playerid, "The server has reached the limit for crates.");
+                SendServerMessage(playerid, "You have successfully order a crate, now the crate in near table in back you.");
+                SetPlayerWaypoint(playerid, "Crate Spawn", -2174.7009,-246.6339,36.5156);
+            }
+            case 4: {
+                GiveMoney(playerid, -1500, ECONOMY_ADD_SUPPLY, "bought crate");
+                id = Crate_Create(playerid,(listitem+1), -2171.2009,-246.6339,36.5156,182.1140);
+                if(id == -1) return SendErrorMessage(playerid, "The server has reached the limit for crates.");
+                SendServerMessage(playerid, "You have successfully order a crate, now the crate in near table in back you.");
+                SetPlayerWaypoint(playerid, "Crate Spawn", -2171.2009,-246.6339,36.5156);
+            }
+            case 5: Dialog_Show(playerid, BuySeeds, DIALOG_STYLE_LIST, "Buy Seeds", "Marijuana Seeds\nCocaine Seeds\nHeroin Opium Seeds", "Buy", "Close");
+        }
+    }
+    return 1;
+}
+Dialog:FoodCourt(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        switch(listitem)
+        {
+            case 0:
+            {
+                if(Inventory_Count(playerid, "Stamps") < 15)
+        	        return SendErrorMessage(playerid, "You don't have enough stamps.");
+
+                SetPlayerHunger(playerid, PlayerData[playerid][pHunger]+35);
+                SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid 15 and received a bread.", ReturnName(playerid, 0));
+                ApplyAnimation(playerid, "FOOD", "EAT_Burger", 4.1, 0, 0, 0, 0, 0, 1);
+                Inventory_Remove(playerid, "Stamps", 15);
+            }
+            case 1:
+            {
+                if(Inventory_Count(playerid, "Stamps") < 20)
+        	        return SendErrorMessage(playerid, "You don't have enough stamps.");
+
+                SetPlayerHunger(playerid, PlayerData[playerid][pHunger]+50);
+                SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid 20 and received a vegetables soup.", ReturnName(playerid, 0));
+                ApplyAnimation(playerid, "FOOD", "EAT_Burger", 4.1, 0, 0, 0, 0, 0, 1);
+                Inventory_Remove(playerid, "Stamps", 20);
+                
+            }
+            case 2:
+            {
+                if(Inventory_Count(playerid, "Stamps") < 10)
+        	        return SendErrorMessage(playerid, "You don't have enough stamps.");
+
+                SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DRINK_SPRUNK);
+                SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s has paid 10 and received a sprunk.", ReturnName(playerid, 0));
+                Inventory_Remove(playerid, "Stamps", 10);                    
+            }
+        }
+    }
+    return 1;
+}
+Dialog:BuySeeds(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        SetPVarInt(playerid, "BuySeedsType", listitem);
+        SetPVarString(playerid, "BuySeedsName", inputtext);
+        Dialog_Show(playerid, BuySeedsValue, DIALOG_STYLE_INPUT, "Amount of Seeds", WHITE"Berapa banyak bibit yang akan kamu beli? "YELLOW"(minimal 50 bibit):", "Beli", "Tolak");
+    }
+    return 1;
+}
+
+Dialog:BuySeedsValue(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new plantName[20];
+
+        if(!(50 <= strval(inputtext) <= 200))
+            return Dialog_Show(playerid, BuySeedsValue, DIALOG_STYLE_INPUT, "Amount of Seeds", WHITE"(error): jumlah hanya dibatasi 50 sampai 200!\n\nBerapa banyak bibit yang akan kamu beli? "YELLOW"(minimal 50 bibit)", "Beli", "Tolak");
+
+        if(GetMoney(playerid) < (strval(inputtext) * 10))
+            return SendErrorMessage(playerid, "Uang tidak mencukupi untuk sebanyak itu!");
+
+        switch(GetPVarInt(playerid, "BuySeedsType"))
+        {
+            case 0:
+            {
+                if(Inventory_Add(playerid, "Marijuana Seeds", 1578, strval(inputtext)) == -1)
+                    return 1;
+            }
+            case 1:
+            {
+                if(Inventory_Add(playerid, "Cocaine Seeds", 1575, strval(inputtext)) == -1)
+                    return 1;
+            }
+            case 2:
+            {
+                if(Inventory_Add(playerid, "Heroin Opium Seeds", 1577, strval(inputtext)) == -1)
+                    return 1;
+            }
+        }
+
+        GiveMoney(playerid, -(strval(inputtext) * 10), ECONOMY_ADD_SUPPLY, "bought plant seed");
+
+        GetPVarString(playerid, "BuySeedsName", plantName, sizeof(plantName));
+        SendServerMessage(playerid, "Sukses membeli "YELLOW"%s "GREEN"(%s)"WHITE". (gunakan perintah '/plant' untuk menanam)", plantName, FormatNumber(strval(inputtext) * 10));
+    }
+    return 1;
+}
+
+Dialog:BuyDrugs(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        SetPVarInt(playerid, "BuyDrugsType", listitem);
+        SetPVarString(playerid, "BuyDrugsName", inputtext);
+        Dialog_Show(playerid, BuyDrugsValue, DIALOG_STYLE_INPUT, "Import Order", WHITE"Berapa banyak yang akan kamu import untuk "YELLOW"%s:", "Order", "Cancel", inputtext);
+
+    }
+    return 1;
+}
+
+
+Dialog:BuyDrugsValue(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new drugType, drugName[20], minBuy[] = {25, 25, 50}, drugPrice[] = {25, 35, 45};
+
+        GetPVarString(playerid, "BuyDrugsName", drugName, sizeof(drugName));
+        drugType = GetPVarInt(playerid, "BuyDrugsType");
+
+        if(!(minBuy[drugType] <= strval(inputtext) <= 1000))
+            return Dialog_Show(playerid, BuyDrugsValue, DIALOG_STYLE_INPUT, "Amount of Drugs", WHITE"(error): jumlah hanya dibatasi %d sampai 1000!\n\nBerapa banyak yang akan kamu import untuk "YELLOW"%s:", "Beli", "Tolak", minBuy[drugType], drugName);
+
+        if(PlayerData[playerid][pBankMoney] < (strval(inputtext) * drugPrice[drugType]))
+            return SendErrorMessage(playerid, "Uang dibank tidak mencukupi untuk sebanyak itu (%s)!", FormatNumber(strval(inputtext) * drugPrice[drugType]));
+        for(new i=0; i < MAX_DROP; i++) 
+        {
+            if(!importData[i][importOrdered])
+            {
+                switch(drugType)
+                {
+                    case 0:
+                    {
+                        importData[i][importType] = 2; //Marijuana
+                        importCreate(playerid, strval(inputtext));
+                    }
+                    case 1:
+                    {
+                        importData[i][importType] = 3; //Heroin
+                        importCreate(playerid, strval(inputtext));
+                    }
+                    case 2:
+                    {
+                        importData[i][importType] = 4; //Cocaine
+                        importCreate(playerid, strval(inputtext));
+                    }
+                }
+                PlayerData[playerid][pBankMoney] -= (strval(inputtext) * drugPrice[drugType]);
+                SendServerMessage(playerid, "Sukses mengorder "YELLOW"%s "WHITE"seharga "GREEN"%s", drugName, FormatNumber((strval(inputtext) * drugPrice[drugType])));
+                return 1;
+            }
+        }
+        SendErrorMessage(playerid, "There's an import on progress currently.");       
+    }
+    return 1;
+}
+
+Dialog:AtmWithdraw(playerid, response, listitem, inputtext[])
+{
+    new id = GetPVarInt(playerid, "ATMID");
+    if(response)
+    {
+        switch(listitem)
+        {
+            case 0: 
+            {
+                if(PlayerData[playerid][pBankMoney] < 100)
+                {
+                    SendServerMessage(playerid, "You don't have enough money to take $100");
+                    return cmd_atm(playerid, "");
+                }
+                // if(AtmData[id][atmCapacity] < 100)
+                // {
+                //     SendServerMessage(playerid, "This atm only have %s you can't take money from inside this ATM!", FormatNumber(AtmData[id][atmCapacity]));
+                //     return cmd_atm(playerid, "");
+                // }
+                PlayerData[playerid][pBankMoney] -= 100;
+
+                AtmData[id][atmCapacity] -= 100;
+
+                if (AtmData[id][atmCapacity] < 0)
+                {
+                    AtmData[id][atmCapacity] = 1;
+                }
+
+                GiveMoney(playerid, 100);
+                Log_Save(E_LOG_WITHDRAW, sprintf("[%s] %s has withdraws %s from ATM ID \"%d\", current bank: %s.", ReturnDate(), ReturnName(playerid), FormatNumber(100), id, FormatNumber(PlayerData[playerid][pBankMoney])));
+                PlayerTextDrawSetString(playerid, BankMoneyVisual[playerid], sprintf("%s", FormatNumber(PlayerData[playerid][pBankMoney])));
+                SendServerMessage(playerid, "You've withdraw $100 from atm.");
+            }
+            case 1: {
+                if(PlayerData[playerid][pBankMoney] < 200)
+                {
+                    SendServerMessage(playerid, "You don't have enough money to take $200");
+                    return cmd_atm(playerid, "");
+                }
+                // if(AtmData[id][atmCapacity] < 200)
+                // {
+                //     SendServerMessage(playerid, "This atm only have %s you can't take money from inside this ATM!", FormatNumber(AtmData[id][atmCapacity]));
+                //     return cmd_atm(playerid, "");
+                // }
+                PlayerData[playerid][pBankMoney] -= 200;
+
+                AtmData[id][atmCapacity] -= 200;
+
+                if (AtmData[id][atmCapacity] < 0)
+                {
+                    AtmData[id][atmCapacity] = 1;
+                }
+
+                GiveMoney(playerid, 200);
+                Log_Save(E_LOG_WITHDRAW, sprintf("[%s] %s has withdraws %s from ATM ID \"%d\", current bank: %s.", ReturnDate(), ReturnName(playerid), FormatNumber(200), id, FormatNumber(PlayerData[playerid][pBankMoney])));
+                PlayerTextDrawSetString(playerid, BankMoneyVisual[playerid], sprintf("%s", FormatNumber(PlayerData[playerid][pBankMoney])));
+                SendServerMessage(playerid, "You've withdraw $200 from atm.");
+            }
+            case 2: {
+                if(PlayerData[playerid][pBankMoney] < 500)
+                {
+                    SendServerMessage(playerid, "You don't have enough money to take $500");
+                    return cmd_atm(playerid, "");
+                }
+                // if(AtmData[id][atmCapacity] < 500)
+                // {
+                //     SendServerMessage(playerid, "This atm only have %s you can't take money from inside this ATM!", FormatNumber(AtmData[id][atmCapacity]));
+                //     return cmd_atm(playerid, "");
+                // }                
+                PlayerData[playerid][pBankMoney] -= 500;
+
+                AtmData[id][atmCapacity] -= 500;
+
+                if (AtmData[id][atmCapacity] < 0)
+                {
+                    AtmData[id][atmCapacity] = 1;
+                }
+
+                GiveMoney(playerid, 500);
+                Log_Save(E_LOG_WITHDRAW, sprintf("[%s] %s has withdraws %s from ATM ID \"%d\", current bank: %s.", ReturnDate(), ReturnName(playerid), FormatNumber(500), id, FormatNumber(PlayerData[playerid][pBankMoney])));
+                PlayerTextDrawSetString(playerid, BankMoneyVisual[playerid], sprintf("%s", FormatNumber(PlayerData[playerid][pBankMoney])));
+                SendServerMessage(playerid, "You've withdraw $500 from atm.");
+            }
+            case 3: {
+                if(PlayerData[playerid][pBankMoney] < 1000)
+                {
+                    SendServerMessage(playerid, "You don't have enough money to take $1000");
+                    return cmd_atm(playerid, "");
+                }
+                // if(AtmData[id][atmCapacity] < 1000)
+                // {
+                //     SendServerMessage(playerid, "This atm only have %s you can't take money from inside this ATM!", FormatNumber(AtmData[id][atmCapacity]));
+                //     return cmd_atm(playerid, "");
+                // }
+                PlayerData[playerid][pBankMoney] -= 1000;
+
+                AtmData[id][atmCapacity] -= 1000;
+
+                if (AtmData[id][atmCapacity] < 0)
+                {
+                    AtmData[id][atmCapacity] = 1;
+                }
+
+                GiveMoney(playerid, 1000);
+                Log_Save(E_LOG_WITHDRAW, sprintf("[%s] %s has withdraws %s from ATM ID \"%d\", current bank: %s.", ReturnDate(), ReturnName(playerid), FormatNumber(1000), id, FormatNumber(PlayerData[playerid][pBankMoney])));
+                PlayerTextDrawSetString(playerid, BankMoneyVisual[playerid], sprintf("%s", FormatNumber(PlayerData[playerid][pBankMoney])));
+                SendServerMessage(playerid, "You've withdraw $1000 from atm.");
+            }
+            case 4: {
+                if(PlayerData[playerid][pBankMoney] < 5000)
+                {
+                    SendServerMessage(playerid, "You don't have enough money to take $5000");
+                    return cmd_atm(playerid, "");
+                }
+                // if(AtmData[id][atmCapacity] < 5000)
+                // {
+                //     SendServerMessage(playerid, "This atm only have %s you can't take money from inside this ATM!", FormatNumber(AtmData[id][atmCapacity]));
+                //     return cmd_atm(playerid, "");
+                // }
+                PlayerData[playerid][pBankMoney] -= 5000;
+
+                AtmData[id][atmCapacity] -= 5000;
+
+                if (AtmData[id][atmCapacity] < 0)
+                {
+                    AtmData[id][atmCapacity] = 1;
+                }
+
+                GiveMoney(playerid, 5000);
+                Log_Save(E_LOG_WITHDRAW, sprintf("[%s] %s has withdraws %s from ATM ID \"%d\", current bank: %s.", ReturnDate(), ReturnName(playerid), FormatNumber(5000), id, FormatNumber(PlayerData[playerid][pBankMoney])));
+                PlayerTextDrawSetString(playerid, BankMoneyVisual[playerid], sprintf("%s", FormatNumber(PlayerData[playerid][pBankMoney])));
+                SendServerMessage(playerid, "You've withdraw $5000 from atm.");
+            }
+            case 5: {
+                if(PlayerData[playerid][pBankMoney] < 10000)
+                {
+                    SendServerMessage(playerid, "You don't have enough money to take $10000");
+                    return cmd_atm(playerid, "");
+                }
+                // if(AtmData[id][atmCapacity] < 10000)
+                // {
+                //     SendServerMessage(playerid, "This atm only have %s you can't take money from inside this ATM!", FormatNumber(AtmData[id][atmCapacity]));
+                //     return cmd_atm(playerid, "");
+                // }
+                PlayerData[playerid][pBankMoney] -= 10000;
+
+                AtmData[id][atmCapacity] -= 10000;
+
+                if (AtmData[id][atmCapacity] < 0)
+                {
+                    AtmData[id][atmCapacity] = 1;
+                }
+
+                GiveMoney(playerid, 10000);
+                Log_Save(E_LOG_WITHDRAW, sprintf("[%s] %s has withdraws %s from ATM ID \"%d\", current bank: %s.", ReturnDate(), ReturnName(playerid), FormatNumber(10000), id, FormatNumber(PlayerData[playerid][pBankMoney])));
+                PlayerTextDrawSetString(playerid, BankMoneyVisual[playerid], sprintf("%s", FormatNumber(PlayerData[playerid][pBankMoney])));
+                SendServerMessage(playerid, "You've withdraw $10000 from atm.");
+            }
+        }
+    }
+    return 1;
+}
+
+Dialog:Atm(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        switch(listitem)
+        {
+            case 0: Dialog_Show(playerid, AtmWithdraw, DIALOG_STYLE_LIST, "ATM Account","$100\n$200\n$500\n$1000\n$5000\n$10000","Take","Close");
+            case 1:
+            {
+                if(PlayerData[playerid][pHour] < 2) return SendErrorMessage(playerid, "You must play 2 hours to transfer.");
+                Dialog_Show(playerid, Transfer, DIALOG_STYLE_INPUT, "Make a transfer", "Your bank account's balance: %s\n\nPlease enter the name or ID of the player below:", "Continue", "Back", FormatNumber(PlayerData[playerid][pBankMoney]));
+            }
+            case 2: Paycheck(playerid);
+        }
+    }
+    return 1;
+}
+
+Dialog:DialogBusiness(playerid, response, listitem, inputtext[])
+{
+    new
+        string[225],
+        id = GetPVarInt(playerid,"BM"),
+        kitchen[255]
+    ;
+
+    if(response)
+    {
+        switch(listitem)
+        {
+            case 0:
+            {
+                format(string,sizeof(string),"Business ID %d", GetPVarInt(playerid,"BM"));
+                Dialog_Show(playerid, BusinessInfo, DIALOG_STYLE_TABLIST,string,""COL_GREY"You can look business information here:\t \n\n \t \n"WHITE"Business name:\t%s\nMessage:\t%s\nBusiness product:\t%d/100\nBusiness Vault:\t%s","Back","Close",BusinessData[id][bizName],BusinessData[id][bizMessage], BusinessData[id][bizProducts], FormatNumber(BusinessData[id][bizVault]));
+            }
+            case 1: if(!Business_IsEmployee(playerid, id)) Dialog_Show(playerid, BusinessName, DIALOG_STYLE_INPUT,"Business Name",""WHITE"Nama sebelumnya: %s\n\n"WHITE"Masukkan nama bisnis yang anda inginkan\nMaksimal 32 karakter untuk nama bisnis","Done","Back",BusinessData[id][bizName]);
+            case 2: if(!Business_IsEmployee(playerid, id)) Dialog_Show(playerid, BusinessMessage, DIALOG_STYLE_INPUT,"Business Message",""COL_LIGHTBLUE"BUSINESS: "WHITE"%s\n\nInput: \"none\" to disable business message\n\nInput your business message below:", "Next", "Close",BusinessData[id][bizMessage]);
+            case 3: if(!Business_IsEmployee(playerid, id)) Dialog_Show(playerid, BusinessVault, DIALOG_STYLE_LIST,"Business Vault","Deposit\nWithdraw","Next","Back");
+            case 4: if(!Business_IsEmployee(playerid, id)) Business_ProductMenu(playerid, id);
+            case 5: if(!Business_IsEmployee(playerid, id)) Dialog_Show(playerid, BusinessCargo, DIALOG_STYLE_INPUT,"Product Price For Sale", WHITE"Harga yang kamu pasang: "GREEN"%s\n"WHITE"Harga minimal: "GREEN"%s\n"WHITE"Berapa harga yang akan anda tawarkan untuk 1 kargo? (1 kargo bisa sampai 5 - 15 pcs)", "Set", "Back", FormatNumber(BusinessData[id][bizCargo]), FormatNumber(Marketplace_Price(id)));
+            case 6: Dialog_Show(playerid, BusinessMusic, DIALOG_STYLE_INPUT,"Business Music",""COL_LIGHTBLUE"BUSINESS: "WHITE"\nInput: \"none\" to disable business music\n\nInput your business musick link below:", "Next", "Close");
+            case 7: 
+            {
+                format(kitchen, sizeof(kitchen), ""COL_LIGHTBLUE"BUSINESS : "WHITE"Current Kitchen Durability %d\n\nDo You want to repair your business's kitchen ?\n\n$1000/Service", BusinessData[id][bizDurability]);
+                Dialog_Show(playerid, BusinessKitchen, DIALOG_STYLE_MSGBOX,"Kitchen Durability", kitchen , "Yes", "Close");
+            }
+            case 8: Dialog_Show(playerid, BusinessManagement, DIALOG_STYLE_LIST, "Business Management", "Employee List\nInvite Employee\nRemove All Employee\nReset Employee Hours", "Select", "Close");
+        }
+    }
+    return 1;
+}
+Dialog:BusinessManagement(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new bizid = GetPVarInt(playerid,"BM");
+        switch(listitem)
+        {
+            case 0: Business_ShowEmploye(playerid, bizid);
+            case 1: if(!Business_IsEmployee(playerid, bizid)) Dialog_Show(playerid, BusinessEmployee, DIALOG_STYLE_INPUT,"Business Employee", "Input Nama pegawai yang ingin di jadikan employee atau masukan idnya :" , "Invite", "Close");
+            case 2: 
+            {
+                if(!Business_IsEmployee(playerid, bizid)) 
+                {
+                    Business_RemoveAllEmploye(bizid);
+                    SendServerMessage(playerid, "You removed all your employee!");
+                }
+            }
+            case 3: 
+            {
+                if(!Business_IsEmployee(playerid, bizid))
+                {
+                    Business_ResetHours(bizid);
+                    SendServerMessage(playerid, "You reset all employee duty hour!");
+                }
+            }
+        }
+    }
+    return 1;
+}
+Dialog:BizEmployeeManagement(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new bizid = GetPVarInt(playerid,"BM"),
+            id = strval(inputtext)
+        ;     
+        SetPVarInt(playerid, "BizEmployeeID", id);
+        Business_ShowEmployeDetails(playerid, bizid, id);
+    }
+    return 1;
+}
+Dialog:BusinessEmployeeDetails(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new bizid = GetPVarInt(playerid,"BM"),
+            id = GetPVarInt(playerid, "BizEmployeeID")
+        ;
+        switch(listitem)
+        {
+            case 0: Business_ShowEmployeDetails(playerid, bizid, id);
+            case 1: Business_ShowEmployeDetails(playerid, bizid, id);
+            case 2:
+            {              
+                if(!Business_IsEmployee(playerid, bizid)) Business_RemoveEmploye(id);
+            }
+        }        
+    }
+    return 1;
+}
+Dialog:BusinessEmployee(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+		new userid,
+			bizid = GetPVarInt(playerid,"BM")
+        ;
+
+		if (Business_EmployeGetCount(bizid) > MAX_BUSINESS_EMPLOYEE) return SendErrorMessage(playerid, "This business is limited 3 employee.");
+		if (sscanf(inputtext, "u", userid)) return Dialog_Show(playerid, BusinessEmployee, DIALOG_STYLE_INPUT,"Business Employee", "Input Nama pegawai yang ingin di jadikan employee atau masukan idnya :" , "Invite", "Close");
+		if (!IsPlayerConnected(userid)) return SendErrorMessage(playerid, "That player is not connected into the game!.");
+        if (Business_IsEmployee(userid, bizid)) return Dialog_Show(playerid, BusinessEmployee, DIALOG_STYLE_INPUT, "Business Employee", "Player tersebut sudah masuk dalam list employe\nMasukkan nama ataupun id player untuk kamu masukkan sebagai -\npekerja di business ini.", "Add", "Close");
+        if (userid == INVALID_PLAYER_ID || userid == playerid) return SendErrorMessage(playerid, "Invalid player id / Tidak bisa masukan diri sendiri!.");
+
+		Business_AddEmploye(userid, bizid);
+		SendServerMessage(playerid, "Kamu memasukkan %s ke dalam list pekerja bisnis mu.", NormalName(userid));
+		SendServerMessage(userid, "%s mempekerjakan kamu di bisnis miliknya %s.", NormalName(playerid), BusinessData[bizid][bizName]);
+    }
+    return 1;
+}
+Dialog:BusinessKitchen(playerid, response, listitem, inputtext[])
+{
+    new id = GetPVarInt(playerid,"BM");
+    if(response)
+    {
+        if(BusinessData[id][bizVault] >= 1000)
+        {
+            BusinessData[id][bizDurability] = 100;
+            SendServerMessage(playerid, "You just hire a repairman and service your kitchen, current kitchen durability is %d", BusinessData[id][bizDurability]);
+            BusinessData[id][bizVault] -= 1000;
+        }
+        else SendServerMessage(playerid, "Your business don't have enough vault to repair the kitchen!");
+    }
+    else cmd_bm(playerid, "\0");
+    return 1;
+}
+Dialog:BusinessCargo(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new id = GetPVarInt(playerid, "BM");
+
+        if(strval(inputtext) < Marketplace_Price(GetPVarInt(playerid, "BM")) || strval(inputtext) > 500)
+            return Dialog_Show(playerid, BusinessCargo, DIALOG_STYLE_INPUT,"Product Price For Sale", WHITE"error: harga minimal "GREEN"%s "WHITE"sampai "GREEN"$500\n\n"WHITE"Harga yang kamu pasang: "GREEN"%s\n"WHITE"Harga minimal: "GREEN"%s\n"WHITE"Berapa harga yang akan anda tawarkan untuk 1 kargo? (1 kargo bisa sampai 5 - 15 pcs)", "Set", "Back", FormatNumber(Marketplace_Price(id)), FormatNumber(BusinessData[id][bizCargo]), FormatNumber(Marketplace_Price(id)));
+
+        BusinessData[id][bizCargo] = strval(inputtext);
+        SendServerMessage(playerid, "Anda menawarkan "GREEN"%s per "YELLOW"kargo "WHITE"sekarang.", FormatNumber(strval(inputtext)));
+    }
+    else cmd_bm(playerid, "\0");
+    return 1;
+}
+
+Dialog:BusinessInfo(playerid, response, listitem, inputtext[])
+{
+    if(response)
+        return cmd_bm(playerid, "\0");
+
+    return 1;
+}
+
+Dialog:BusinessVault(playerid, response, listitem, inputtext[])
+{
+    if(response) {
+        switch(listitem) {
+            case 0: Dialog_Show(playerid, BusinessDeposit, DIALOG_STYLE_INPUT, "Deposit", "Uang anda: %s.\n\nMasukkan berapa banyak uang yang akan anda simpan di dalam bisnis ini", "Deposit", "Back", FormatNumber(GetMoney(playerid)));
+            case 1: Dialog_Show(playerid, BusinessWithdraw, DIALOG_STYLE_INPUT,"Withdraw","Business Vault: %s\n\nMasukkan berapa banyak uang yang akan anda ambil di dalam bisnis ini","Withdraw","Back", FormatNumber(BusinessData[GetPVarInt(playerid,"BM")][bizVault]));
+        }
+    }
+    return 1;
+}
+
+Dialog:BusinessWithdraw(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new id = GetPVarInt(playerid,"BM");
+
+        if(strval(inputtext) < 1 || strval(inputtext) > BusinessData[id][bizVault])
+            return SendErrorMessage(playerid, "Invalid amount specified!");
+
+        BusinessData[id][bizVault] -= strval(inputtext);
+        Business_Save(id);
+
+        GiveMoney(playerid, strval(inputtext));
+        SendClientMessageEx(playerid, X11_TURQUOISE_1,"BUSINESS: "WHITE"You have withdrawn "YELLOW"%s "WHITE"from the business vault.", FormatNumber(strval(inputtext)));
+        Log_Save(E_LOG_BUSINESS, sprintf("[%s] %s has withdrawn \"%s\" from business ID: %d.", ReturnDate(), NormalName(playerid), FormatNumber(strval(inputtext)), id));
+    }
+    else Dialog_Show(playerid, BusinessVault, DIALOG_STYLE_LIST,"Business Vault","Deposit\nWithdraw","Next","Back");
+
+    return 1;
+}
+
+Dialog:BusinessDeposit(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new id = GetPVarInt(playerid,"BM");
+
+        if(strval(inputtext) < 1 || strval(inputtext) > GetMoney(playerid))
+            return SendErrorMessage(playerid, "Invalid amount specified!");
+
+        BusinessData[id][bizVault] += strval(inputtext);
+        Business_Save(id);
+
+        GiveMoney(playerid, -strval(inputtext));
+        SendClientMessageEx(playerid, X11_TURQUOISE_1,"BUSINESS: "WHITE"You have deposit "YELLOW"%s "WHITE"into the business vault.", FormatNumber(strval(inputtext)));
+        Log_Save(E_LOG_BUSINESS, sprintf("[%s] %s has deposit \"%s\" to business ID: %d.", ReturnDate(), NormalName(playerid), FormatNumber(strval(inputtext)), id));
+    }
+    else Dialog_Show(playerid, BusinessVault, DIALOG_STYLE_LIST,"Business Vault","Deposit\nWithdraw","Next","Back");
+
+    return 1;
+}
+
+Dialog:BusinessName(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new id = GetPVarInt(playerid,"BM");
+
+        if(!Business_IsOwner(playerid, id))
+            return SendErrorMessage(playerid, "This is not on your business.");
+
+        if(isnull(inputtext))
+            return Dialog_Show(playerid, BusinessName, DIALOG_STYLE_INPUT,"Business Name",""COL_LIGHTRED"NOTE: "WHITE"Nama bisnis tidak di perbolehkan kosong!\n\n"WHITE"Nama sebelumnya: %s\n\n"WHITE"Masukkan nama bisnis yang anda inginkan\nMaksimal 32 karakter untuk nama bisnis","Done","Back",BusinessData[id][bizName]);
+
+        if(strlen(inputtext) > 32 || strlen(inputtext) < 5)
+            return Dialog_Show(playerid, BusinessName, DIALOG_STYLE_INPUT,"Business Name",""COL_LIGHTRED"NOTE: "WHITE"Nama bisnis harus 5 sampai 32 karakter.\n\n"WHITE"Nama sebelumnya: %s\n\n"WHITE"Masukkan nama bisnis yang anda inginkan\nMaksimal 32 karakter untuk nama bisnis","Done","Back",BusinessData[id][bizName]);
+
+        format(BusinessData[id][bizName], 32, ColouredText(inputtext));
+
+        Business_Refresh(id);
+        Business_Save(id);
+
+        SendServerMessage(playerid, "Business name set to: \"%s\".", BusinessData[id][bizName]);
+    }
+    else
+        return cmd_bm(playerid, "\0");
+    return 1;
+}
+Dialog:BusinessMusic(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new id = GetPVarInt(playerid,"BM");
+        if(strlen(inputtext) > 128 || strlen(inputtext) < 5)
+            return SendErrorMessage(playerid, "Maksimal dan minimal untuk business name yaitu 5-128 karakter.");
+
+        if(!strcmp(inputtext, "none", true))
+        {
+            BusinessData[id][bizLink][0] = '\0';
+
+            Business_Save(id);
+            SendServerMessage(playerid, "You have removed the business message.");
+        }
+        else
+        {
+            format(BusinessData[id][bizLink], 128, inputtext);
+
+            Business_Save(id);
+            SendServerMessage(playerid, "Business music set to: \"%s\".", inputtext);
+        }
+    }
+    else
+        return cmd_bm(playerid, "\0");
+    return 1;
+}
+Dialog:BusinessMessage(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new id = GetPVarInt(playerid,"BM");
+        if(strlen(inputtext) > 128 || strlen(inputtext) < 5)
+            return SendErrorMessage(playerid, "Maksimal dan minimal untuk business name yaitu 5-128 karakter.");
+
+        if(!strcmp(inputtext, "none", true))
+        {
+            BusinessData[id][bizMessage][0] = '\0';
+
+            Business_Save(id);
+            SendServerMessage(playerid, "You have removed the business message.");
+        }
+        else
+        {
+            format(BusinessData[id][bizMessage], 128, inputtext);
+
+            Business_Save(id);
+            SendServerMessage(playerid, "Business message set to: \"%s\".", inputtext);
+        }
+    }
+    else
+        return cmd_bm(playerid, "\0");
+    return 1;
+}
+
+Dialog:RemoveMember(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        foreach(new id : Player) if(!strcmp(inputtext, ReturnName(id))) {
+            SendErrorMessage(playerid, "That player is online, (/fremove) to remove him.");
+            return 1;
+        }
+        SetPVarString(playerid, "MemberName", inputtext);
+        Dialog_Show(playerid, RemoveAccept, DIALOG_STYLE_MSGBOX, "Remove Agreement", "Are you sure want remove %s from %s member?.", "Yes", "No", inputtext, FactionData[PlayerData[playerid][pFaction]][factionName]);
+    }
+    return 1;
+}
+
+Dialog:RemoveAccept(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        static
+            query[200],
+            name[MAX_PLAYER_NAME];
+
+        GetPVarString(playerid, "MemberName", name, sizeof(name));
+
+        format(query, sizeof(query), "UPDATE `characters` SET `Faction`='-1', `FactionRank`='0', `FactionDuty`='0', `SkinFaction`='0' WHERE `Character`='%q'", name); //`Character` LIKE '%q'
+        mysql_tquery(g_iHandle, query);
+
+        SendFactionMessage(PlayerData[playerid][pFaction], COLOR_CLIENT, "FACTION NOTICE: "WHITE"%s remove %s from %s member.", ReturnName2(playerid, 0), name, FactionData[PlayerData[playerid][pFaction]][factionName]);
+        SetPVarString(playerid, "MemberName", "");
+    }
+    else
+        SetPVarString(playerid, "MemberName", "");
+
+    return 1;
+}
+
+Dialog:Trace(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        if(listitem == 1) Dialog_Show(playerid, TracePhone, DIALOG_STYLE_INPUT, "Trace Phone Number", "Insert phone number to track the player:", "Track", "Close");
+    }
+    return 1;
+}
+
+Dialog:TracePlate(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        if(isnull(inputtext)) return Dialog_Show(playerid, TracePlate, DIALOG_STYLE_INPUT, "Trace Number Plate", "Insert plate number to track the vehicle:", "Track", "Close");
+        if(!strcmp(inputtext, "NONE", true)) return Dialog_Show(playerid, TracePlate, DIALOG_STYLE_INPUT, "Trace Number Plate", "Unable to find this plate\nInsert plate number to track the vehicle:", "Track", "Close");
+        if(!strcmp(inputtext, "STATIC", true)) return Dialog_Show(playerid, TracePlate, DIALOG_STYLE_INPUT, "Trace Number Plate", "Unable to find this plate\nInsert plate number to track the vehicle:", "Track", "Close");
+
+        for(new i=0, j = GetVehiclePoolSize(); i <= j; i++) if(IsValidVehicle(i) && !strcmp(GetVehicleNumberPlate(i), inputtext, true))
+        {
+            new Float:x, Float:y, Float:z;
+            GetVehiclePos(i, x, y, z);
+
+            SetPlayerWaypoint(playerid, sprintf("Track Plate Number '%s'", GetVehicleNumberPlate(i)), x,y,z);
+            SendServerMessage(playerid, "You have been successfull track vehicle number plate "YELLOW"%s.", inputtext);
+            return 1;
+        }
+        SendErrorMessage(playerid, "There are no one vehicle with that plate.");
+    }
+    return 1;
+}
+
+Dialog:TracePhone(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        if(isnull(inputtext)) return Dialog_Show(playerid, TracePhone, DIALOG_STYLE_INPUT, "Trace Phone Number", "Insert phone number to track the player:", "Track", "Close");
+        if(strval(inputtext) == 0) return Dialog_Show(playerid, TracePhone, DIALOG_STYLE_INPUT, "Trace Phone Number", "Insert phone number to track the player:", "Track", "Close");
+        if(!IsNumeric(inputtext)) return Dialog_Show(playerid, TracePhone, DIALOG_STYLE_INPUT, "Trace Phone Number", "Insert phone number to track the player:", "Track", "Close");
+
+        foreach(new i : Player) if(PlayerData[i][pPhone] == strval(inputtext))
+        {
+            if(PlayerData[i][pPhoneOff]) return SendErrorMessage(playerid, "Unable to find this number.");
+
+            new Float:x, Float:y, Float:z;
+            GetPlayerPos(i, x, y, z);
+
+            SetPlayerWaypoint(playerid, sprintf("Track Phone Number '%d'", strval(inputtext)), x,y,z);
+            SendServerMessage(playerid, "You have been successfull track phone number "YELLOW"%d.", strval(inputtext));
+            return 1;
+        }
+        SendErrorMessage(playerid, "There are no one phone number with that.");
+    }
+    return 1;
+}
+
+Dialog:TakePills(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        switch(listitem)
+        {
+            case 0: Dialog_Show(playerid, coughPills, DIALOG_STYLE_INPUT, "Pharmacy Locker", "Jumlah Neladrly Acetate : ", "Take", "Close");
+            case 1: Dialog_Show(playerid, migrainPills, DIALOG_STYLE_INPUT, "Pharmacy Locker", "Jumlah Kratotamax Plus 1.0 : ", "Take", "Close");
+            case 2: Dialog_Show(playerid, fiverPills, DIALOG_STYLE_INPUT, "Pharmacy Locker", "Jumlah Lazattavitus Extra : ", "Take", "Close");
+        }
+    }
+    return 1;
+}
+Dialog:coughPills(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new amount = strval(inputtext);
+        if(isnull(inputtext)) return Dialog_Show(playerid, coughPills, DIALOG_STYLE_INPUT, "Pharmacy Locker", "Jumlah Neladrly Acetate : ", "Take", "Close");
+        if(!IsNumeric(inputtext)) return Dialog_Show(playerid, coughPills, DIALOG_STYLE_INPUT, "Pharmacy Locker", "Jumlah Neladrly Acetate : ", "Take", "Close");
+        if(amount < 3 || amount > 10) return SendErrorMessage(playerid, "Kamu hanya bisa mengambil minimal 3 - maximal 10 obat!");
+
+        if(Inventory_Add(playerid, "Neladryl Acetate", 2709, amount) != -1)
+        {
+            SendServerMessage(playerid, "Anda sudah mengambil obat"YELLOW"Neladrly Acetate dengan jumlah %d", amount);
+        }
+    }
+    return 1;
+}
+Dialog:undercoverSkin(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new amount = strval(inputtext);
+        if(FactionData[PlayerData[playerid][pFaction]][factionType] != FACTION_POLICE) return SendErrorMessage(playerid, "You're not a police officer!");
+        if(PlayerData[playerid][pFactionRank] < FactionData[PlayerData[playerid][pFaction]][factionRanks] - 7) return SendErrorMessage(playerid, "You must be at least rank %d.", FactionData[PlayerData[playerid][pFaction]][factionRanks] - 7);
+        if(isnull(inputtext)) return Dialog_Show(playerid, undercoverSkin, DIALOG_STYLE_INPUT, "Undercover Skin","Input Skin ID Number :", "Take", "Close");
+        if(!IsNumeric(inputtext)) return Dialog_Show(playerid, undercoverSkin, DIALOG_STYLE_INPUT, "Undercover Skin","Input Skin ID Number :", "Take", "Close");
+        if(amount == 0 || amount == 51 || amount == 52 || amount == 92) return Dialog_Show(playerid, undercoverSkin, DIALOG_STYLE_INPUT, "Undercover Skin","Input Skin ID Number :", "Take", "Close");
+
+        PlayerData[playerid][pSkinFaction] = amount;
+        PlayerData[playerid][pUndercoverDuty] = true;
+        SetPlayerSkinEx(playerid, amount, 1);
+        SetPlayerColor(playerid, DEFAULT_COLOR);
+
+    }
+    return 1;
+}
+Dialog:customSkin(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new amount = strval(inputtext);
+        if(FactionData[PlayerData[playerid][pFaction]][factionType] != FACTION_POLICE) return SendErrorMessage(playerid, "You're not a police officer!");
+        if(isnull(inputtext)) return Dialog_Show(playerid, customSkin, DIALOG_STYLE_INPUT, "Custom Skin","ID 20022 - 20056, 20070 - 20074\n\nInput Skin ID Number :", "Take", "Close");
+        if(!IsNumeric(inputtext)) return Dialog_Show(playerid, customSkin, DIALOG_STYLE_INPUT, "Custom Skin","Custom Skin","ID 20022 - 20056, 20070 - 20074\n\nInput Skin ID Number :", "Take", "Close");
+        if(!IsCustomSkin(amount)) return Dialog_Show(playerid, customSkin, DIALOG_STYLE_INPUT, "Custom Skin","ID 20022 - 20056, 20070 - 20074\n\nInput Skin ID Number :", "Take", "Close");
+
+        PlayerData[playerid][pSkinFaction] = amount;
+        SetPlayerSkinEx(playerid, amount, 1);
+    }
+    return 1;
+}
+Dialog:migrainPills(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new amount = strval(inputtext);
+        if(isnull(inputtext)) return Dialog_Show(playerid, migrainPills, DIALOG_STYLE_INPUT, "Pharmacy Locker", "Jumlah Kratotamax Plus 1.0 : ", "Take", "Close");
+        if(!IsNumeric(inputtext)) return Dialog_Show(playerid, migrainPills, DIALOG_STYLE_INPUT, "Pharmacy Locker", "Jumlah Kratotamax Plus 1.0 : ", "Take", "Close");
+        if(amount < 3 || amount > 10) return SendErrorMessage(playerid, "Kamu hanya bisa mengambil minimal 3 - maximal 10 obat!");
+
+        if(Inventory_Add(playerid, "Kratotamax Plus 1.0", 2709, amount) != -1)
+        {
+            SendServerMessage(playerid, "Anda sudah mengambil obat"YELLOW"Kratotamax Plus 1.0 dengan jumlah %d", amount);
+        } 
+    }
+    return 1;
+}
+Dialog:fiverPills(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new amount = strval(inputtext);
+        if(isnull(inputtext)) return Dialog_Show(playerid, feverPills, DIALOG_STYLE_INPUT, "Pharmacy Locker", "Jumlah Lazattavitus Extra : ", "Take", "Close");
+        if(!IsNumeric(inputtext)) return Dialog_Show(playerid, feverPills, DIALOG_STYLE_INPUT, "Pharmacy Locker", "Jumlah Lazattavitus Extra : ", "Take", "Close");
+        if(amount < 3 || amount > 10) return SendErrorMessage(playerid, "Kamu hanya bisa mengambil minimal 3 - maximal 10 obat!");
+
+        if(Inventory_Add(playerid, "Lazattavitus Extra", 2709, amount) != -1)
+        {
+            SendServerMessage(playerid, "Anda sudah mengambil obat"YELLOW"Lazattavitus Extra dengan jumlah %d", amount);
+        }
+    }
+    return 1;
+}
+
+
+Dialog:ToggleMenu(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        switch(listitem)
+        {
+            case 0:
+            {
+                PlayerData[playerid][pDisableOOC] = (PlayerData[playerid][pDisableOOC]) ? (false) : (true);
+                SendServerMessage(playerid, "You have %s OOC chat.", PlayerData[playerid][pDisableOOC] ? ("disable") : ("enable"));
+            }
+            case 1:
+            {
+                PlayerData[playerid][pDisablePM] = (PlayerData[playerid][pDisablePM]) ? (false) : (true);
+                SendServerMessage(playerid, "You have %s private messages.", PlayerData[playerid][pDisablePM] ? ("disable") : ("enable"));
+            }
+            case 2:
+            {
+                PlayerData[playerid][pDisableBC] = (PlayerData[playerid][pDisableBC]) ? (false) : (true);
+                SendServerMessage(playerid, "You have %s news broadcasts.", PlayerData[playerid][pDisableBC] ? ("disable") : ("enable"));
+            }
+            case 3:
+            {
+                if(PlayerData[playerid][pFaction] == -1) return SendErrorMessage(playerid, "You are not part of any faction.");
+
+                PlayerData[playerid][pDisableFaction] = (PlayerData[playerid][pDisableFaction]) ? (false) : (true);
+                SendServerMessage(playerid, "You have %s faction chat.", PlayerData[playerid][pDisableFaction] ? ("disable") : ("enable"));
+            }
+            case 4:
+            {
+                PlayerData[playerid][pDisableLogin] = (PlayerData[playerid][pDisableLogin]) ? (false) : (true);
+                SendServerMessage(playerid, "You have %s login message.", PlayerData[playerid][pDisableLogin] ? ("disable") : ("enable"));
+            }
+            case 5:
+            {
+                ToggleGUIDisplay(playerid, PlayerData[playerid][pTogHud]);
+                SendServerMessage(playerid, "You have %s hud display.", PlayerData[playerid][pTogHud] ? ("disable") : ("enable"));
+            }
+            case 6:
+            {
+                if(!IsPlayerVIP(playerid)) return SendErrorMessage(playerid, "You are not part of vip members.");
+
+                SetToggleVIPMessage(playerid, IsToggleVIPMessage(playerid) ? (false) : (true));
+                SendServerMessage(playerid, "You have %s vip message.", IsToggleVIPMessage(playerid) ? ("disable") : ("enable"));
+            }
+            case 7:
+            {
+                PlayerData[playerid][pDisableAnim] = (PlayerData[playerid][pDisableAnim]) ? (false) : (true);
+                SendServerMessage(playerid, "You have %s chat animation.", PlayerData[playerid][pDisableAnim] ? ("disable") : ("enable"));
+            }
+            // case 8:
+            // {
+            //     ToggleRelationDisplay(playerid, PlayerData[playerid][pTogRelation]);
+            //     SendServerMessage(playerid, "You have %s relationship display.", PlayerData[playerid][pTogRelation] ? ("disable") : ("enable"));
+            // }
+            case 8:
+            {
+                PlayerData[playerid][pDisableAdmin] = (PlayerData[playerid][pDisableAdmin]) ? (false) : (true);
+                SendServerMessage(playerid, "You have %s admin chat.", PlayerData[playerid][pDisableAdmin] ? ("disable") : ("enable"));
+            }
+            case 9:
+            {
+                PlayerData[playerid][pDisableAPM] = (PlayerData[playerid][pDisableAPM]) ? (false) : (true);
+                SendServerMessage(playerid, "You have %s Player PM.", PlayerData[playerid][pDisableAPM] ? ("disable") : ("enable"));
+            }
+            case 10:
+            {
+                PlayerData[playerid][pDisableLDO] = (PlayerData[playerid][pDisableLDO]) ? (false) : (true);
+                SendServerMessage(playerid, "You have %s Player /ldo.", PlayerData[playerid][pDisableLDO] ? ("disable") : ("enable"));
+            }
+            case 11:
+            {
+                PlayerData[playerid][pDisableRADIO] = (PlayerData[playerid][pDisableRADIO]) ? (false) : (true);
+                SendServerMessage(playerid, "You have %s Player Radio.", PlayerData[playerid][pDisableRADIO] ? ("disable") : ("enable"));
+            }
+        }
+        SaveToggle(playerid);
+    }
+    return 1;
+}
+
+Dialog:CheckTicket(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new i = ListedTickets[playerid][listitem];
+        Dialog_Show(playerid, TicketDetail, DIALOG_STYLE_MSGBOX, "Ticket Detail", ""WHITE"Ticket detail {C0C0C0}#%03d\n\n"WHITE"Ticket issuer: {C0C0C0}%s\n"WHITE"Reason: {C0C0C0}%s\n"WHITE"Amout: {C0C0C0}%s\n"WHITE"Date: {C0C0C0}%s", "<< Back", "", TicketData[playerid][i][ticketID], TicketData[playerid][i][ticketIssuer], TicketData[playerid][i][ticketReason], FormatNumber(TicketData[playerid][i][ticketFee]), TicketData[playerid][i][ticketDate]);
+    }
+    return 1;
+}
+
+Dialog:TicketDetail(playerid, response, listitem, inputtext[])
+{
+    if(response) return cmd_tickets(playerid, "\1");
+    return 1;
+}
+
+Dialog:PayTicket(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new i = ListedTickets[playerid][listitem];
+        Dialog_Show(playerid, PayToPolice, DIALOG_STYLE_MSGBOX, "Ticket Detail", ""WHITE"Ticket detail {C0C0C0}#%03d\n\n"WHITE"Ticket issuer: {C0C0C0}%s\n"WHITE"Reason: {C0C0C0}%s\n"WHITE"Amout: {C0C0C0}%s\n"WHITE"Date: {C0C0C0}%s\n\n"WHITE"Do you want to pay this ticket?.", "Pay Now", "Close", TicketData[playerid][i][ticketID], TicketData[playerid][i][ticketIssuer], TicketData[playerid][i][ticketReason], FormatNumber(TicketData[playerid][i][ticketFee]), TicketData[playerid][i][ticketDate]);
+        SetPVarInt(playerid, "TicketIndex", i);
+    }
+    return 1;
+}
+
+Dialog:PayToPolice(playerid, response, listitem, inputtext[])
+{
+    if(response) {
+        new i = GetPVarInt(playerid, "TicketIndex");
+        if(GetMoney(playerid) < TicketData[playerid][i][ticketFee]) return SendErrorMessage(playerid, "You don't have enough money to pay this ticket.");
+        GiveMoney(playerid, -TicketData[playerid][i][ticketFee], ECONOMY_ADD_SUPPLY, "paid ticket fine");
+        SendServerMessage(playerid, "Thanks for pay your ticket for "COL_GREEN"%s.", FormatNumber(TicketData[playerid][i][ticketFee]));
+
+        for(new fac = 0; fac != MAX_FACTIONS; fac++) if(FactionData[fac][factionExists] && FactionData[fac][factionType] == FACTION_POLICE) {
+            FactionData[fac][factionMoney] += TicketData[playerid][i][ticketFee];
+            FactionData[fac][factionDepositMoney] = TicketData[playerid][i][ticketFee];
+            format(FactionData[fac][factionDeposit], MAX_PLAYER_NAME, "Ticket Pay");
+        }
+        Ticket_Remove(playerid, i);
+        DeletePVar(playerid, "TicketIndex");
+    }
+    else cmd_payticket(playerid, "\1");
+    return 1;
+}
+
+Dialog:BackupSystem(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        switch(listitem)
+        {
+            case 0:
+            {
+                new Float:x, Float:y, Float:z;
+                GetPlayerPos(playerid, x, y, z);
+                SendFactionMessageEx(FACTION_POLICE, COLOR_RADIO, "BACKUP: %s needs backup %s {8D8DFF}unit at %s.", ReturnName(playerid, 0), inputtext, GetLocation(x,y,z));
+                foreach (new i : Player) if(i != playerid && GetFactionType(i) == FACTION_POLICE && PlayerData[i][pOnDuty]) 
+                {
+                    BackupCheckPoint[i] = 1;
+                    DisablePlayerRaceCheckpoint(i);
+                    SetPlayerRaceCheckpoint(i, 1, x, y, z, 0, 0, 0, 2.0);
+                }
+            }
+            case 1:
+            {
+                new Float:x, Float:y, Float:z;
+                GetPlayerPos(playerid, x, y, z);
+                SendFactionMessageEx(FACTION_MEDIC, COLOR_RADIO, "BACKUP: %s needs %s {8D8DFF}unit at %s.", ReturnName(playerid, 0), inputtext, GetLocation(x,y,z));
+                foreach (new i : Player) if(i != playerid && GetFactionType(i) == FACTION_MEDIC && PlayerData[i][pOnDuty]) 
+                {
+                    BackupCheckPoint[i] = 1;
+                    DisablePlayerRaceCheckpoint(i);
+                    SetPlayerRaceCheckpoint(i, 1, x, y, z, 0, 0, 0, 2.0);
+                }
+            }
+        }
+        cmd_ame(playerid, "reaches his panic button as he pressing it and sends a signal!");
+    }
+    return 1;
+}
+
+Dialog:PilihWarna(playerid, response, listitem, inputtext[])
+{
+    new id = GetPVarInt(playerid, "BackColor");
+
+    if(response)
+    {
+        ObjectData[id][oBackColor] = AvailableColor[listitem][0];
+        ObjectText_Refresh(id);
+        SendClientMessageEx(playerid, X11_TURQUOISE_1,"SERVER: "WHITE"You've update backcolor this object to %s",AvailableColor[listitem][1]);
+    }
+    return 1;
+}
+
+Dialog:MasukkanWarna(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new id = GetPVarInt(playerid, "BackColor"),
+            hax;
+
+        if(sscanf(inputtext,"h", hax))
+            return SendErrorMessage(playerid, "Invalid hax color");
+
+        ObjectData[id][oBackColor] = hax;
+        ObjectText_Refresh(id);
+        SendClientMessageEx(playerid, X11_TURQUOISE_1,"SERVER: "WHITE"You've update backcolor this object.");
+    }
+    return 1;
+}
+
+Dialog:WarnaBelakang(playerid, response, listitem, inputtext[])
+{
+    new id = GetPVarInt(playerid, "BackColor"),
+        string[128];
+
+    if(response)
+    {
+        switch(listitem)
+        {
+            case 0: Dialog_Show(playerid, MasukkanWarna, DIALOG_STYLE_INPUT,"Custom Backcolor","Enter a hex value for the font color (ARGB)\nFormat example: 0xFFFFFFFF for white","Submit","Close");
+            case 1:
+            {
+                for (new i = 0, j = sizeof(AvailableColor); i < j; i++)
+                {
+                        format(string,sizeof(string),"%s%s\n",string, AvailableColor[i][1]);
+                }
+                Dialog_Show(playerid, PilihWarna, DIALOG_STYLE_LIST,"Available Color",string,"Select","Close");
+            }
+            case 2:
+            {
+                ObjectData[id][oBackColor] = 0x00000000;
+                ObjectText_Refresh(id);
+                SendClientMessageEx(playerid, X11_TURQUOISE_1,"SERVER: "WHITE"You've update backcolor this object to transparant");
+            }
+        }
+    }
+    return 1;
+}
+
+Dialog:FontSizes(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new id = GetPVarInt(playerid, "FontSizes");
+
+        ObjectData[id][oFontSize] = FontSizes[listitem][0];
+        ObjectText_Refresh(id);
+        SendClientMessageEx(playerid, X11_TURQUOISE_1,"SERVER: "WHITE"You've update fontsize this object (%s).",FontSizes[listitem][1]);
+    }
+    return 1;
+}
+
+Dialog:FontNames(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new id = GetPVarInt(playerid, "FontNames");
+
+        format(ObjectData[id][oFontNames], 24, inputtext);
+
+        ObjectText_Refresh(id);
+        SendClientMessageEx(playerid, X11_TURQUOISE_1,"SERVER: "WHITE"You've update font name to (%s).", inputtext);
+    }
+    return 1;
+}
+
+Dialog:ObjectList(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new id = GetPVarInt(playerid, "ObjectList");
+
+        ObjectData[id][oModel] = ObjectList[listitem][0];
+
+        ObjectText_Refresh(id);
+        SendClientMessageEx(playerid, X11_TURQUOISE_1,"SERVER: "WHITE"You've update object to id %d.", ObjectList[listitem][0]);
+    }
+    return 1;
+}
+
+Dialog:SelectHouse(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new id = -1,
+            business = GetPVarInt(playerid, "InsideBusiness"),
+            price = GetPVarInt(playerid, "FurniturePrice"),
+            model = GetPVarInt(playerid, "FurnitureModel"),
+            houseid = ListedHouse[playerid][listitem];
+
+        // SendServerMessage(playerid, "Furniture Count: %d | houseid: %d", Furniture_GetCount(houseid), houseid);
+
+        if(Furniture_GetCount(houseid) > MAX_HOUSE_FURNITURE)
+            return SendErrorMessage(playerid, "You can only have %d furniture items in your house.", MAX_HOUSE_FURNITURE);
+
+        id = Furniture_Add(houseid, GetFurnitureNameByModel(model), model, 0.0, 0.0, 0.0);
+
+        if(id == -1)
+            return SendErrorMessage(playerid, "You don't have any house furniture slots left.");
+
+        GiveMoney(playerid, -price, ECONOMY_ADD_SUPPLY, "bought furniture");
+        SendServerMessage(playerid, "You have purchased a \"%s\" for %s.", GetFurnitureNameByModel(model), FormatNumber(price));
+
+        BusinessData[business][bizProducts]--;
+        BusinessData[business][bizVault] += price;
+        Business_Save(business);
+    }
+    else cmd_buy(playerid, "\0");
+    return 1;
+}
+AddPlayerSmoking(playerid)
+{
+    PlayerSmoking[playerid]++;
+    return 1;
+}
+
+IkanDiTarik(playerid, status)
+{
+    if(!SQL_IsCharacterLogged(playerid) || !PlayerData[playerid][pFishing])
+        return 0;
+
+    new
+        rand = random(8)
+    ;
+
+    SetFishingSkill(playerid, 1.0);
+
+    switch(status)
+    {
+        case 1: {
+            switch(rand)
+            {
+                case 0: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(5.0,15.0));
+                case 1: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(10.0,20.0));
+                case 2: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(10.0,20.0));
+                case 3: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(5.0,15.0));
+                case 4: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(5.0,15.0));
+                case 5: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(10.0,20.0));
+                case 6: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(5.0,15.0));
+                case 7: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(10.0,20.0));
+            }
+        }
+        case 2: {
+            switch(rand)
+            {
+                case 0: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(5.0,15.0));
+                case 1: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(20.0,30.0));
+                case 2: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(15.0,25.0));
+                case 3: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(15.0,25.0));
+                case 4: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(15.0,25.0));
+                case 5: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(20.0,30.0));
+                case 6: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(15.0,25.0));
+                case 7: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(15.0,30.0));
+            }
+        }
+        case 3: {
+            switch(rand)
+            {
+                case 0: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(5.0,15.0));
+                case 1: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(30.0,40.0));
+                case 2: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(30.0,40.0));
+                case 3: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(25.0,35.0));
+                case 4: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(30.0,40.0));
+                case 5: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(25.0,35.0));
+                case 6: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(30.0,40.0));
+                case 7: AddFish(playerid, fishNames[random(sizeof(fishNames))], RandomFloat(25.0,35.0)); 
+            }
+        }
+    }
+
+    if(IsPlayerAttachedObjectSlotUsed(playerid, 4)) RemovePlayerAttachedObject(playerid, 4);
+
+    ClearAnimations(playerid);
+    PlayerData[playerid][pFishing] = 0;
+    BaitEaten[playerid] = false;
+    FishClicked[playerid] = 0;
+    stop MancingTimer[playerid];
+    StopFishing(playerid);
+    return 1;
+}
+timer refuseEmail[300000](playerid) {
+    if (IsPlayerConnected(playerid)) {
+        SendServerMessage(playerid, "Anda di keluarkan dari server dikarenakan terlalu lama memasukkan email.");
+
+        Dialog_Close(playerid);
+        KickEx(playerid);
+    }
+    return 1;
+}
+
+Dialog:RefillGasPump(playerid, response, listitem, inputtext[])
+{
+    static pump_id;
+
+    if((pump_id = Pump_Nearest(playerid)) != -1)
+    {
+        new business_id = Pump_BusinessID(pump_id);
+
+        if(!Business_IsOwner(playerid, business_id))
+            return SendErrorMessage(playerid, "Ini bukan pompa bahan bakar milik bisnis mu!");
+
+        if(BusinessData[business_id][bizProducts] < 10)
+            return SendErrorMessage(playerid, "Minimal 10 produk untuk mengisi pompa bahan bakar!");
+
+        BusinessData[business_id][bizProducts] -= 10;
+        PumpData[pump_id][pumpFuel] += 200;
+
+        if(PumpData[pump_id][pumpFuel] > 1000)
+            PumpData[pump_id][pumpFuel] = 1000;
+
+        Pump_Save(pump_id, false);
+        Pump_Sync(pump_id);
+
+        SendServerMessage(playerid, "Sukses menambahkan persediaan bahan bakar menjadi "YELLOW"%d liter", PumpData[pump_id][pumpFuel]);
+    }
+    else SendErrorMessage(playerid, "Kamu tidak berada didekat pompa bahan bakar!");
+    return 1;
+}
+
+timer UpdateJobInfo[1000](job_id)
+{
+    Job_Refresh(job_id);
+    return 1;
+}
+
+timer UpdateTreatmentPrice[1000]()
+{
+    UpdateDynamic3DTextLabelText(gTreatmentText3D, COLOR_CLIENT, sprintf("[Medical Treatment]\n"WHITE"Type "YELLOW"/treatment "WHITE"to get medical treatment\n"GREEN"%s", FormatNumber(Economy_GetTreatmentPrice())));
+    return 1;
+}
+
+hook OnEconomyLoaded()
+{
+    for (new i = 0; i < MAX_DYNAMIC_JOBS; i++)
+    {
+        if(JobData[i][jobExists])
+        {
+            if (JobData[i][jobType] == JOB_MECHANIC)
+            {
+                defer UpdateJobInfo(i);
+            }
+        }
+    }
+
+    UpdateTreatmentPrice();
+    return 1;
+}
+
+hook OnUpdateComponentPrice(old_price, new_price)
+{
+    #pragma unused old_price, new_price
+
+    for (new i = 0; i < MAX_DYNAMIC_JOBS; i++)
+    {
+        if(JobData[i][jobExists])
+        {
+            if (JobData[i][jobType] == JOB_MECHANIC)
+            {
+                UpdateJobInfo(i);
+            }
+        }
+    }
+
+    return 1;
+}
+
+hook OnUpdateMaterialPrice(old_price, new_price)
+{
+    #pragma unused old_price, new_price
+
+    for (new i = 0; i < MAX_DYNAMIC_JOBS; i++)
+    {
+        if(JobData[i][jobExists])
+        {
+            if (JobData[i][jobType] == JOB_ARMS_DEALER)
+            {
+                UpdateJobInfo(i);
+            }
+        }
+    }
+
+    return 1;
+}
+
+hook OnUpdateTreatmentPrice(old_price, new_price)
+{
+    #pragma unused old_price, new_price
+
+    UpdateTreatmentPrice();
+    return 1;
+}
