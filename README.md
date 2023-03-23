@@ -1,15 +1,16 @@
-# BR-P
+# GC-RP
 .
 ### Developed by 
 - Revelt
 - Rsetiawan7
 - BlockRing
+- Kentuz
 
 ### Gamemode based 
 - SC-RP
 
 ### Latest version 
-- BR-P v1.3.3d
+- GC-RP v1.0.0
 
 ### Plugin Version
 - crashdetect (`v4.20`) (https://github.com/Zeex/samp-plugin-crashdetect/releases/tag/v4.20)
@@ -23,3 +24,4 @@
 - Y_Ini
 - ZCMD
 # BlockRing-Project
+# Kentuz-Project
