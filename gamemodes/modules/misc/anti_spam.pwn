@@ -9,7 +9,7 @@ static
 	chat_flood[MAX_PLAYERS] = {0, ...},
 	bool:flood_detect[MAX_PLAYERS] = {false, ...};
 
-timer EnableChat[5000](playerid)
+timer EnableChat[1000](playerid)
 {
 	chat_flood[playerid] = 0;
 	flood_detect[playerid] = false;
@@ -35,7 +35,7 @@ IsPlayerFlooding(playerid) {
 	return flood_detect[playerid];
 }
 
-ptask FloodTimer[2500](playerid)
+ptask FloodTimer[1000](playerid)
 {
 	if(SQL_IsLogged(playerid) && flood_detect[playerid] == false)
 	{

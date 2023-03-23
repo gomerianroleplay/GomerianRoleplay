@@ -552,7 +552,7 @@ Dialog:BusSideJobRoute(playerid, response, listitem, inputtext[])
 		busRoute[playerid] = listitem+1;
 
 		SetEngineStatus(GetPlayerVehicleID(playerid), true);
-		SetDoorStatus(GetPlayerVehicleID(playerid), true);
+		//SetDoorStatus(GetPlayerVehicleID(playerid), true);
 
 		SetBusCheckpoin(playerid, 0);
 		SendCustomMessage(playerid, "BUS SIDEJOB", "Ikuti checkpoint yang ada dimap, itu merupakan rute tujuan yang akan dilalui.");
