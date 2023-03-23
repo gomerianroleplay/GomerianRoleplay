@@ -18506,18 +18506,18 @@ CMD:ame(playerid, params[])
 
     return 1;
 }
-CMD:melow(playerid, params[])
+CMD:lme(playerid, params[])
 {
     if(PlayerData[playerid][pHospital] != -1) return 0;
     if(isnull(params))
         return SendSyntaxMessage(playerid, "/melow [action]");
 
     if(strlen(params) > 64) {
-        SendNearbyMessage(playerid, 8.0, X11_PLUM, "* %s (low) %.64s ..", ReturnName(playerid, 0, 1), params);
-        SendNearbyMessage(playerid, 8.0, X11_PLUM, ".. %s", params[64]);
+        SendNearbyMessage(playerid, 8.0, X11_ORCHID, "* %s (low) %.64s ..", ReturnName(playerid, 0, 1), params);
+        SendNearbyMessage(playerid, 8.0, X11_ORCHID, ".. %s", params[64]);
     }
     else {
-        SendNearbyMessage(playerid, 8.0, X11_PLUM, "* %s (low) %s", ReturnName(playerid, 0, 1), params);
+        SendNearbyMessage(playerid, 8.0, X11_ORCHID, "* %s (low) %s", ReturnName(playerid, 0, 1), params);
     }
     return 1;
 }
@@ -18587,11 +18587,11 @@ CMD:dolow(playerid, params[])
         return SendSyntaxMessage(playerid, "/do [description]");
 
     if(strlen(params) > 64) {
-        SendNearbyMessage(playerid, 8.0, X11_PLUM, "* %.64s ..", params);
-        SendNearbyMessage(playerid, 8.0, X11_PLUM, ".. %s (( (low) %s ))", params[64], ReturnName(playerid, 0, 1));
+        SendNearbyMessage(playerid, 8.0, X11_ORCHID, "* %.64s ..", params);
+        SendNearbyMessage(playerid, 8.0, X11_ORCHID, ".. %s (( (low) %s ))", params[64], ReturnName(playerid, 0, 1));
     }
     else {
-        SendNearbyMessage(playerid, 8.0, X11_PLUM, "* %s (( (low) %s ))", params, ReturnName(playerid, 0, 1));
+        SendNearbyMessage(playerid, 8.0, X11_ORCHID, "* %s (( (low) %s ))", params, ReturnName(playerid, 0, 1));
     }
     return 1;
 }
@@ -18829,6 +18829,8 @@ CMD:help(playerid, params[])
 
 CMD:changepass(playerid, params[])
 {
+    if(CheckAdmin(playerid, 1))
+        return PermissionError(playerid);
     Dialog_Show(playerid, ChangePassword, DIALOG_STYLE_PASSWORD, "Ganti Password", WHITE"Masukkan password lamamu:", "Masuk", "Keluar");
     return 1;
 }
@@ -34877,7 +34879,7 @@ Dialog:Help(playerid, response, listitem, inputtext[]) {
             case 0:
             {
                 SendClientMessage(playerid, X11_LIGHTGREEN, "HELP >> Account Commands:");
-                SendCustomMessage(playerid, "ACCOUNT", "/changepass, /lastlogged, /properties, /showidcard, /levels.");
+                SendCustomMessage(playerid, "ACCOUNT", "/properties, /showidcard, /levels.");
             }
             case 1:
             {
@@ -34905,7 +34907,7 @@ Dialog:Help(playerid, response, listitem, inputtext[]) {
             {
                 SendClientMessage(playerid, X11_LIGHTGREEN, "HELP >> Chat Commands:");
                 SendCustomMessage(playerid, "CHAT", "/s(hout), /l(ow), /me, /do, /ame, /ado, /o(oc), /live.");
-                SendCustomMessage(playerid, "CHAT", "/me(low), /do(low), /pr(low).");
+                SendCustomMessage(playerid, "CHAT", "/lme), /do(low), /pr(low).");
             }
             case 4: {
                 if(PlayerData[playerid][pFactionMod])

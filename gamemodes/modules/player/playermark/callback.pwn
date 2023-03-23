@@ -3,9 +3,10 @@
 
 public OnPlayerClickMap(playerid, Float:fX, Float:fY, Float:fZ)
 {
-    // jika admin lebih dari > 1 = player biasa
-    // next improve syntax IsAdmin
-    if (AccountData[playerid][pAdmin] > 1)
+    // jika kurang dari 1 = player biasa
+    if(!(AccountData[playerid][pAdminDuty]))
+            return 0;
+    if (AccountData[playerid][pAdmin] < 1)
     {
         // variable tujuan teleport
         SetPlayerPosFindZ(playerid, fX, fY, fZ);
