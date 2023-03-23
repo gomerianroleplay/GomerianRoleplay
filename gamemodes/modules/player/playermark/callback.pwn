@@ -6,6 +6,7 @@ public OnPlayerClickMap(playerid, Float:fX, Float:fY, Float:fZ)
     if (!(AccountData[playerid][pAdminDuty]))
         return 0;
     if (AccountData[playerid][pAdmin] > 1)
+
     {
         SetPlayerPosFindZ(playerid, fX, fY, fZ);
         new vehicleid = GetPlayerVehicleID(playerid);
