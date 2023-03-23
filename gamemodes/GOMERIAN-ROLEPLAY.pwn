@@ -1199,8 +1199,8 @@ timer getFish[30000](playerid)
     BaitEaten[playerid] = true;
     MancingTimer[playerid] = defer MancingGagal(playerid);
     Fishing(playerid);
-    SendServerMessage(playerid, "Umpan di tarik tahan tombol "YELLOW"SPRINT "WHITE"untuk menarik ikan dan lepas ketika hijau.");
-    ShowPlayerFooter(playerid, "Umpan di tarik tahan tombol ~y~SPRINT ~w~untuk menarik ikan dan lepas ketika hijau.");
+    SendServerMessage(playerid, "Umpan di tarik TEKAN dan TAHAN tombol "YELLOW"SPRINT (SPACE)"WHITE"untuk menarik ikan dan lepas ketika hijau.");
+    ShowPlayerFooter(playerid, "Umpan di tarik TEKAN dan TAHAN tombol ~y~SPRINT (SPACE) ~w~untuk menarik ikan dan lepas ketika hijau.");
     return 1;
 }
 
@@ -17792,10 +17792,10 @@ CMD:fish(playerid, params[])
 
         switch(level)
         {
-            case 1: time = 120000; 
-            case 2: time = 90000; 
-            case 3: time = 60000; 
-            default: time = 30000; 
+            case 1: time = 60000; 
+            case 2: time = 45000; 
+            case 3: time = 30000; 
+            default: time = 20000; 
         }
         PlayerData[playerid][pFishingTime] = defer getFish[time](playerid);
         return 1;
@@ -17857,8 +17857,8 @@ CMD:buyrod(playerid, params[])
     ;
 
     new
-        rod_price = 250,
-        amount = Economy_GetAmountAfterSalesTax(rod_price)
+        rod_price = 250
+        //amount = Economy_GetAmountAfterSalesTax(rod_price)
     ;
     
     if(!IsPlayerInRangeOfPoint(playerid, 3.0, 1359.2423,1340.3364,10.8862))
@@ -17867,24 +17867,24 @@ CMD:buyrod(playerid, params[])
     if(Inventory_HasItem(playerid, "Fish Rod"))
         return SendErrorMessage(playerid, "Anda sudah memiliki pancingan.");
 
-    if(GetMoney(playerid) < amount)
-        return SendClientErrorMessage(playerid, "Anda tidak memiliki uang %s.", FormatNumber(amount));
+    if(GetMoney(playerid) < rod_price/*amount*/)
+        return SendErrorMessage(playerid, "Anda tidak memiliki uang %s.", FormatNumber(rod_price));
 
     if(sscanf(params, "s[8]", confirm))
-        return SendClientSyntaxMessage(playerid, "/buyrod ['confirm'] (harga pancingan yaitu: "GREEN"%s"GREY_80", '/buyrod confirm' untuk setuju)", FormatNumber(amount));
+        return SendSyntaxMessage(playerid, "/buyrod ['confirm'] (harga pancingan yaitu: "GREEN"%s"GREY_80", '/buyrod confirm' untuk setuju)", FormatNumber(rod_price));
 
     if(!strcmp(confirm, "confirm"))
     {
         if(Inventory_Add(playerid, "Fish Rod", 18632, 1) != -1)
         {
-            GiveMoney(playerid, -amount, ECONOMY_ADD_SUPPLY, "bought fish rod");
+            GiveMoney(playerid, -rod_price, ECONOMY_ADD_SUPPLY, "bought fish rod");
 
-            SendClientServerMessage(playerid, "Anda telah membeli pancingan dengan harga "COL_GREEN"%s dollar.", FormatNumber(amount));
+            SendServerMessage(playerid, "Anda telah membeli pancingan dengan harga "COL_GREEN"%s dollar.", FormatNumber(rod_price));
             return 1;
         }
     }
 
-    SendClientSyntaxMessage(playerid, "Harga untuk pancingan yaitu: "GREEN"%s"GREY_80", "WHITE"/buyrod confirm "GREY_80"untuk setuju.)", FormatNumber(amount));
+    //SendSyntaxMessage(playerid, "Harga untuk pancingan yaitu: "GREEN"%s"GREY_80", "WHITE"/buyrod confirm "GREY_80"untuk setuju.)", FormatNumber(amount));
     return 1;
 }
 CMD:training(playerid, params[])
