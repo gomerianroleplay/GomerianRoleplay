@@ -88,8 +88,8 @@
                 "StaticLocations"
             ],
             "rcon_password": "gass",
-            "port": 7777,
-            "hostname": "EarlyLife Roleplay | Development",
+            "port": 7787,
+            "hostname": "Gomerian Roleplay | Development",
             "maxplayers": 100,
             "language": "English",
             "mapname": "San Andreas",
@@ -124,7 +124,7 @@
             "output": true,
             "extra": {
                 "long_call_time": "0",
-                "discord_bot_token": "123456789"
+                "discord_bot_token": "MTA4MzM4MDAxMDQ2MDY1OTgxMw.GyhySa.-IP4iL7SAX1eglEQwj-JpB4_yJZB_GPvfWgT5w"
             }
         },
         {

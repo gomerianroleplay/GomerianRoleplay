@@ -133,7 +133,7 @@ static Text3D:gTreatmentText3D;
 new DCC_Channel:Whitelist;
 
 main() { 
-    Whitelist = DCC_FindChannelById("1059548768074219541");
+    Whitelist = DCC_FindChannelById("1083762644877590648");
 }
 
 public OnGameModeInit()
@@ -17644,7 +17644,7 @@ public SendActivationCode(message[], userId[], owner[])
 		mysql_format(g_iHandle,zquery,sizeof(zquery),"INSERT INTO `accounts` (`Username`, `VerifyCode`, `DiscordID`) VALUES('%e', '%e', '%e')", message, verif, userId);
 		mysql_tquery(g_iHandle,zquery);
 
-        DCC_SetGuildMemberNickname(DCC_FindGuildById("1059548768074219541"), target, message);
+        DCC_SetGuildMemberNickname(DCC_FindGuildById("1083377645665927188"), target, message);
         
 		printf("[LOGS] Created account for Discord '%s' with Username '%s' and Code '%s'", owner, message, verif);
 	}
