@@ -24016,7 +24016,7 @@ CMD:id(playerid, params[])
             //new szString[144];
             //format(szString, sizeof(szString), "Packets lost: %.2f percent.", NetStats_PacketLossPercent(params));
             //SendClientMessage(playerid, -1, szString);
-            SendClientMessageEx(playerid, X11_WHITE, "** %s - ID: %d , Packets Loss : %.2f ", ReturnName(i), i, NetStats_PacketLossPercent(i));
+            SendClientMessageEx(playerid, X11_WHITE, "** %s | ID: %d | Level : %i | Ping : %d | Packets Loss : %.2f ", ReturnName(i), i, GetPlayerScore(i), GetPlayerPing(i), NetStats_PacketLossPercent(i));
             count++;
         }
     }
