@@ -133,7 +133,7 @@ static Text3D:gTreatmentText3D;
 new DCC_Channel:Whitelist;
 
 main() { 
-    Whitelist = DCC_FindChannelById("1083762644877590648");
+    Whitelist = DCC_FindChannelById("1084196850023809035");
 }
 
 public OnGameModeInit()
@@ -17644,7 +17644,7 @@ public SendActivationCode(message[], userId[], owner[])
 		mysql_format(g_iHandle,zquery,sizeof(zquery),"INSERT INTO `accounts` (`Username`, `VerifyCode`, `DiscordID`) VALUES('%e', '%e', '%e')", message, verif, userId);
 		mysql_tquery(g_iHandle,zquery);
 
-        DCC_SetGuildMemberNickname(DCC_FindGuildById("1083377645665927188"), target, message);
+        DCC_SetGuildMemberNickname(DCC_FindGuildById("1084192522521280522"), target, message);
         
 		printf("[LOGS] Created account for Discord '%s' with Username '%s' and Code '%s'", owner, message, verif);
 	}
@@ -18510,7 +18510,7 @@ CMD:lme(playerid, params[])
 {
     if(PlayerData[playerid][pHospital] != -1) return 0;
     if(isnull(params))
-        return SendSyntaxMessage(playerid, "/melow [action]");
+        return SendSyntaxMessage(playerid, "/lme [action]");
 
     if(strlen(params) > 64) {
         SendNearbyMessage(playerid, 8.0, X11_ORCHID, "* %s (low) %.64s ..", ReturnName(playerid, 0, 1), params);
@@ -26398,7 +26398,7 @@ CMD:gps(playerid, params[])
     if(PlayerData[playerid][pInjured] || PlayerData[playerid][pLoading] > 0 || PlayerData[playerid][pUnloading] != -1 || PlayerData[playerid][pDeliverShipment] > 0)
         return SendErrorMessage(playerid, "You can't use this command at the moment.");
 
-    Dialog_Show(playerid, MainGPS, DIALOG_STYLE_LIST, "GPS System", "Custom Locations\nFind House\nFind Business\nFind Entrance\nFind Job\nFind Tree\nFind Dealership\nFind Workshop\nFind Garage\nOther\nFind Cargo", "Select", "Cancel");
+    Dialog_Show(playerid, MainGPS, DIALOG_STYLE_LIST, "GPS System", "Custom Locations\nFind House\nFind Business\nFind Entrance\nFind Job\nFind Sidejob\nFind Tree\nFind Dealership\nFind Workshop\nFind Garage\nOther\nFind Cargo", "Select", "Cancel");
     return 1;
 }
 
@@ -30882,9 +30882,10 @@ Dialog:MainGPS(playerid, response, listitem, inputtext[])
             case 2: Dialog_Show(playerid, FindBusiness, DIALOG_STYLE_LIST, "Find Business", "Retail Store\nWeapon Store\nClothing Store\nFast Food\nDealership\nGas Station\nFurniture Store\nElectronic Store\nBar & Lounge", "Submit", "Cancel");
             case 3: Dialog_Show(playerid, FindEntrance, DIALOG_STYLE_LIST, "Find Entrance", "Nearest DMV\nNearest Bank\nNearest Warehouse\nNearest City Hall", "Select", "Back");
             case 4: Dialog_Show(playerid, FindJob, DIALOG_STYLE_LIST, "Find Job", "Trucker\nMechanic\nTaxi Driver\nCargo Unloader\nMiner\nFood Vendor\nPackage Sorter\nArms Dealer\nLumberjack\nHauler\nFarmer", "Select", "Cancel");
-            case 5: Show_Lumber(playerid);
-            case 6: Dealership_GPS(playerid);
-            case 7:
+            case 5: Dialog_Show(playerid, FindSidejob, DIALOG_STYLE_LIST, "Find Sidejob", "Bus Driver\nBoxville\nMoney Transport\nSweeper\nTrashmaster", "Select", "Close");
+            case 6: Show_Lumber(playerid);
+            case 7: Dealership_GPS(playerid);
+            case 8:
             {
                 new string[255];
                 format(string, sizeof(string), "#\tName\n");
@@ -30893,8 +30894,8 @@ Dialog:MainGPS(playerid, response, listitem, inputtext[])
                 }
                 Dialog_Show(playerid, ListWorkshop, DIALOG_STYLE_TABLIST_HEADERS, "GPS Workshop", string, "Select", "Close");
             }
-            case 9: Dialog_Show(playerid, OtherLocation, DIALOG_STYLE_LIST, "Other Location", "Component Warehouse\nWheels & Hydraulics Shop\nFish Shop\nModshop\nMechanic Center\nSweeper Sidejob\nInsurance Center\nBus Sidejob\nDMV\nRodeo Bank\nAdvertisement Agency\nButcher\nPublic Parking Downtown\nPublic Parking Market\nMoney Transporter Sidejob\nBoxville Sidejob\nTrashmaster\nFarm Warehouse", "Select", "Close");
-            case 10: Dialog_Show(playerid, FindCargo, DIALOG_STYLE_LIST, "Find Cargo (Trucker Only)", "Retail Cargo\nClothes Cargo\nFuel Cargo\nFood Cargo\nFurniture Cargo\nElectronics Cargo\nAmmunation Cargo\nBar Cargo", "Select", "Close");
+            case 10: Dialog_Show(playerid, OtherLocation, DIALOG_STYLE_LIST, "Other Location", "Component Warehouse\nWheels & Hydraulics Shop\nFish Shop\nModshop\nMechanic Center\nInsurance Center\nDMV\nRodeo Bank\nAdvertisement Agency\nButcher\nPublic Parking Downtown\nPublic Parking Market\nFarm Warehouse", "Select", "Close");
+            case 11: Dialog_Show(playerid, FindCargo, DIALOG_STYLE_LIST, "Find Cargo (Trucker Only)", "Retail Cargo\nClothes Cargo\nFuel Cargo\nFood Cargo\nFurniture Cargo\nElectronics Cargo\nAmmunation Cargo\nBar Cargo", "Select", "Close");
         }
     }
     return 1;
@@ -30926,19 +30927,14 @@ Dialog:OtherLocation(playerid, response, listitem, inputtext[])
             case 2: SetPlayerWaypoint(playerid, inputtext, 128.7940,-1813.1044,2.2147);
             case 3: SetPlayerWaypoint(playerid, inputtext, 2246.1946,-2016.3121,13.5469);
             case 4: SetPlayerWaypoint(playerid, inputtext, 2427.5293,-2089.8679,13.5469);
-            case 5: SetPlayerWaypoint(playerid, inputtext, 1700.1438,-1543.4144,13.3828); 
-            case 6: SetPlayerWaypoint(playerid, inputtext, 1111.6385,-1795.5822,16.5938);
-            case 7: SetPlayerWaypoint(playerid, inputtext, 1789.9645,-1911.4059,13.5041);
-            case 8: SetPlayerWaypoint(playerid, inputtext, 1081.1970,-1696.7852,13.5469);
-            case 9: SetPlayerWaypoint(playerid, inputtext, 588.4249,-1239.4244,17.82159);
-            case 10: SetPlayerWaypoint(playerid, inputtext, 643.9781,-1357.1801,13.5695);
-            case 11: SetPlayerWaypoint(playerid, inputtext, -384.0056,-1438.9092,26.3203);
-            case 12: SetPlayerWaypoint(playerid, inputtext, 1630.7808,-1139.1279,23.9063);
-            case 13: SetPlayerWaypoint(playerid, inputtext, 1224.6685,-1376.7126,14.9861);
-            case 14: SetPlayerWaypoint(playerid, inputtext, 891.3865,-1208.2157,16.9766);
-            case 15: SetPlayerWaypoint(playerid, inputtext, 1363.1598,-1648.3190,13.3828);
-            case 16: SetPlayerWaypoint(playerid, inputtext, 2286.7566,-1981.7808,13.5699);
-            case 17: SetPlayerWaypoint(playerid, inputtext, -64.8065,-1120.8037,1.0781);
+            case 5: SetPlayerWaypoint(playerid, inputtext, 1111.6385,-1795.5822,16.5938);
+            case 6: SetPlayerWaypoint(playerid, inputtext, 1081.1970,-1696.7852,13.5469);
+            case 7: SetPlayerWaypoint(playerid, inputtext, 588.4249,-1239.4244,17.82159);
+            case 8: SetPlayerWaypoint(playerid, inputtext, 643.9781,-1357.1801,13.5695);
+            case 9: SetPlayerWaypoint(playerid, inputtext, -384.0056,-1438.9092,26.3203);
+            case 10: SetPlayerWaypoint(playerid, inputtext, 1630.7808,-1139.1279,23.9063);
+            case 11: SetPlayerWaypoint(playerid, inputtext, 1224.6685,-1376.7126,14.9861);
+            case 12: SetPlayerWaypoint(playerid, inputtext, -64.8065,-1120.8037,1.0781);
         }
         SendServerMessage(playerid, "Waypoint %s marked on your map.", inputtext);
     }
@@ -31056,6 +31052,21 @@ Dialog:FindJob(playerid, response, listitem, inputtext[])
         }
     }
     else cmd_gps(playerid, "\1");
+    return 1;
+}
+
+Dialog:FindSidejob(playerid, response, listitem, inputtext[])
+{
+    if(response) {
+        switch(listitem) {
+            case 0: SetPlayerWaypoint(playerid, inputtext, 1789.9645,-1911.4059,13.5041);
+            case 1: SetPlayerWaypoint(playerid, inputtext, 1622.4833,-1887.6677,13.548);
+            case 2: SetPlayerWaypoint(playerid, inputtext, 891.3865,-1208.2157,16.9766);
+            case 3: SetPlayerWaypoint(playerid, inputtext, 1700.1438,-1543.4144,13.3828);
+            case 4: SetPlayerWaypoint(playerid, inputtext, 2286.7566,-1981.7808,13.5699);
+        }
+        SendServerMessage(playerid, "Waypoint %s marked on your map.", inputtext);
+    }
     return 1;
 }
 
@@ -34907,7 +34918,7 @@ Dialog:Help(playerid, response, listitem, inputtext[]) {
             {
                 SendClientMessage(playerid, X11_LIGHTGREEN, "HELP >> Chat Commands:");
                 SendCustomMessage(playerid, "CHAT", "/s(hout), /l(ow), /me, /do, /ame, /ado, /o(oc), /live.");
-                SendCustomMessage(playerid, "CHAT", "/lme), /do(low), /pr(low).");
+                SendCustomMessage(playerid, "CHAT", "/lme, /do(low), /pr(low).");
             }
             case 4: {
                 if(PlayerData[playerid][pFactionMod])
@@ -35080,7 +35091,7 @@ Dialog:Help(playerid, response, listitem, inputtext[]) {
                 SendCustomMessage(playerid, "KEYS", ""YELLOW"C Tahan: "WHITE"Untuk animasi duduk. "YELLOW"C + SPACE: "WHITE"Untuk animasi mengangkat tangan.");
                 SendCustomMessage(playerid, "KEYS", ""YELLOW"H: "WHITE"Untuk masuk/keluar entrance/business/dan lainnya. "YELLOW"C (jongkok) + N: "WHITE"Untuk mengambil item yang ada di dekatmu.");
             }
-            case 13: Dialog_Show(playerid, SidejobGuide, DIALOG_STYLE_LIST, "Select Sidejob", "Trashmaster\nSweeper\nBus", "Select", "Close");
+            case 13: Dialog_Show(playerid, SidejobGuide, DIALOG_STYLE_LIST, "Select Sidejob", "Trashmaster\nSweeper\nBus\nBoxville", "Select", "Close");
             case 14: cmd_viphelp(playerid, "\0");
             case 15:
             {
@@ -35106,7 +35117,9 @@ Dialog:SidejobGuide(playerid, response, listitem, inputtext[])
     {
         switch(listitem)
         {
-            case 0: Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_MSGBOX, "Trashmaster Sidejob", ""WHITE"Pekerjaan trashmaster bertujuan untuk membersikhan sampah yang ada dikota ini.\n\n\
+            case 0: 
+            {
+                Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_MSGBOX, "Trashmaster Sidejob", ""WHITE"Pekerjaan trashmaster bertujuan untuk membersikhan sampah yang ada dikota ini.\n\n\
                 Anda bisa menemukan pekerjaan dengan menggunakan GPS (/gps).\n\n\
                 "COL_LIGHTGREEN"Langkah-langkah:"WHITE"\n\
                 * Pergi ke lokasi kerja.\n\
@@ -35123,6 +35136,58 @@ Dialog:SidejobGuide(playerid, response, listitem, inputtext[])
                 * Saat berada dalam mobil, jangan coba untuk turun sebelum anda menghentikan pekerjaan-\n  \
                   itu akan membuat anda gagal dan tidak mendapatkan bonus.\n\
                 * Anda akan delay 15 menit setelah melakukan pekerjaan ini, termasuk gagal saat bekerja.", "Close", "");
+            }
+            case 1:
+            {
+                Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_MSGBOX, "Sweeper Sidejob", ""WHITE"Pekerjaan Sweeper bertujuan untuk membersikhan jalanan yang ada dikota ini.\n\n\
+                Anda bisa menemukan pekerjaan dengan menggunakan GPS (/gps).\n\n\
+                "COL_LIGHTGREEN"Langkah-langkah:"WHITE"\n\
+                * Pergi ke lokasi kerja.\n\
+                * Baca dialog yang di berikan untuk melihat peraturan sebelum memulai pekerjaan.\n\
+                * Jika setuju dengan aturan, kendarai mobil ke arah yang di tandai di radar map anda.\n\
+                * Ikuti radar untuk mengikuti rute kamu.\n\n\
+                "COL_LIGHTGREEN"Penting:"WHITE"\n\
+                * Saat berada dalam mobil, jangan coba untuk turun sebelum anda menghentikan pekerjaan-\n  \
+                  itu akan membuat anda gagal dan tidak mendapatkan bonus.\n\
+                * Anda akan delay 15 menit setelah melakukan pekerjaan ini, termasuk gagal saat bekerja.", "Close", "");
+            }
+            case 2:
+            {
+                Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_MSGBOX, "Bus Sidejob", ""WHITE"Pekerjaan bus bertujuan untuk mengantarkan orang dari rute tertentu ke rute lain.\n\n\
+                Anda bisa menemukan pekerjaan dengan menggunakan GPS (/gps).\n\n\
+                "COL_LIGHTGREEN"Langkah-langkah:"WHITE"\n\
+                * Pergi ke lokasi kerja.\n\
+                * Baca dialog yang di berikan untuk melihat peraturan sebelum memulai pekerjaan.\n\
+                * Jika setuju dengan aturan, kendarai mobil ke arah yang di tandai di radar map anda.\n\
+                * Ikuti radar untuk mengikuti rute kamu.\n\n\
+                "COL_LIGHTGREEN"Perintah:"WHITE"\n\
+                * Gunakan /limitspeed 75 supaya tidak gagal dalam bekerja.\n\n\
+                "COL_LIGHTGREEN"Penting:"WHITE"\n\
+                * Saat berada dalam mobil, jangan coba untuk turun sebelum anda menghentikan pekerjaan-\n  \
+                  itu akan membuat anda gagal dan tidak mendapatkan bonus.\n\
+                * Anda akan delay 15 menit setelah melakukan pekerjaan ini, termasuk gagal saat bekerja.", "Close", "");
+            }
+            case 3:
+            {
+                Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_MSGBOX, "Boxville Sidejob", ""WHITE"Pekerjaan boxville bertujuan untuk mengantarkan paket ke rumah-rumah.\n\n\
+                Anda bisa menemukan pekerjaan dengan menggunakan GPS (/gps).\n\n\
+                "COL_LIGHTGREEN"Langkah-langkah:"WHITE"\n\
+                * Pergi ke lokasi kerja.\n\
+                * Baca dialog yang di berikan untuk melihat peraturan sebelum memulai pekerjaan.\n\
+                * Jika setuju dengan aturan, kendarai mobil ke arah yang di tandai di radar map anda.\n\
+                * Anda akan melihat tampilan di sebelah kiri layar, tampilan itu sebagai indikator (bantuan)-\n  \
+                  untuk melihat jumlah rumah yang bisa anda antarkan paketnya.\n\
+                * Antarkan paket sebanyak mungkin, setelah itu bawa kembali ke lokasi yang ditentukan untuk-\n  \
+                  menukarkan dengan bonus.\n\n\
+                "COL_LIGHTGREEN"Perintah:"WHITE"\n\
+                * "YELLOW"H: mengambil atau memasukan paket dari dalam mobil box."WHITE"\n\
+                * /deliverpacket: mengantar paket didepan pintu rumah.\n\
+                * /stopboxville: menukarkan sampah untuk mendapatkan bonus.\n\n\
+                "COL_LIGHTGREEN"Penting:"WHITE"\n\
+                * Saat berada dalam mobil, anda hanya diberi waktu 5 menit untuk turun mengantarkan paket-\n  \
+                  jika melebihi waktu tersebut, itu akan membuat anda gagal dan tidak mendapatkan bonus.\n\
+                * Anda akan delay 15 menit setelah melakukan pekerjaan ini, termasuk gagal saat bekerja.", "Close", "");
+            }
         }
     }
     return 1;
