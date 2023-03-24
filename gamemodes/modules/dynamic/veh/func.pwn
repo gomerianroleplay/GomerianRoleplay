@@ -1623,14 +1623,14 @@ Vehicle_RentInfo(playerid)
 
 	new output[256];
 
-	strcat(output, "Model\tDurasi\n");
+	strcat(output, "ID\tModel\tDurasi\n");
 
 	foreach(new i : RentedVehicles<playerid>)
 	{
 		new times[3];
 		GetElapsedTime(Vehicle_GetRentTime(i), times[0], times[1], times[2]);
 
-		strcat(output, sprintf(""LIGHTBLUE"%s\t"YELLOW"%d jam %d menit %d detik\n", GetVehicleNameByModel(VehicleData[i][vehModel]), times[0], times[1], times[2]));
+		strcat(output, sprintf(""LIGHTBLUE"%d\t"LIGHTBLUE"%s\t"YELLOW"%d jam %d menit %d detik\n", VehicleData[i][vehVehicleID], GetVehicleNameByModel(VehicleData[i][vehModel]), times[0], times[1], times[2]));
 	}
 	Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_TABLIST_HEADERS, "Vehicle Rental(s)", output, "Close", "");
 	return 1;
