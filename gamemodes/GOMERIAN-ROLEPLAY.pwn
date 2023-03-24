@@ -47,12 +47,10 @@ Server Update list URP v2.9a Blackjack!
 #pragma compat 1
 #pragma compress 0
 #pragma dynamic 1_048_576
-
+#define CGEN_MEMORY 40000
 #include <a_samp>                   //Credits to SA-MP
-#define CGEN_MEMORY 190000
 //Uncomment this if you want to use high-level debug mode
-#define DEBUG_MODE 
-
+//#define DEBUG_MODE
 
 /*==============================================================================
     Librarys
@@ -2274,8 +2272,8 @@ SetPlayerInPrison(playerid)
     SetPlayerPosEx(playerid, prisonArrays[idx][0], prisonArrays[idx][1], prisonArrays[idx][2] + 0.3);
     SetPlayerFacingAngle(playerid, prisonArrays[idx][3]);
 
-    // SetPlayerInterior(playerid, LSPD_JAIL);
-    // SetPlayerVirtualWorld(playerid, PRISON_WORLD);
+    SetPlayerInterior(playerid, LSPD_JAIL);
+    SetPlayerVirtualWorld(playerid, PRISON_WORLD);
 
     ClearAnimations(playerid);
     TextDrawHideForPlayer(playerid, gServerTextdraws[0]);
@@ -14192,7 +14190,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
         }
     }
     //Entrance key
-    if((GetPlayerState(playerid) == PLAYER_STATE_ONFOOT) && (newkeys & KEY_CTRL_BACK))
+    if((GetPlayerState(playerid) == PLAYER_STATE_ONFOOT) && (newkeys & KEY_CTRL_BACK) || (GetPlayerState(playerid) == PLAYER_STATE_DRIVER) && (newkeys & KEY_CROUCH))
     {
         static
             id = -1;
@@ -15612,8 +15610,8 @@ static LoadServerPickup()
     // CreateDynamicPickup(1239, 23, 180.8817,1463.4524,10.6136, -1, 0);
     // CreateDynamic3DTextLabel("[Prison Foodcourt]\n"WHITE"Type "YELLOW"/foodcourt "WHITE"to open the menu.", COLOR_CLIENT, 180.8817,1463.4524,10.6136+0.5, 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, 0);
 
-    // CreateDynamicPickup(1239, 23, 180.8657,1469.2339,10.6136, -1, 0);
-    // CreateDynamic3DTextLabel("[Prison Foodcourt]\n"WHITE"Type "YELLOW"/foodcourt "WHITE"to open the menu.", COLOR_CLIENT, 180.8657,1469.2339,10.6136+0.5, 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, 0);
+    CreateDynamicPickup(1239, 23, -2008.2313,-514.5503,38.9319, LSPD_JAIL, PRISON_WORLD);
+    CreateDynamic3DTextLabel("[Prison Foodcourt]\n"WHITE"Type "YELLOW"/foodcourt "WHITE"to open the menu.", COLOR_CLIENT, -2008.2313,-514.5503,38.9319+0.5, 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, LSPD_JAIL, PRISON_WORLD);
 
 /*    for (new i = 0; i < sizeof(arrHospitalSpawns); i ++) {
         CreateDynamicMapIcon(arrHospitalSpawns[i][0], arrHospitalSpawns[i][1], arrHospitalSpawns[i][2], 22, 0);
@@ -17450,7 +17448,7 @@ CMD:jobdelay(playerid, params[])
 
 CMD:foodcourt(playerid, params[])
 {
-    if(IsPlayerInRangeOfPoint(playerid, 3.0, 180.8817,1458.1420,10.6136) || IsPlayerInRangeOfPoint(playerid, 3.0, 180.8817,1463.4524,10.6136) || IsPlayerInRangeOfPoint(playerid, 3.0, 180.8657,1469.2339,10.6136))
+    if(IsPlayerInRangeOfPoint(playerid, 3.0, -2008.2313,-514.5503,38.9319) || IsPlayerInRangeOfPoint(playerid, 3.0, -2008.2313,-514.5503,38.9319) || IsPlayerInRangeOfPoint(playerid, 3.0, -2008.2313,-514.5503,38.9319))
     {    
         Dialog_Show(playerid, FoodCourt, DIALOG_STYLE_LIST, "Food Court", "Bread (15 Stamps)\n"WHITE"Vegetables Soup (20 Stamps)\n"WHITE"Mineral Water (10 Stamps)", "Buy", "Close");
     }
