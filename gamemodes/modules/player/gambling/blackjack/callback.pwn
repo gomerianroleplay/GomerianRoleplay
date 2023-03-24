@@ -1,24 +1,25 @@
 #include <YSI_Coding\y_hooks>
-
 hook OnPlayerClickTD(playerid, Text:clickedid)
 {
 	#if defined DEBUG_MODE
-	    printf("[debug] OnPlayerClickTextDraw(PID : %d)", playerid);
+    printf("[debug] OnPlayerClickTextDraw(PID : %d)", playerid);
 	#endif
 
-    if(clickedid == Text:INVALID_TEXT_DRAW)
+    //hanya tester
+
+    if (clickedid == Text:INVALID_TEXT_DRAW)
     {
-        if(PlayerTemp[playerid][temp_selecttextdraw])
+        if (PlayerTemp[playerid][temp_selecttextdraw])
         {
             new targetid = CardData[playerid][cardGame];
-            if(targetid != INVALID_PLAYER_ID)
+            if (targetid != INVALID_PLAYER_ID)
             {
-                if(CardData[playerid][cardScore] >= CardData[targetid][cardScore] && CardData[playerid][cardScore] <= 21)
+                if (CardData[playerid][cardScore] >= CardData[targetid][cardScore] && CardData[playerid][cardScore] <= 21)
                 {
                     GiveMoney(targetid, CardData[playerid][cardGamePrize], ECONOMY_TAKE_SUPPLY, "won blackjack");
                     Blackjack_End(playerid, CardData[playerid][cardGame]);
                 }
-                else if(CardData[playerid][cardScore] < CardData[targetid][cardScore])
+                else if (CardData[playerid][cardScore] < CardData[targetid][cardScore])
                 {
                     Blackjack_FinishGame(playerid, CardData[playerid][cardGame]);
                     Blackjack_End(playerid, CardData[playerid][cardGame]);
@@ -37,7 +38,7 @@ hook OnPlayerConnect(playerid)
 
 hook OnPlayerDisconnect(playerid, reason)
 {
-    if(CardData[playerid][cardGame] != INVALID_PLAYER_ID)
+    if (CardData[playerid][cardGame] != INVALID_PLAYER_ID)
     {
         Blackjack_FinishGame(playerid, CardData[playerid][cardGame]);
         Blackjack_End(playerid, CardData[playerid][cardGame]);
@@ -47,34 +48,34 @@ hook OnPlayerDisconnect(playerid, reason)
 hook OnPlayerClickPlayerTD(playerid, PlayerText:playertextid)
 {
     new targetid = CardData[playerid][cardGame];
-    if(playertextid == Hit_Button[playerid])
-    {        
-        if(targetid != INVALID_PLAYER_ID)
+    if (playertextid == Hit_Button[playerid])
+    {
+        if (targetid != INVALID_PLAYER_ID)
         {
-            if(CardData[playerid][cardGamePrize] > 0)
+            if (CardData[playerid][cardGamePrize] > 0)
             {
-                if(CardData[playerid][cardPlayerTurn])
+                if (CardData[playerid][cardPlayerTurn])
                 {
-                    if(!CardData[playerid][cardPlayerStand])
+                    if (!CardData[playerid][cardPlayerStand])
                     {
-                        if(CardData[playerid][cardTurn] < 5)
+                        if (CardData[playerid][cardTurn] < 5)
                         {
                             ++CardData[playerid][cardTurn];
-                            
+
                             CardData[playerid][cardValue] = RandomEx(1, 10);
                             CardData[playerid][cardValueType] = RandomEx(0, 3);
-                            if(CardData[playerid][cardValue] == 10) 
+                            if (CardData[playerid][cardValue] == 10)
                                 CardData[playerid][cardValueTen] = RandomEx(0, 15);
-                            
-                            if(CardData[playerid][cardTurn] == 1 && CardData[playerid][cardValue] == 1)
+
+                            if (CardData[playerid][cardTurn] == 1 && CardData[playerid][cardValue] == 1)
                                 CardData[playerid][cardScore] += 10;
-                                
-                            if(CardData[playerid][cardPlayerType] == CARD_DEALER)
+
+                            if (CardData[playerid][cardPlayerType] == CARD_DEALER)
                             {
                                 Blackjack_Hit(playerid, CardData[playerid][cardTurn], true, CardData[playerid][cardValue], CardData[playerid][cardValueType], CardData[playerid][cardValueTen]);
                                 Blackjack_Hit(targetid, CardData[playerid][cardTurn], true, CardData[playerid][cardValue], CardData[playerid][cardValueType], CardData[playerid][cardValueTen]);
                             }
-                            else if(CardData[playerid][cardPlayerType] == CARD_PLAYER)
+                            else if (CardData[playerid][cardPlayerType] == CARD_PLAYER)
                             {
                                 Blackjack_Hit(playerid, CardData[playerid][cardTurn], false, CardData[playerid][cardValue], CardData[playerid][cardValueType], CardData[playerid][cardValueTen]);
                                 Blackjack_Hit(targetid, CardData[playerid][cardTurn], false, CardData[playerid][cardValue], CardData[playerid][cardValueType], CardData[playerid][cardValueTen]);
@@ -91,27 +92,27 @@ hook OnPlayerClickPlayerTD(playerid, PlayerText:playertextid)
         }
         else SendErrorMessage(playerid, "You dont have opponents to play!");
     }
-    else if(playertextid == Bet_Button[playerid])
+    else if (playertextid == Bet_Button[playerid])
     {
-        if(CardData[playerid][cardGamePrize] == 0)
+        if (CardData[playerid][cardGamePrize] == 0)
         {
-            if(CardData[playerid][cardPlayerType] == CARD_PLAYER)
+            if (CardData[playerid][cardPlayerType] == CARD_PLAYER)
             {
                 Dialog_Show(playerid, BlackJack_Bet, DIALOG_STYLE_INPUT, "Blackjack Bet", "Input bet amount that you want to place:\n", "Place Bet", "Close");
             }
             else SendErrorMessage(playerid, "Dealer are not allowed to set bet price!");
         }
     }
-    else if(playertextid == Stand_Button[playerid])
+    else if (playertextid == Stand_Button[playerid])
     {
-        if(CardData[playerid][cardPlayerTurn])
+        if (CardData[playerid][cardPlayerTurn])
         {
-            if(!CardData[playerid][cardPlayerStand])
+            if (!CardData[playerid][cardPlayerStand])
             {
                 CardData[playerid][cardPlayerStand] = true;
                 CardData[targetid][cardPlayerTurn] = true;
                 SendNearbyMessage(playerid, 15.0, X11_PLUM, "** %s stands their card on blackjack table with score "RED"%d", ReturnName(playerid), CardData[playerid][cardScore]);
-                if(CardData[playerid][cardPlayerStand] && CardData[targetid][cardPlayerStand])
+                if (CardData[playerid][cardPlayerStand] && CardData[targetid][cardPlayerStand])
                 {
                     Blackjack_FinishGame(playerid, targetid);
                 }
