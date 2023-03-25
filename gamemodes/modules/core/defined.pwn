@@ -6,7 +6,7 @@ Script Defined List
 
 #define SERVER_NAME                     "Roleplay"
 #define SERVER_URL                      "ComingSoon"
-#define SERVER_DISCORD					"https://discord.gg/Fp5UEdBNC6"
+#define SERVER_DISCORD					"bit.ly/GC-RP"
 #define SERVER_REVISION                 "Gomerian Roleplay"
 
 //==============================   SERVER MACROS 	=============================

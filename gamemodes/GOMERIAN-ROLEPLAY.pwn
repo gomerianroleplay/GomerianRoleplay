@@ -2109,7 +2109,7 @@ stock Float:cache_get_field_float(row, const field_name[])
 
 cache_get_field_int(row, const field_name[])
 {
-    new val;
+    new val=0;
     cache_get_value_name_int(row, field_name, val);
     return val;
 }
@@ -12258,7 +12258,7 @@ Function:OnQueryFinished(extraid, threadid, race_check)
             if (race_check != g_MysqlRaceCheck[extraid])
                 return KickEx(extraid);
 
-            format(string, sizeof(string), "The Andreas Community Project - %s", ReturnName(extraid));
+            format(string, sizeof(string), "Gomerian Corp Project - %s", ReturnName(extraid));
 
             if(cache_num_rows()) {
                 //TextDrawShowForPlayer(extraid, gLoginTextdraws);
@@ -12297,7 +12297,7 @@ Function:OnQueryFinished(extraid, threadid, race_check)
                 
                 
                 if(is_active == 0)
-                    return Dialog_Show(extraid, PutCode, DIALOG_STYLE_INPUT, "Kode Verifikasi", WHITE"Isi kode disini untuk memverifikasi akun kamu\n(kode sudah dikirimkan ke Direct Message discord oleh BOT CP:RP):", "Verifikasi", "Kembali");
+                    return Dialog_Show(extraid, PutCode, DIALOG_STYLE_INPUT, "Kode Verifikasi", WHITE"Isi kode disini untuk memverifikasi akun kamu\n(kode sudah dikirimkan ke Direct Message discord oleh BOT GC:RP):", "Verifikasi", "Kembali");
 
                 if(is_registered == 1)
                 {
@@ -12306,12 +12306,12 @@ Function:OnQueryFinished(extraid, threadid, race_check)
                 }
                 else
                 {
-                    Dialog_Show(extraid, RegisterScreen, DIALOG_STYLE_PASSWORD, "REGISTER", ""WHITE"Selamat datang di The Andreas Community Project "YELLOW"%s"WHITE".\n\nMasukkan password untuk mendaftarkan akun: (password minimal 8 sampai dengan 32 karakter).", "Daftarkan", "Keluar", ReturnName(extraid));
+                    Dialog_Show(extraid, RegisterScreen, DIALOG_STYLE_PASSWORD, "REGISTER", ""WHITE"Selamat datang di Gomerian Corp Project "YELLOW"%s"WHITE".\n\nMasukkan password untuk mendaftarkan akun: (password minimal 8 sampai dengan 32 karakter).", "Daftarkan", "Keluar", ReturnName(extraid));
                 }
             }
             else 
             {
-                Dialog_Show(extraid, ShowOnly, DIALOG_STYLE_MSGBOX, string, "Your account is not registered!\n\nPlease register your account on our Discord:\n\n"YELLOW"https://discord.gg/EsMMBNCfkn", "Close", "", ReturnName(extraid));
+                Dialog_Show(extraid, ShowOnly, DIALOG_STYLE_MSGBOX, string, "Your account is not registered!\n\nPlease register your account on our Discord:\n\n"YELLOW"https://bit.ly/GC-RP", "Close", "", ReturnName(extraid));
                 KickEx(extraid, 500);
             }
         }
@@ -15610,8 +15610,8 @@ static LoadServerPickup()
     // CreateDynamicPickup(1239, 23, 180.8817,1463.4524,10.6136, -1, 0);
     // CreateDynamic3DTextLabel("[Prison Foodcourt]\n"WHITE"Type "YELLOW"/foodcourt "WHITE"to open the menu.", COLOR_CLIENT, 180.8817,1463.4524,10.6136+0.5, 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, 0);
 
-    CreateDynamicPickup(1239, 23, -2008.2313,-514.5503,38.9319, LSPD_JAIL, PRISON_WORLD);
-    CreateDynamic3DTextLabel("[Prison Foodcourt]\n"WHITE"Type "YELLOW"/foodcourt "WHITE"to open the menu.", COLOR_CLIENT, -2008.2313,-514.5503,38.9319+0.5, 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, LSPD_JAIL, PRISON_WORLD);
+    CreateDynamicPickup(1239, 23, -2008.2313,-514.5503,38.9319, PRISON_WORLD, LSPD_JAIL);
+    CreateDynamic3DTextLabel("[Prison Foodcourt]\n"WHITE"Type "YELLOW"/foodcourt "WHITE"to open the menu.", COLOR_CLIENT, -2008.2313,-514.5503,38.9319+0.5, 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, PRISON_WORLD, LSPD_JAIL);
 
 /*    for (new i = 0; i < sizeof(arrHospitalSpawns); i ++) {
         CreateDynamicMapIcon(arrHospitalSpawns[i][0], arrHospitalSpawns[i][1], arrHospitalSpawns[i][2], 22, 0);
@@ -15654,7 +15654,7 @@ static LoadGlobalTextdraws()
     TextDrawSetShadow(gServerTextdraws[1], 0);
 
     //  Server watermark
- 	gServerTextdraws[2] = TextDrawCreate(554.000000, 3.000000, "~b~~h~~h~The_Andreas _~w~Community_Project");
+ 	gServerTextdraws[2] = TextDrawCreate(554.000000, 3.000000, "~b~~h~~h~Gomerian_Corp_~w~Project");
 	TextDrawFont(gServerTextdraws[2], 1);
 	TextDrawLetterSize(gServerTextdraws[2], 0.366665, 1.700000);
 	TextDrawTextSize(gServerTextdraws[2], 400.000000, 191.500000);
@@ -16120,7 +16120,7 @@ public OnPlayerRequestClass(playerid, classid)
 
     if(IsValidRoleplayName(ReturnName(playerid)))
     {
-        SendErrorMessage(playerid, "U:RP Account Center tidak sesuai format!");
+        SendErrorMessage(playerid, "GC:RP Account Center tidak sesuai format!");
         SendErrorMessage(playerid, "Penggunaan Account Center harus mengikuti format nama biasa.");
         SendErrorMessage(playerid, "Sebagai contoh, Agung, Gajahduduk, KevinSanjaya, DimasNugroho dan lainnya.");
         KickEx(playerid);
@@ -17628,7 +17628,7 @@ public SendActivationCode(message[], userId[], owner[])
 	else
 	{
 		new verif[32];
-        format(verif, sizeof(verif), "TACP-%d", RandomEx(1000, 9999));
+        format(verif, sizeof(verif), "GCRP-%d", RandomEx(1000, 9999));
 
 		new zstr[256];
 		format(zstr, sizeof(zstr), "**In-Game Activation Code**\n\n**WARNING:** Jangan berikan kode ini kepada siapapun!\nActivation Code: [ ||%s|| ]\n\nHINT: Klik kotak hitam untuk melihat Activation Code.", verif);
@@ -18177,23 +18177,20 @@ CMD:credits(playerid, params[])
     strcat(credits, CYAN"Sourch Support\n");
     strcat(credits, WHITE"Y_Less, Incognito, Emmet_, Southclaws, Vince\n");
     strcat(credits, "Slice, maddinat0r, Zeex, Nexus and lainnya\n\n");
-    strcat(credits, CYAN"Unity Server Owner\n");
-    strcat(credits, WHITE"Kevynn Adam & Dimas Yudha\n");
-    strcat(credits, "U:RP Team yang telah membantu dalam mengembangkan U:RP\n\n");
+    strcat(credits, CYAN"Gomerian Corp Owner\n");
+    strcat(credits, WHITE"Kentuz & Kwetiaw\n");
+    strcat(credits, "GC:RP Team yang telah membantu dalam mengembangkan GC:RP\n\n");
     strcat(credits, CYAN"Script Development\n");
-    strcat(credits, WHITE"Leynardo Yosef (Scripter)\n");
-    strcat(credits, WHITE"Rachmad Setiawan (Scripter)\n");
-    strcat(credits, WHITE"Muhammad Prima (mapper)\n\n");
+    strcat(credits, WHITE"Leynardo Yosef (Scripter Base)\n");
+    strcat(credits, WHITE"Rachmad Setiawan (Scripter Base)\n");
+    strcat(credits, WHITE"Blockring (Scripter Development)\n");
+    strcat(credits, WHITE"GigUp (Scripter)\n");
+    strcat(credits, WHITE"Nandes (Manager In Game)\n\n");
     strcat(credits, CYAN"Lifetime Donations\n");
-    strcat(credits, WHITE"Rizki Brian (Aldrichea)\n");
-    strcat(credits, WHITE"Togi Samuel Simarmata (Luckystar)\n");
-    strcat(credits, WHITE"Afiriyan Choirul Anam (Irul)\n");
-    strcat(credits, WHITE"Vicky Yaphyaputra  (Mingxi)\n");
-    strcat(credits, WHITE"Ahmad Ghozali (Xauz)\n");
-    strcat(credits, WHITE"David Martin (matematika)\n\n");
+    strcat(credits, WHITE"LuckyAL(Supporter)\n\n");
     strcat(credits, CYAN"Server Mapping\n");
-    strcat(credits, WHITE"Kim <3\n\n");
-    strcat(credits, "* TA:CP Player yang senantiasa memberikan waktu luangnya bermain di The Andreas Community Project!\n\n");
+    strcat(credits, WHITE"-\n\n");
+    strcat(credits, "* GC:RP Player yang senantiasa memberikan waktu luangnya bermain di Gomerian Corp Project!\n\n");
     Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_MSGBOX, "CREDITS", credits, "Close", "");
     return 1;
 }
@@ -34037,7 +34034,7 @@ Dialog:PutCode(playerid, response, listitem, inputtext[])
     if(strcmp(AccountData[playerid][pVerifyCode], inputtext))
     {
         SendErrorMessage(playerid, "Kode Verifikasi salah, mohon di cek kembali.");
-        return Dialog_Show(playerid, PutCode, DIALOG_STYLE_INPUT, "Kode Verifikasi", WHITE"Isi kode disini untuk memverifikasi akun kamu\n(kode sudah dikirimkan ke Direct Message discord oleh BOT CP:RP):", "Verifikasi", "Kembali");
+        return Dialog_Show(playerid, PutCode, DIALOG_STYLE_INPUT, "Kode Verifikasi", WHITE"Isi kode disini untuk memverifikasi akun kamu\n(kode sudah dikirimkan ke Direct Message discord oleh BOT GC:RP):", "Verifikasi", "Kembali");
     }
 
     SendClientMessage(playerid, X11_LIGHTBLUE, "ACCOUNT: {FFFFFF}Your ACP successfully activated!");
