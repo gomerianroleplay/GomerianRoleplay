@@ -571,7 +571,13 @@ enum playerData {
 
     pSpecialEffect,
 
-    pHudStyle
+    pHudStyle,
+
+    //Garage
+    pGarageSeller,
+    pGarageOffered,
+    pGarageValue,
+    
 
 };
 

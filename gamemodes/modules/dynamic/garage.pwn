@@ -1,4 +1,7 @@
 #define GARAGE_INTERIOR	4
+#define MAX_GARAGE 100
+#include <YSI_Game\y_vehicledata>
+#include <YSI_Coding\y_hooks>
 
 /*Variable List*/
 new const Float:garageInterior[][4] = {
@@ -6,10 +9,34 @@ new const Float:garageInterior[][4] = {
 };
 
 /*Enums List*/
+enum E_GARAGE_DATA {
+    garageID,
+    garageOwner[MAX_PLAYER_NAME],
+    garageOwnerId,
+    garageLoc[128],
+	garagePrice,
+	garageType,
+	garageLock,
+	garageLocInt[128],
+	garageLabel,
+	garageHouseLink,
+	garageExists,
+	garageInside,
+	garagePickup,
+
+};
+
+new GarageData[MAX_GARAGE][E_GARAGE_DATA],
+	Iterator:Garage<MAX_GARAGE>;
 
 
+hook OnGameModeInitEx()
+{
+    mysql_pquery(g_iHandle, sprintf("SELECT * FROM `garage` ORDER BY `ID` ASC LIMIT %d;", MAX_GARAGE), "Garage_Load", "");
+	
+}
 /*Function:List*/
-
+forward Lumber_Load();
 Function:Garage_Load()
 {
 	if(!cache_num_rows()) return printf("[Dynamic Garage] There are no one garage loaded to the server.");
@@ -35,7 +62,7 @@ Function:Garage_Load()
 		GarageData[id][garageLock] = cache_get_field_int(id, "Lock");
 		GarageData[id][garageInside] = cache_get_field_int(id, "Inside");
 		GarageData[id][garageHouseLink] = cache_get_field_int(id, "HouseLink");
-
+		
 		Garage_Sync(id);
 	}
 	return 1;
@@ -90,7 +117,7 @@ stock Garage_Sync(id)
 		}
 		GarageData[id][garageLabel] = CreateDynamic3DTextLabel(str, COLOR_CLIENT, GarageData[id][garageLoc][0], GarageData[id][garageLoc][1], GarageData[id][garageLoc][2]+0.5, 7);
 		GarageData[id][garagePickup] = CreateDynamicPickup(1239, 23, GarageData[id][garageLoc][0], GarageData[id][garageLoc][1], GarageData[id][garageLoc][2], -1, -1, -1, 10);
-
+		
 		Garage_Save(id);
 	}
 	return 1;
@@ -225,7 +252,7 @@ stock Garage_Create(playerid, price, type)
 Function:Garage_Created(id)
 {
 	GarageData[id][garageID] = cache_insert_id();
-
+	
 	Garage_Sync(id);
 	Garage_Save(id);
 	return 1;
@@ -245,7 +272,7 @@ CMD:creategarage(playerid, params[])
 	if(price < 1) return SendErrorMessage(playerid, "Price minimum is zero.");
 
 	id = Garage_Create(playerid, price, type);
-
+	SendClientMessage(playerid, -1, "garage X = %d",GarageData[id][garageLocInt][0]);
 	if(id == -1)
 		return SendErrorMessage(playerid, "The server has reached the limit for garage.");
 
@@ -399,23 +426,23 @@ CMD:garage(playerid, params[])
 			static 
 				vehicleid = -1;
 
-			if((vehicleid = Vehicle_GetID(GetPlayerVehicleID(playerid))) != -1)
+			if((vehicleid = GetPlayerVehicleID(playerid)) != -1)
 			{
-				if(!Vehicle_IsOwner(playerid, vehicleid)) return SendErrorMessage(playerid, "This is not your vehicle.");
+				if(!Vehicle_IsOwned(playerid, vehicleid)) return SendErrorMessage(playerid, "This is not your vehicle.");
 				if(!Garage_IsOwner(playerid, id)) return SendErrorMessage(playerid, "This garage isn't owned by you.");
 				if(IsAPlane(GetPlayerVehicleID(playerid)) || IsAHelicopter(GetPlayerVehicleID(playerid)) || IsLoadableVehicle(GetPlayerVehicleID(playerid))) return SendErrorMessage(playerid, "Can't loaded this vehicle.");
 				if(GarageData[id][garageInside] >= GarageData[id][garageType]) return SendErrorMessage(playerid, "Can't put more vehicle to this garage.");
 
 				GarageData[id][garageInside] ++;
 
-				VehicleData[vehicleid][cInt] = GARAGE_INTERIOR+GarageData[id][garageType];
-				VehicleData[vehicleid][cVw] = GarageData[id][garageID]+1000;
+				VehicleData[vehicleid][vehInterior] = GARAGE_INTERIOR+GarageData[id][garageType];
+				VehicleData[vehicleid][vehVirtual] = GarageData[id][garageID]+1000;
 
-				SetVehiclePos(VehicleData[vehicleid][cVehicle], GarageData[id][garageLocInt][0], GarageData[id][garageLocInt][1], GarageData[id][garageLocInt][2]);
-				SetVehicleZAngle(VehicleData[vehicleid][cVehicle], GarageData[id][garageLocInt][3]);
+				SetVehiclePos(VehicleData[vehicleid][vehVehicleID], GarageData[id][garageLocInt][0], GarageData[id][garageLocInt][1], GarageData[id][garageLocInt][2]);
+				SetVehicleZAngle(VehicleData[vehicleid][vehVehicleID], GarageData[id][garageLocInt][3]);
 
-				LinkVehicleToInterior(VehicleData[vehicleid][cVehicle], GARAGE_INTERIOR+GarageData[id][garageType]);
-				SetVehicleVirtualWorld(VehicleData[vehicleid][cVehicle], VehicleData[vehicleid][cVw]);
+				LinkVehicleToInterior(VehicleData[vehicleid][vehVehicleID], GARAGE_INTERIOR+GarageData[id][garageType]);
+				SetVehicleVirtualWorld(VehicleData[vehicleid][vehVehicleID], VehicleData[vehicleid][vehVirtual]);
 
 				SetPlayerInterior(playerid, GARAGE_INTERIOR+GarageData[id][garageType]);
 				SetPlayerVirtualWorld(playerid, GarageData[id][garageID]+1000);
@@ -550,22 +577,22 @@ CMD:garage(playerid, params[])
 				static 
 					vehicleid = -1;
 
-				if((vehicleid = Vehicle_GetID(GetPlayerVehicleID(playerid))) != -1)
+				if((vehicleid = GetPlayerVehicleID(playerid)) != -1)
 				{
-					if(!Vehicle_IsOwner(playerid, vehicleid)) return SendErrorMessage(playerid, "This is not your vehicle.");
+					if(!Vehicle_IsOwned(playerid, vehicleid)) return SendErrorMessage(playerid, "This is not your vehicle.");
 					if(!Garage_IsOwner(playerid, id)) return SendErrorMessage(playerid, "This garage isn't owned by you.");
 
-					VehicleData[vehicleid][cGarage] = 0;
+					VehicleData[vehicleid][vehGarage] = 0;
 					GarageData[id][garageInside] --;
 
-					VehicleData[vehicleid][cInt] = 0;
-					VehicleData[vehicleid][cVw] = 0;
+					VehicleData[vehicleid][vehInterior] = 0;
+					VehicleData[vehicleid][vehVirtual] = 0;
 
-					SetVehiclePos(VehicleData[vehicleid][cVehicle], GarageData[id][garageLoc][0], GarageData[id][garageLoc][1], GarageData[id][garageLoc][2]);
-					SetVehicleZAngle(VehicleData[vehicleid][cVehicle], GarageData[id][garageLoc][3]);
+					SetVehiclePos(VehicleData[vehicleid][vehVehicleID], GarageData[id][garageLoc][0], GarageData[id][garageLoc][1], GarageData[id][garageLoc][2]);
+					SetVehicleZAngle(VehicleData[vehicleid][vehVehicleID], GarageData[id][garageLoc][3]);
 
-					LinkVehicleToInterior(VehicleData[vehicleid][cVehicle], 0);
-					SetVehicleVirtualWorld(VehicleData[vehicleid][cVehicle], 0);
+					LinkVehicleToInterior(VehicleData[vehicleid][vehVehicleID], 0);
+					SetVehicleVirtualWorld(VehicleData[vehicleid][vehVehicleID], 0);
 
 					SetPlayerInterior(playerid, 0);
 					SetPlayerVirtualWorld(playerid, 0);
