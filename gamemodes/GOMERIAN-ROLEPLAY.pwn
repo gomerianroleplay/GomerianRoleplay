@@ -203,6 +203,7 @@ public OnGameModeInit()
 #include "modules/dynamic/ccp/core.pwn"
 
 
+
 // Business Function
 #include "modules\server\business_employee\func.pwn"
 // Admin Activity
@@ -277,6 +278,7 @@ public OnGameModeInit()
 #include "modules\jobs\mechanic.pwn"
 #include "modules\jobs\farmer.pwn"
 #include "modules\jobs\jobskill.pwn"
+//#include "modules\jobs\lumber.pwn"
 
 #include "modules/dynamic/gate/cmd.pwn"
 #include "modules/dynamic/gate/action.pwn"
@@ -431,6 +433,7 @@ public OnGameModeInit()
 #include "modules/core/server_entity.pwn"
 // Dynamic
 #include "modules\dynamic\apartment.pwn"
+#include "modules\dynamic\garage.pwn"
 
 // Faction Goverment Feature
 // #include "modules\player\faction\gov.pwn"
@@ -6842,7 +6845,7 @@ Business_Inside(playerid)
 {
     if(PlayerData[playerid][pBusiness] != -1)
     {
-        for (new i = 0; i != MAX_BUSINESSES; i ++) if(BusinessData[i][bizExists] && BusinessData[i][bizID] == PlayerData[playerid][pBusiness] && GetPlayerInterior(playerid) == BusinessData[i][bizInterior] && GetPlayerVirtualWorld(playerid) > 0) {
+        for (new i = 0; i != MAX_BUSINESSES; i ++) if(BusinessData[i][bizExists] && BusinessData[i][bizID] == PlayerData[playerid][pBusiness] && GetPlayerInterior(playerid) == BusinessData[i][bizInterior] && GetPlayerVirtualWorld(playerid) >= 0) {
             return i;
         }
     }
@@ -14279,12 +14282,15 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
             SetPlayerPos(playerid, BusinessData[id][bizInt][0], BusinessData[id][bizInt][1], BusinessData[id][bizInt][2]);
             SetPlayerFacingAngle(playerid, BusinessData[id][bizInt][3]);
             SetPlayerInterior(playerid, BusinessData[id][bizInterior]);
-            SetPlayerVirtualWorld(playerid, BusinessData[id][bizID] + 6000);
+            if(BusinessData[id][bizID] != 0){
+                SetPlayerVirtualWorld(playerid, BusinessData[id][bizID] + 6000);
+                SetPlayerWeather(playerid, 1);
+                SetPlayerTime(playerid, 12, 0);
+            }
             PlayerData[playerid][pBusiness] = BusinessData[id][bizID];
             Player_ToggleTelportAntiCheat(playerid, true);
 
-            SetPlayerWeather(playerid, 1);
-            SetPlayerTime(playerid, 12, 0);
+            
 
             if(strlen(BusinessData[id][bizMessage]) && strcmp(BusinessData[id][bizMessage], "NULL", true)) {
                 SendClientMessageEx(playerid, X11_TURQUOISE_1, "BUSINESS: "WHITE"%s", BusinessData[id][bizMessage]);

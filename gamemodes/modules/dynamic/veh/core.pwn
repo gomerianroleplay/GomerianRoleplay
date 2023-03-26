@@ -152,7 +152,11 @@ Float:	vehLastCoords[3],
 		Float:durabilityMileage,   // Ketahanan kendaraan di nilai mileage tertentu.
 		
 		Timer:vehLockTireTimer,
-		Timer:vehHandbrakeTimer
+		Timer:vehHandbrakeTimer,
+
+		vehGarage,
+
+
 		
 };
 
