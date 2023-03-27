@@ -1566,6 +1566,25 @@ CMD:maxenergy(playerid, params[])
     return 1;
 }
 
+CMD:resetbat(playerid, params[])
+{
+    if (CheckAdmin(playerid, 8))
+        return PermissionError(playerid);
+
+    PlayerData[playerid][pPhoneBattery] = 0;
+
+    PlayerTextDrawSetString(playerid, BatteryIndicatorMaximize[playerid], sprintf("%.2f%", PlayerData[playerid][pPhoneBattery]));
+    PlayerTextDrawSetString(playerid, BatteryIndicatorMinimize[playerid], sprintf("%.2f%", PlayerData[playerid][pPhoneBattery]));
+
+    /*SetPlayerProgressBarValue(playerid, BarBawah[playerid], PlayerData[playerid][pPhoneBattery]);
+    SetPlayerProgressBarColour(playerid, BarBawah[playerid], ConvertHBEColor(floatround(PlayerData[playerid][pPhoneBattery]), true));
+
+    SetPlayerProgressBarValue(playerid, BarAtas[playerid], PlayerData[playerid][pPhoneBattery]);
+    SetPlayerProgressBarColour(playerid, BarAtas[playerid], ConvertHBEColor(floatround(PlayerData[playerid][pPhoneBattery]), true));*/
+    SendServerMessage(playerid, "Kamu telah melakukan reset battery");
+    return 1;
+}
+
 CMD:aslap(playerid, params[])
 {
     new userid;

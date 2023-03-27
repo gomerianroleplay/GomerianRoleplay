@@ -2912,8 +2912,8 @@ DestroyPhoneDraw(playerid)
     PlayerTextDrawDestroy(playerid, PhoneTimeMinimize[playerid]);
 	PlayerTextDrawDestroy(playerid, PhoneTimeMaximize[playerid]);
 
-    DestroyPlayerProgressBar(playerid, BarAtas[playerid]);
-    DestroyPlayerProgressBar(playerid, BarBawah[playerid]);
+    //DestroyPlayerProgressBar(playerid, BarAtas[playerid]);
+    //DestroyPlayerProgressBar(playerid, BarBawah[playerid]);
 	// PlayerTextDrawDestroy(playerid, IncomingNumber[playerid]);
 	// PlayerTextDrawDestroy(playerid, IncomingCall[playerid]);
     return 1;
@@ -9704,8 +9704,38 @@ CreatePhoneDraw(playerid)
 	PlayerTextDrawSetProportional(playerid, PhoneTimeMaximize[playerid], 1);
 	PlayerTextDrawSetSelectable(playerid, PhoneTimeMaximize[playerid], 0);
 
-    BarAtas[playerid] = CreatePlayerProgressBar(playerid, X_PHONE+220.000000, 289.000000, 10.000000, 2.000000, 16711935, 100.000000, progressbar_direction:1);
-	BarBawah[playerid] = CreatePlayerProgressBar(playerid, 450.000000, 435.000000, 10.000000, 2.000000, 16711935, 100.000000, progressbar_direction:1);
+
+    BatteryIndicatorMinimize[playerid] = CreatePlayerTextDraw(playerid, 430.000000, 433.000000, "100.00%");
+    PlayerTextDrawFont(playerid, BatteryIndicatorMinimize[playerid], 1);
+    PlayerTextDrawLetterSize(playerid, BatteryIndicatorMinimize[playerid], 0.133330, 0.599995);
+    PlayerTextDrawTextSize(playerid, BatteryIndicatorMinimize[playerid], 400.000000, 17.000000);
+    PlayerTextDrawSetOutline(playerid, BatteryIndicatorMinimize[playerid], 0);
+    PlayerTextDrawSetShadow(playerid, BatteryIndicatorMinimize[playerid], 0);
+    PlayerTextDrawAlignment(playerid, BatteryIndicatorMinimize[playerid], 1);
+    PlayerTextDrawColor(playerid, BatteryIndicatorMinimize[playerid], -1);
+    PlayerTextDrawBackgroundColor(playerid, BatteryIndicatorMinimize[playerid], 255);
+    PlayerTextDrawBoxColor(playerid, BatteryIndicatorMinimize[playerid], 50);
+    PlayerTextDrawUseBox(playerid, BatteryIndicatorMinimize[playerid], 0);
+    PlayerTextDrawSetProportional(playerid, BatteryIndicatorMinimize[playerid], 1);
+    PlayerTextDrawSetSelectable(playerid, BatteryIndicatorMinimize[playerid], 0);
+
+    BatteryIndicatorMaximize[playerid] = CreatePlayerTextDraw(playerid, 429.000000, 287.000000, "100.00%");
+    PlayerTextDrawFont(playerid, BatteryIndicatorMaximize[playerid], 1);
+    PlayerTextDrawLetterSize(playerid, BatteryIndicatorMaximize[playerid], 0.133330, 0.599995);
+    PlayerTextDrawTextSize(playerid, BatteryIndicatorMaximize[playerid], 400.000000, 17.000000);
+    PlayerTextDrawSetOutline(playerid, BatteryIndicatorMaximize[playerid], 0);
+    PlayerTextDrawSetShadow(playerid, BatteryIndicatorMaximize[playerid], 0);
+    PlayerTextDrawAlignment(playerid, BatteryIndicatorMaximize[playerid], 1);
+    PlayerTextDrawColor(playerid, BatteryIndicatorMaximize[playerid], -1);
+    PlayerTextDrawBackgroundColor(playerid, BatteryIndicatorMaximize[playerid], 255);
+    PlayerTextDrawBoxColor(playerid, BatteryIndicatorMaximize[playerid], 50);
+    PlayerTextDrawUseBox(playerid, BatteryIndicatorMaximize[playerid], 0);
+    PlayerTextDrawSetProportional(playerid, BatteryIndicatorMaximize[playerid], 1);
+    PlayerTextDrawSetSelectable(playerid, BatteryIndicatorMaximize[playerid], 0);
+
+
+    /*BarAtas[playerid] = CreatePlayerProgressBar(playerid, X_PHONE+220.000000, 289.000000, 10.000000, 2.000000, 16711935, 100.000000, progressbar_direction:1);
+	BarBawah[playerid] = CreatePlayerProgressBar(playerid, 450.000000, 435.000000, 10.000000, 2.000000, 16711935, 100.000000, progressbar_direction:1);*/
 
     return 1;
 }
@@ -23500,7 +23530,8 @@ ToggleMinimizePhone(playerid)
         PlayerTextDrawHide(playerid, MinimizePhoneNumb[playerid]);
         PlayerTextDrawHide(playerid, MinimizeWallpaper[playerid]);
         PlayerTextDrawHide(playerid, PhoneTimeMinimize[playerid]);
-        HidePlayerProgressBar(playerid, BarBawah[playerid]);
+        PlayerTextDrawHide(playerid, BatteryIndicatorMinimize[playerid]);
+        //HidePlayerProgressBar(playerid, BarBawah[playerid]);
         SetPVarInt(playerid, "TogMinimizePhone", 1);
     }
     else
@@ -23509,7 +23540,8 @@ ToggleMinimizePhone(playerid)
         PlayerTextDrawShow(playerid, MinimizePhoneNumb[playerid]);
         PlayerTextDrawShow(playerid, MinimizeWallpaper[playerid]);
         PlayerTextDrawShow(playerid, PhoneTimeMinimize[playerid]);
-        ShowPlayerProgressBar(playerid, BarBawah[playerid]);
+        PlayerTextDrawShow(playerid, BatteryIndicatorMinimize[playerid]);
+        //ShowPlayerProgressBar(playerid, BarBawah[playerid]);
         SetPVarInt(playerid, "TogMinimizePhone", 0);
     }
 }
@@ -23519,7 +23551,8 @@ HideMinimizePhone(playerid)
 	PlayerTextDrawHide(playerid, MinimizePhoneNumb[playerid]);
     PlayerTextDrawHide(playerid, MinimizeWallpaper[playerid]);
     PlayerTextDrawHide(playerid, PhoneTimeMinimize[playerid]);
-    HidePlayerProgressBar(playerid, BarBawah[playerid]);
+    PlayerTextDrawHide(playerid, BatteryIndicatorMinimize[playerid]);
+    //HidePlayerProgressBar(playerid, BarBawah[playerid]);
     return 1;
 }
 ShowMinimizePhone(playerid)
@@ -23527,21 +23560,24 @@ ShowMinimizePhone(playerid)
     if(PlayerData[playerid][pPhoneOff])
     {
         PlayerTextDrawShow(playerid, MinimizeBG[playerid]);
-        HidePlayerProgressBar(playerid, BarBawah[playerid]);
+        //HidePlayerProgressBar(playerid, BarBawah[playerid]);
         PlayerTextDrawHide(playerid, MinimizePhoneNumb[playerid]);
         PlayerTextDrawHide(playerid, PhoneTimeMinimize[playerid]);
         PlayerTextDrawShow(playerid, MinimizeWallpaper[playerid]);
-
+        PlayerTextDrawShow(playerid, BatteryIndicatorMinimize[playerid]);
+        
+        PlayerTextDrawHide(playerid, BatteryIndicatorMaximize[playerid]);
         PlayerTextDrawHide(playerid, PhoneOnButton[playerid]);
         PlayerTextDrawHide(playerid, PhoneOnText[playerid]);        
     }
     else
     {
         PlayerTextDrawShow(playerid, MinimizeBG[playerid]);
-        ShowPlayerProgressBar(playerid, BarBawah[playerid]);
+        //ShowPlayerProgressBar(playerid, BarBawah[playerid]);
         PlayerTextDrawShow(playerid, MinimizePhoneNumb[playerid]);
         PlayerTextDrawShow(playerid, MinimizeWallpaper[playerid]);
         PlayerTextDrawShow(playerid, PhoneTimeMinimize[playerid]);
+        PlayerTextDrawShow(playerid, BatteryIndicatorMinimize[playerid]);
     }
     return 1;
 }
@@ -23558,16 +23594,18 @@ TogglePhone(playerid)
         PlayerTextDrawHide(playerid, MinimizePhoneNumb[playerid]);
         PlayerTextDrawHide(playerid, MinimizeWallpaper[playerid]);
         PlayerTextDrawHide(playerid, PhoneTimeMinimize[playerid]);
-        HidePlayerProgressBar(playerid, BarBawah[playerid]);
+        PlayerTextDrawHide(playerid, BatteryIndicatorMinimize[playerid]);
+        //HidePlayerProgressBar(playerid, BarBawah[playerid]);
         SetPVarInt(playerid, "TogglePhone", 0);
     }
     else
     {
         PlayerTextDrawShow(playerid, MinimizeBG[playerid]);
-        ShowPlayerProgressBar(playerid, BarBawah[playerid]);
+        //ShowPlayerProgressBar(playerid, BarBawah[playerid]);
         PlayerTextDrawShow(playerid, MinimizePhoneNumb[playerid]);
         PlayerTextDrawShow(playerid, MinimizeWallpaper[playerid]);
         PlayerTextDrawShow(playerid, PhoneTimeMinimize[playerid]);
+        PlayerTextDrawShow(playerid, BatteryIndicatorMinimize[playerid]);
         SetPVarInt(playerid, "TogglePhone", 1);
     }
 
@@ -23594,7 +23632,8 @@ ClosePhone(playerid)
     PlayerTextDrawHide(playerid, CarGPS[playerid]);
     PlayerTextDrawHide(playerid, PhoneOff[playerid]);
     PlayerTextDrawHide(playerid, PhoneTimeMaximize[playerid]);
-    HidePlayerProgressBar(playerid, BarAtas[playerid]);
+    PlayerTextDrawHide(playerid, BatteryIndicatorMaximize[playerid]);
+    //HidePlayerProgressBar(playerid, BarAtas[playerid]);
     ShowMinimizePhone(playerid);
     CancelSelectTextDrawEx(playerid);    
     return 1;
@@ -23631,7 +23670,8 @@ OpenPhone(playerid)
         PlayerTextDrawHide(playerid, CarGPS[playerid]);
         PlayerTextDrawHide(playerid, PhoneOff[playerid]);
         PlayerTextDrawHide(playerid, PhoneTimeMaximize[playerid]);
-        HidePlayerProgressBar(playerid, BarAtas[playerid]);
+        PlayerTextDrawHide(playerid, BatteryIndicatorMinimize[playerid]);
+        //HidePlayerProgressBar(playerid, BarAtas[playerid]);
 
         HideMinimizePhone(playerid);
         SelectTextDrawEx(playerid, 0xFF0000FF);        
@@ -23657,7 +23697,8 @@ OpenPhone(playerid)
         PlayerTextDrawShow(playerid, CarGPS[playerid]);
         PlayerTextDrawShow(playerid, PhoneOff[playerid]);
         PlayerTextDrawShow(playerid, PhoneTimeMaximize[playerid]);
-        ShowPlayerProgressBar(playerid, BarAtas[playerid]);
+        PlayerTextDrawShow(playerid, BatteryIndicatorMaximize[playerid]);
+        //ShowPlayerProgressBar(playerid, BarAtas[playerid]);
 
         PlayerTextDrawHide(playerid, PhoneOnButton[playerid]);
         PlayerTextDrawHide(playerid, PhoneOnText[playerid]);
