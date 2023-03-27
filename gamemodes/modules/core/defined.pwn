@@ -35,7 +35,7 @@ Script Defined List
 
 #define MAX_ACC                         (4)
 #define MAX_CHARACTERS                  (4)
-#define MAX_WORKSHOP										(15)
+#define MAX_WORKSHOP					(15)
 #define MAX_DYNAMIC_JOBS                (25)
 #define MAX_IMPOUND_LOTS                (20)
 #define MAX_FACTIONS                    (15)

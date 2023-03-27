@@ -81,3 +81,6 @@ discord_bot/log_collector/node_modules/
 
 # Konfigurasi MySQL
 mysql.ini
+
+# log samp in linux
+nohup.out
