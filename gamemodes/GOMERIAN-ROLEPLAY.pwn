@@ -201,6 +201,7 @@ public OnGameModeInit()
 #include "modules/dynamic/cade/core.pwn"
 #include "modules/dynamic/speed/core.pwn"
 #include "modules/dynamic/ccp/core.pwn"
+#include "modules/dynamic/garage/core.pwn"
 
 
 
@@ -279,6 +280,9 @@ public OnGameModeInit()
 #include "modules\jobs\farmer.pwn"
 #include "modules\jobs\jobskill.pwn"
 //#include "modules\jobs\lumber.pwn"
+
+#include "modules/dynamic/garage/cmd.pwn"
+#include "modules/dynamic/garage/action.pwn"
 
 #include "modules/dynamic/gate/cmd.pwn"
 #include "modules/dynamic/gate/action.pwn"
@@ -433,7 +437,7 @@ public OnGameModeInit()
 #include "modules/core/server_entity.pwn"
 // Dynamic
 #include "modules\dynamic\apartment.pwn"
-#include "modules\dynamic\garage.pwn"
+// #include "modules\dynamic\garage.pwn"
 
 // Faction Goverment Feature
 // #include "modules\player\faction\gov.pwn"
@@ -5953,7 +5957,7 @@ AddStorage(playerid, amount, index)
                 money = 1300+bonus;
             }
             
-            AddPlayerSalary(playerid, money, "Revelt Wood Export Factory");
+            AddPlayerSalary(playerid, money, "San Andreas Wood Export Factory");
 
             VehicleData[index][vehWoods] -= (to_be_added > JOB_STOCK_LIMIT) ? sisa : amount;
 
@@ -6004,7 +6008,7 @@ AddStorageComponent(playerid, amount, index)
                 money = 1300+bonus;
             }
             
-            AddPlayerSalary(playerid, money, "Revelt Vehicle Component Import Factory");
+            AddPlayerSalary(playerid, money, "San Andreas Vehicle Component Import Factory");
 
             VehicleData[index][vehComponent] -= (to_be_added > JOB_STOCK_LIMIT) ? sisa : amount;
 
@@ -15726,6 +15730,7 @@ OnGameModeInit_Setup()
     mysql_pquery(g_iHandle, "SELECT * FROM `garbage` ORDER BY `garbageID` ASC", "Garbage_Load", "");
     mysql_pquery(g_iHandle, "SELECT * FROM `objecttext`", "ObjectText_Load", "");
     mysql_pquery(g_iHandle, "SELECT * FROM `workshop`", "Workshop_Load", "");
+    mysql_pquery(g_iHandle, "SELECT * FROM `garage` ORDER BY `garageID` ASC", "Garage_Load", "");
 //    mysql_pquery(g_iHandle, "SELECT * FROM `furnstore` ORDER BY `id` ASC", "FurnStore_Load", "");
 //    mysql_pquery(g_iHandle, "SELECT * FROM `furnobject` ORDER BY `id` ASC", "FurnObject_Load", "");
 

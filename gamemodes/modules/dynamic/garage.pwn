@@ -1,24 +1,28 @@
 #define GARAGE_INTERIOR	4
-#define MAX_GARAGE 100
-#include <YSI_Game\y_vehicledata>
-#include <YSI_Coding\y_hooks>
+#define MAX_GARAGE 15
+// #include <YSI_Game\y_vehicledata>
+// #include <YSI_Coding\y_hooks>
 
 /*Variable List*/
 new const Float:garageInterior[][4] = {
-	{1990.0426,-2640.0649,13.1878,358.4085}
+	{-1790.5884,1434.1504,7.1875,180.1477},
+	{-1790.5884,1434.1504,7.1875,180.1477},
+	{-1790.5884,1434.1504,7.1875,180.1477},
+	{-1790.5884,1434.1504,7.1875,180.1477}
+
 };
 
 /*Enums List*/
-enum E_GARAGE_DATA {
+enum E_GARAGES {
     garageID,
-    garageOwner[MAX_PLAYER_NAME],
+    garageOwner[32],
     garageOwnerId,
-    garageLoc[128],
+    Float:garageLoc[4],
+	Float:garageLocInt[4],
 	garagePrice,
 	garageType,
 	garageLock,
-	garageLocInt[128],
-	garageLabel,
+	Text3D:garageLabel,
 	garageHouseLink,
 	garageExists,
 	garageInside,
@@ -26,43 +30,34 @@ enum E_GARAGE_DATA {
 
 };
 
-new GarageData[MAX_GARAGE][E_GARAGE_DATA],
-	Iterator:Garage<MAX_GARAGE>;
+new GarageInfo[MAX_GARAGE][E_GARAGES];
 
-
-hook OnGameModeInitEx()
-{
-    mysql_pquery(g_iHandle, sprintf("SELECT * FROM `garage` ORDER BY `ID` ASC LIMIT %d;", MAX_GARAGE), "Garage_Load", "");
-	
-}
 /*Function:List*/
-forward Lumber_Load();
 Function:Garage_Load()
 {
 	if(!cache_num_rows()) return printf("[Dynamic Garage] There are no one garage loaded to the server.");
 
-	for(new id = 0; id != cache_num_rows(); id++) if (id < MAX_GARAGE && !GarageData[id][garageExists])
-	{
+	for(new id = 0; id != cache_num_rows(); id++) if (id < MAX_GARAGE && !GarageInfo[id][garageExists])
+	{	
 		new part[64];
 
-		GarageData[id][garageExists] = true;
+		GarageInfo[id][garageExists] = true;
 
-		cache_get_field_content(id, "Owner", GarageData[id][garageOwner], MAX_PLAYER_NAME);
+		cache_get_field_content(id, "garageOwner", GarageInfo[id][garageOwner], MAX_PLAYER_NAME);
 
 		cache_get_field_content(id, "Location", part, sizeof(part));
-		sscanf(part, "p<|>ffff", GarageData[id][garageLoc][0], GarageData[id][garageLoc][1], GarageData[id][garageLoc][2], GarageData[id][garageLoc][3]);
+		sscanf(part, "p<|>ffff", GarageInfo[id][garageLoc][0], GarageInfo[id][garageLoc][1], GarageInfo[id][garageLoc][2], GarageInfo[id][garageLoc][3]);
 
 		cache_get_field_content(id, "LocationInt", part, sizeof(part));
-		sscanf(part, "p<|>ffff", GarageData[id][garageLocInt][0], GarageData[id][garageLocInt][1], GarageData[id][garageLocInt][2], GarageData[id][garageLocInt][3]);
+		sscanf(part, "p<|>ffff", GarageInfo[id][garageLocInt][0], GarageInfo[id][garageLocInt][1], GarageInfo[id][garageLocInt][2], GarageInfo[id][garageLocInt][3]);
 
-		GarageData[id][garageID] = cache_get_field_int(id, "ID");
-		GarageData[id][garageOwnerId] = cache_get_field_int(id, "OwnerID");
-		GarageData[id][garagePrice] = cache_get_field_int(id, "Price");
-		GarageData[id][garageType] = cache_get_field_int(id, "Type");
-		GarageData[id][garageLock] = cache_get_field_int(id, "Lock");
-		GarageData[id][garageInside] = cache_get_field_int(id, "Inside");
-		GarageData[id][garageHouseLink] = cache_get_field_int(id, "HouseLink");
-		
+		GarageInfo[id][garageID] = cache_get_field_int(id, "garageID");
+		GarageInfo[id][garageOwnerId] = cache_get_field_int(id, "garageOwnerID");
+		GarageInfo[id][garagePrice] = cache_get_field_int(id, "Price");
+		GarageInfo[id][garageType] = cache_get_field_int(id, "Type");
+		GarageInfo[id][garageLock] = cache_get_field_int(id, "Lock");
+		GarageInfo[id][garageInside] = cache_get_field_int(id, "Inside");
+		GarageInfo[id][garageHouseLink] = cache_get_field_int(id, "HouseLink");
 		Garage_Sync(id);
 	}
 	return 1;
@@ -71,52 +66,51 @@ Function:Garage_Load()
 stock Garage_Save(id)
 {
 	new query[300];
-
-	format(query, sizeof(query), "UPDATE `garage` SET `Owner`='%s', `Location`='%.02f|%.02f|%.02f|%.02f', `OwnerID`='%d', `Inside`='%d', `HouseLink`='%d'", 
-		GarageData[id][garageOwner],
-		GarageData[id][garageLoc][0],
-		GarageData[id][garageLoc][1],
-		GarageData[id][garageLoc][2],
-		GarageData[id][garageLoc][3],
-		GarageData[id][garageOwnerId],
-		GarageData[id][garageInside],
-		GarageData[id][garageHouseLink]
+	format(query, sizeof(query), "UPDATE `garage` SET `garageOwner`='%s', `Location`='%.02f|%.02f|%.02f|%.02f', `garageOwnerID`='%d', `Inside`='%d', `HouseLink`='%d'", 
+		GarageInfo[id][garageOwner],
+		GarageInfo[id][garageLoc][0],
+		GarageInfo[id][garageLoc][1],
+		GarageInfo[id][garageLoc][2],
+		GarageInfo[id][garageLoc][3],
+		GarageInfo[id][garageOwnerId],
+		GarageInfo[id][garageInside],
+		GarageInfo[id][garageHouseLink]
 	);
-	format(query, sizeof(query), "%s, `Price`='%d', `Type`='%d', `Lock`='%d', `LocationInt`='%.02f|%.02f|%.02f|%.02f' WHERE `ID` = '%d'", 
+	format(query, sizeof(query), "%s, `Price`='%d', `Type`='%d', `Lock`='%d', `LocationInt`='%.02f|%.02f|%.02f|%.02f' WHERE `garageID` = '%d'", 
 		query,
-		GarageData[id][garagePrice],
-		GarageData[id][garageType],
-		GarageData[id][garageLock],
-		GarageData[id][garageLocInt][0],
-		GarageData[id][garageLocInt][1],
-		GarageData[id][garageLocInt][2],
-		GarageData[id][garageLocInt][3],
-		GarageData[id][garageID]
+		GarageInfo[id][garagePrice],
+		GarageInfo[id][garageType],
+		GarageInfo[id][garageLock],
+		GarageInfo[id][garageLocInt][0],
+		GarageInfo[id][garageLocInt][1],
+		GarageInfo[id][garageLocInt][2],
+		GarageInfo[id][garageLocInt][3],
+		GarageInfo[id][garageID]
 	);
 	return mysql_tquery(g_iHandle, query);
 }
 
 stock Garage_Sync(id)
 {
-	if (GarageData[id][garageExists]) 
+	if (GarageInfo[id][garageExists]) 
 	{
-		new str[200];
+		new str[500];
 
-		if(IsValidDynamicPickup(GarageData[id][garagePickup]))
-			DestroyDynamicPickup(GarageData[id][garagePickup]);
+		if(IsValidDynamicPickup(GarageInfo[id][garagePickup]))
+			DestroyDynamicPickup(GarageInfo[id][garagePickup]);
 
-		if(IsValidDynamic3DTextLabel(GarageData[id][garageLabel]))
-			DestroyDynamic3DTextLabel(GarageData[id][garageLabel]);
+		if(IsValidDynamic3DTextLabel(GarageInfo[id][garageLabel]))
+			DestroyDynamic3DTextLabel(GarageInfo[id][garageLabel]);
 
-		if(GarageData[id][garageOwnerId]) 
-			if(GarageData[id][garageHouseLink]) format(str, sizeof(str), "%s's garage\n"WHITE"House Garage Id: "YELLOW"%d\n"WHITE"Vehicle Inside: {FFFF00}%d{FFFFFF}/{FFFF00}%d\n"WHITE"Type '{FFFF00}/garage"WHITE"' to use this.", GarageData[id][garageOwner], GetHouseByID(GarageData[id][garageHouseLink]), GarageData[id][garageInside], GarageData[id][garageType]);
-			else format(str, sizeof(str), "%s's garage\n"WHITE"Vehicle Inside: {FFFF00}%d{FFFFFF}/{FFFF00}%d\n"WHITE"Type '{FFFF00}/garage"WHITE"' to use this.", GarageData[id][garageOwner], GarageData[id][garageInside], GarageData[id][garageType]);
+		if(GarageInfo[id][garageOwnerId]) 
+			if(GarageInfo[id][garageHouseLink]) format(str, sizeof(str), "%s's garage\n"WHITE"House Garage Id: "YELLOW"%d\n"WHITE"Vehicle Inside: {FFFF00}%d{FFFFFF}/{FFFF00}%d\n"WHITE"Type '{FFFF00}/garage"WHITE"' to use this.", GarageInfo[id][garageOwner], GetHouseByID(GarageInfo[id][garageHouseLink]), GarageInfo[id][garageInside], GarageInfo[id][garageType]);
+			else format(str, sizeof(str), "%s's garage\n"WHITE"Vehicle Inside: {FFFF00}%d{FFFFFF}/{FFFF00}%d\n"WHITE"Type '{FFFF00}/garage"WHITE"' to use this.", GarageInfo[id][garageOwner], GarageInfo[id][garageInside], GarageInfo[id][garageType]);
 		else {
-			if(GarageData[id][garageHouseLink]) format(str, sizeof(str), "[Garage ID: %d]\n"WHITE"House Garage Id: "YELLOW"%d\n"WHITE"Vehicle Limit: {FFFF00}%d\n"WHITE"Type '{FFFF00}/garage"WHITE"' to use this.", id, GetHouseByID(GarageData[id][garageHouseLink]), GarageData[id][garageType]);
-			else format(str, sizeof(str), "[Garage ID: %d]\n"WHITE"Garage Price: {00FF00}%s\n"WHITE"Vehicle Limit: {FFFF00}%d\n"WHITE"Type '{FFFF00}/garage"WHITE"' to use this.", id, FormatNumber(GarageData[id][garagePrice]), GarageData[id][garageType]);
+			if(GarageInfo[id][garageHouseLink]) format(str, sizeof(str), "[Garage ID: %d]\n"WHITE"House Garage Id: "YELLOW"%d\n"WHITE"Vehicle Limit: {FFFF00}%d\n"WHITE"Type '{FFFF00}/garage"WHITE"' to use this.", id, GetHouseByID(GarageInfo[id][garageHouseLink]), GarageInfo[id][garageType]);
+			else format(str, sizeof(str), "[Garage ID: %d]\n"WHITE"Garage Price: {00FF00}%s\n"WHITE"Vehicle Limit: {FFFF00}%d\n"WHITE"Type '{FFFF00}/garage"WHITE"' to use this.", id, FormatNumber(GarageInfo[id][garagePrice]), GarageInfo[id][garageType]);
 		}
-		GarageData[id][garageLabel] = CreateDynamic3DTextLabel(str, COLOR_CLIENT, GarageData[id][garageLoc][0], GarageData[id][garageLoc][1], GarageData[id][garageLoc][2]+0.5, 7);
-		GarageData[id][garagePickup] = CreateDynamicPickup(1239, 23, GarageData[id][garageLoc][0], GarageData[id][garageLoc][1], GarageData[id][garageLoc][2], -1, -1, -1, 10);
+		GarageInfo[id][garageLabel] = CreateDynamic3DTextLabel(str, COLOR_CLIENT, GarageInfo[id][garageLoc][0], GarageInfo[id][garageLoc][1], GarageInfo[id][garageLoc][2]+0.5, 7);
+		GarageInfo[id][garagePickup] = CreateDynamicPickup(1239, 23, GarageInfo[id][garageLoc][0], GarageInfo[id][garageLoc][1], GarageInfo[id][garageLoc][2], -1, -1, -1, 10);
 		
 		Garage_Save(id);
 	}
@@ -125,7 +119,7 @@ stock Garage_Sync(id)
 
 stock Garage_FreeID()
 {
-	for(new id = 0; id != MAX_GARAGE; id++) if(!GarageData[id][garageExists]) {
+	for(new id = 0; id != MAX_GARAGE; id++) if(!GarageInfo[id][garageExists]) {
 		return id;
 	}
 	return -1;
@@ -133,7 +127,7 @@ stock Garage_FreeID()
 
 stock Garage_Nearest(playerid)
 {
-	for(new id = 0; id != MAX_GARAGE; id++) if(GarageData[id][garageExists] && IsPlayerInRangeOfPoint(playerid, 4.0, GarageData[id][garageLoc][0], GarageData[id][garageLoc][1], GarageData[id][garageLoc][2])) {
+	for(new id = 0; id != MAX_GARAGE; id++) if(GarageInfo[id][garageExists] && IsPlayerInRangeOfPoint(playerid, 4.0, GarageInfo[id][garageLoc][0], GarageInfo[id][garageLoc][1], GarageInfo[id][garageLoc][2])) {
 		return id;
 	}
 	return -1;
@@ -143,7 +137,7 @@ stock Garage_Inside(playerid)
 {
     if(PlayerData[playerid][pGarage] != -1)
     {
-        for (new i = 0; i != MAX_GARAGE; i ++) if(GarageData[i][garageExists] && GarageData[i][garageID] == PlayerData[playerid][pGarage]) {
+        for (new i = 0; i != MAX_GARAGE; i ++) if(GarageInfo[i][garageExists] && GarageInfo[i][garageID] == PlayerData[playerid][pGarage]) {
             return i;
         }
     }
@@ -155,7 +149,7 @@ stock Garage_IsOwner(playerid, id)
     if(!PlayerData[playerid][pLogged] || PlayerData[playerid][pID] == -1)
         return 0;
 
-    if((GarageData[id][garageExists] && GarageData[id][garageOwnerId] != 0) && GarageData[id][garageOwnerId] == PlayerData[playerid][pID])
+    if((GarageInfo[id][garageExists] && GarageInfo[id][garageOwnerId] != 0) && GarageInfo[id][garageOwnerId] == PlayerData[playerid][pID])
         return 1;
 
     return 0;
@@ -163,7 +157,7 @@ stock Garage_IsOwner(playerid, id)
 
 stock Garage_SQLID(id)
 {
-    for (new i = 0; i != MAX_GARAGE; i ++) if(GarageData[i][garageExists] && GarageData[i][garageID] == id) {
+    for (new i = 0; i != MAX_GARAGE; i ++) if(GarageInfo[i][garageExists] && GarageInfo[i][garageID] == id) {
         return i;
     }
 
@@ -174,7 +168,7 @@ stock Garage_SQLID(id)
 stock Garage_GetCount(playerid)
 {
     new count = 0;
-    for (new i = 0; i != MAX_GARAGE; i ++) if(GarageData[i][garageExists] && Garage_IsOwner(playerid, i)) {
+    for (new i = 0; i != MAX_GARAGE; i++) if(GarageInfo[i][garageExists] && Garage_IsOwner(playerid, i)) {
         count++;
     }
     return count;
@@ -182,10 +176,10 @@ stock Garage_GetCount(playerid)
 
 stock Garage_Destroy(id)
 {
-	mysql_tquery(g_iHandle, sprintf("DELETE FROM `garage` WHERE `ID`='%d'", GarageData[id][garageID]));
+	mysql_tquery(g_iHandle, sprintf("DELETE FROM `garage` WHERE `garageID`='%d'", GarageInfo[id][garageID]));
 	mysql_tquery(g_iHandle, sprintf("UPDATE `player_vehicles` SET `Garage`= 0, Pos1 = '%.01f', Pos2 = '%.01f', Pos3 = '%.01f', Pos4 = '%.01f' WHERE Garage='%d'", 
-		GarageData[id][garageLoc][0],  GarageData[id][garageLoc][1], GarageData[id][garageLoc][2], GarageData[id][garageLoc][3], 
-		GarageData[id][garageID])
+		GarageInfo[id][garageLoc][0],  GarageInfo[id][garageLoc][1], GarageInfo[id][garageLoc][2], GarageInfo[id][garageLoc][3], 
+		GarageInfo[id][garageID])
 	);
 
 	Garage_Reset(id);
@@ -194,25 +188,25 @@ stock Garage_Destroy(id)
 
 stock Garage_Reset(id)
 {
-	if(!GarageData[id][garageExists])
+	if(!GarageInfo[id][garageExists])
 		return 0;
 
-	if(IsValidDynamicPickup(GarageData[id][garagePickup]))
-		DestroyDynamicPickup(GarageData[id][garagePickup]);
+	if(IsValidDynamicPickup(GarageInfo[id][garagePickup]))
+		DestroyDynamicPickup(GarageInfo[id][garagePickup]);
 
-	if(IsValidDynamic3DTextLabel(GarageData[id][garageLabel]))
-		DestroyDynamic3DTextLabel(GarageData[id][garageLabel]);
+	if(IsValidDynamic3DTextLabel(GarageInfo[id][garageLabel]))
+		DestroyDynamic3DTextLabel(GarageInfo[id][garageLabel]);
 
-	GarageData[id][garageOwner] = EOS;
+	GarageInfo[id][garageOwner] = EOS;
 
-	GarageData[id][garageExists] = false;
-	GarageData[id][garageID] = 0;
-	GarageData[id][garageType] = 0;
-	GarageData[id][garagePrice] = 0;
-	GarageData[id][garageInside] = 0;
-	GarageData[id][garageOwnerId] = 0;
-	GarageData[id][garageLock] = 1;
-	GarageData[id][garageHouseLink] = 0;
+	GarageInfo[id][garageExists] = false;
+	GarageInfo[id][garageID] = 0;
+	GarageInfo[id][garageType] = 0;
+	GarageInfo[id][garagePrice] = 0;
+	GarageInfo[id][garageInside] = 0;
+	GarageInfo[id][garageOwnerId] = 0;
+	GarageInfo[id][garageLock] = 1;
+	GarageInfo[id][garageHouseLink] = 0;
 
 	return 1;
 }
@@ -224,25 +218,23 @@ stock Garage_Create(playerid, price, type)
 
 	if((id = Garage_FreeID()) != -1) 
 	{
-		GetPlayerPos(playerid, GarageData[id][garageLoc][0], GarageData[id][garageLoc][1], GarageData[id][garageLoc][2]);
-		GetPlayerFacingAngle(playerid, GarageData[id][garageLoc][3]);
+		GetPlayerPos(playerid, GarageInfo[id][garageLoc][0], GarageInfo[id][garageLoc][1], GarageInfo[id][garageLoc][2]);
+		GetPlayerFacingAngle(playerid, GarageInfo[id][garageLoc][3]);
 
-		GarageData[id][garageLocInt][0] = garageInterior[0][0];
-		GarageData[id][garageLocInt][1] = garageInterior[0][1];
-		GarageData[id][garageLocInt][2] = garageInterior[0][2];
-		GarageData[id][garageLocInt][3] = garageInterior[0][3];
+		GarageInfo[id][garageLocInt][0] = garageInterior[0][0];
+		GarageInfo[id][garageLocInt][1] = garageInterior[0][1];
+		GarageInfo[id][garageLocInt][2] = garageInterior[0][2];
+		GarageInfo[id][garageLocInt][3] = garageInterior[0][3];
 
-		GarageData[id][garageExists] = true;
-		GarageData[id][garageType] = type;
-		GarageData[id][garagePrice] = price;
-		GarageData[id][garageInside] = 0;
-		GarageData[id][garageOwnerId] = 0;
-		GarageData[id][garageOwner] = EOS;
-		GarageData[id][garageLock] = 1;
-		GarageData[id][garageHouseLink] = 0;
-
-		mysql_tquery(g_iHandle, sprintf("INSERT INTO `garage` (`Price`) VALUES (%d)", GarageData[id][garagePrice]), "Garage_Created", "d", id);
-
+		GarageInfo[id][garageExists] = true;
+		GarageInfo[id][garageType] = type;
+		GarageInfo[id][garagePrice] = price;
+		GarageInfo[id][garageInside] = 0;
+		GarageInfo[id][garageOwnerId] = 0;
+		GarageInfo[id][garageOwner] = EOS;
+		GarageInfo[id][garageLock] = 1;
+		GarageInfo[id][garageHouseLink] = 0;
+		mysql_tquery(g_iHandle, sprintf("INSERT INTO `garage` (`Price`) VALUES (%d)", GarageInfo[id][garagePrice]), "Garage_Created", "d", id);
 		return id;
 	} 
 	return 1;
@@ -251,8 +243,8 @@ stock Garage_Create(playerid, price, type)
 /*Function:other List*/
 Function:Garage_Created(id)
 {
-	GarageData[id][garageID] = cache_insert_id();
-	
+	GarageInfo[id][garageID] = cache_insert_id();
+	//sync = refresh
 	Garage_Sync(id);
 	Garage_Save(id);
 	return 1;
@@ -269,10 +261,9 @@ CMD:creategarage(playerid, params[])
 
 	if(sscanf(params, "dd", price, type)) return SendSyntaxMessage(playerid, "/creategarage [price] [type 1-3]");
 	if(type < 1 || type > 3) return SendErrorMessage(playerid, "Invalid type id.");
-	if(price < 1) return SendErrorMessage(playerid, "Price minimum is zero.");
+	if(price < 1) return SendErrorMessage(playerid, "Price minimum is $1.");
 
 	id = Garage_Create(playerid, price, type);
-	SendClientMessage(playerid, -1, "garage X = %d",GarageData[id][garageLocInt][0]);
 	if(id == -1)
 		return SendErrorMessage(playerid, "The server has reached the limit for garage.");
 
@@ -289,7 +280,7 @@ CMD:destroygarage(playerid, params[])
 		id;
 
 	if(sscanf(params, "d", id)) return SendErrorMessage(playerid, "/destroygarage [id]");
-	if(!GarageData[id][garageExists]) return SendErrorMessage(playerid, "Invalid garage id.");
+	if(!GarageInfo[id][garageExists]) return SendErrorMessage(playerid, "Invalid garage id.");
 
 	SendServerMessage(playerid, "You have successfully destroy garage ID: %d.", id);
 	Garage_Destroy(id);
@@ -307,12 +298,12 @@ CMD:editgarage(playerid, params[])
 		category[10];
 
 	if(sscanf(params, "ds[10]S()[128]", id, category, string)) return SendSyntaxMessage(playerid, "/editgarage [id] [location/price/type/lock/sell/houselink]");
-	if(!GarageData[id][garageExists]) return SendErrorMessage(playerid, "Invalid garage id.");
+	if(!GarageInfo[id][garageExists]) return SendErrorMessage(playerid, "Invalid garage id.");
 
 	if(!strcmp(category, "location"))
 	{
-		GetPlayerPos(playerid, GarageData[id][garageLoc][0], GarageData[id][garageLoc][1], GarageData[id][garageLoc][2]);
-		GetPlayerFacingAngle(playerid, GarageData[id][garageLoc][3]);
+		GetPlayerPos(playerid, GarageInfo[id][garageLoc][0], GarageInfo[id][garageLoc][1], GarageInfo[id][garageLoc][2]);
+		GetPlayerFacingAngle(playerid, GarageInfo[id][garageLoc][3]);
 
 		Garage_Sync(id);
 
@@ -323,9 +314,9 @@ CMD:editgarage(playerid, params[])
 		new price;
 
 		if(sscanf(string, "d", price)) return SendSyntaxMessage(playerid, "/editgarage id price [value]");
-		if(price < 1) return SendErrorMessage(playerid, "Price minimum is zero.");
+		if(price < 1) return SendErrorMessage(playerid, "Price minimum is $1.");
 
-		GarageData[id][garagePrice] = price;
+		GarageInfo[id][garagePrice] = price;
 		Garage_Sync(id);
 
 		SendServerMessage(playerid, "You have successfully edit price of garage id %d to %s", id, FormatNumber(price));
@@ -337,7 +328,7 @@ CMD:editgarage(playerid, params[])
 		if(sscanf(string, "d", type)) return SendSyntaxMessage(playerid, "/editgarage id type [1-3]");
 		if(type < 1 || type > 3) return SendErrorMessage(playerid, "Invalid type id.");
 
-		GarageData[id][garageType] = type;
+		GarageInfo[id][garageType] = type;
 		Garage_Sync(id);
 
 		SendServerMessage(playerid, "You have successfully edit type of garage id %d to %d", id, type);
@@ -349,10 +340,10 @@ CMD:editgarage(playerid, params[])
 		if(sscanf(string, "d", lock)) return SendSyntaxMessage(playerid, "/editgarage id lock [0/1]");
 		if(lock < 0 || lock > 1) return SendErrorMessage(playerid, "Only 0 (unlock) or 1 (lock).");
 
-		GarageData[id][garageLock] = lock;
+		GarageInfo[id][garageLock] = lock;
 		Garage_Sync(id);
 
-		SendServerMessage(playerid, "You have successfully %s of garage id %d.", GarageData[id][garageLock] ? ("Lock") : ("Unlock"), id);
+		SendServerMessage(playerid, "You have successfully %s of garage id %d.", GarageInfo[id][garageLock] ? ("Lock") : ("Unlock"), id);
 	}
 	else if(!strcmp(category, "houselink"))
 	{
@@ -361,10 +352,10 @@ CMD:editgarage(playerid, params[])
 		if(sscanf(string, "d", houseid)) return SendSyntaxMessage(playerid, "/editgarage id houselink [houseid]");
 		if(!HouseData[houseid][houseExists]) return SendErrorMessage(playerid, "Invalid house id.");
 
-		GarageData[id][garageHouseLink] = HouseData[houseid][houseID];
+		GarageInfo[id][garageHouseLink] = HouseData[houseid][houseID];
 		if(HouseData[houseid][houseOwner]) {
-			GarageData[id][garageOwnerId] = HouseData[houseid][houseOwner];
-			format(GarageData[id][garageOwner], MAX_PLAYER_NAME, HouseData[houseid][houseOwnerName]);
+			GarageInfo[id][garageOwnerId] = HouseData[houseid][houseOwner];
+			format(GarageInfo[id][garageOwner], MAX_PLAYER_NAME, HouseData[houseid][houseOwnerName]);
 		}
 
 		Garage_Sync(id);
@@ -373,18 +364,18 @@ CMD:editgarage(playerid, params[])
 	}
 	else if(!strcmp(category, "sell"))
 	{
-		if (!GarageData[id][garageOwnerId]) return SendErrorMessage(playerid, "This garage is for sale!.");
-		if (GarageData[id][garageHouseLink]) return SendErrorMessage(playerid, "This garage linked to houseid!.");
+		if (!GarageInfo[id][garageOwnerId]) return SendErrorMessage(playerid, "This garage is for sale!.");
+		if (GarageInfo[id][garageHouseLink]) return SendErrorMessage(playerid, "This garage linked to houseid!.");
 
 		mysql_tquery(g_iHandle, sprintf("UPDATE `player_vehicles` SET `Garage`= 0, Pos1 = '%.01f', Pos2 = '%.01f', Pos3 = '%.01f', Pos4 = '%.01f' WHERE Garage='%d'", 
-			GarageData[id][garageLoc][0],  GarageData[id][garageLoc][1], GarageData[id][garageLoc][2], GarageData[id][garageLoc][3], 
-			GarageData[id][garageID])
+			GarageInfo[id][garageLoc][0],  GarageInfo[id][garageLoc][1], GarageInfo[id][garageLoc][2], GarageInfo[id][garageLoc][3], 
+			GarageInfo[id][garageID])
 		);
 
-		GarageData[id][garageOwnerId] = 0;
-		GarageData[id][garageOwner] = EOS;
-		GarageData[id][garageLock] = 1;
-		GarageData[id][garageInside] = 0;
+		GarageInfo[id][garageOwnerId] = 0;
+		GarageInfo[id][garageOwner] = EOS;
+		GarageInfo[id][garageLock] = 1;
+		GarageInfo[id][garageInside] = 0;
 		Garage_Sync(id);
 	}
 	Garage_Save(id);
@@ -404,14 +395,14 @@ CMD:garage(playerid, params[])
 	if(!strcmp(category, "buy"))
 	{
 		if((id = Garage_Nearest(playerid)) == -1) return SendErrorMessage(playerid, "You're not in nearest any garage.");
-		if(GarageData[id][garageOwnerId]) return SendErrorMessage(playerid, "This garage owned by someone.");
+		if(GarageInfo[id][garageOwnerId]) return SendErrorMessage(playerid, "This garage owned by someone.");
 		if(Garage_GetCount(playerid) >= 2) return SendErrorMessage(playerid, "You have two garage now!.");
-		if(GetMoney(playerid) < GarageData[id][garagePrice]) return SendErrorMessage(playerid, "You dont have enough money to buy this garage.");
-		if(GarageData[id][garageHouseLink]) return SendErrorMessage(playerid, "This garage linked to the house, buy house near this garage to owned this garage.");
+		if(GetMoney(playerid) < GarageInfo[id][garagePrice]) return SendErrorMessage(playerid, "You dont have enough money to buy this garage.");
+		if(GarageInfo[id][garageHouseLink]) return SendErrorMessage(playerid, "This garage linked to the house, buy house near this garage to owned this garage.");
 
-		GarageData[id][garageOwnerId] = PlayerData[playerid][pID];
-		format(GarageData[id][garageOwner], MAX_PLAYER_NAME, "%s", ReturnName(playerid, 0));
-		GiveMoney(playerid, -GarageData[id][garagePrice], ECONOMY_ADD_SUPPLY, "bought garage");
+		GarageInfo[id][garageOwnerId] = PlayerData[playerid][pID];
+		format(GarageInfo[id][garageOwner], MAX_PLAYER_NAME, "%s", ReturnName(playerid, 0));
+		GiveMoney(playerid, -GarageInfo[id][garagePrice], ECONOMY_ADD_SUPPLY, "bought garage");
 
 		SendServerMessage(playerid, "You've bough this garage.");
 
@@ -420,7 +411,7 @@ CMD:garage(playerid, params[])
 	else if(!strcmp(category, "enter"))
 	{
 		if((id = Garage_Nearest(playerid)) == -1) return SendErrorMessage(playerid, "You're not in nearest any garage.");
-		if(GarageData[id][garageLock]) return GameTextForPlayer(playerid, "~r~Locked", 1500, 1);
+		if(GarageInfo[id][garageLock]) return GameTextForPlayer(playerid, "~r~Locked", 1500, 1);
 		if(IsPlayerInAnyVehicle(playerid))
 		{
 			static 
@@ -431,39 +422,39 @@ CMD:garage(playerid, params[])
 				if(!Vehicle_IsOwned(playerid, vehicleid)) return SendErrorMessage(playerid, "This is not your vehicle.");
 				if(!Garage_IsOwner(playerid, id)) return SendErrorMessage(playerid, "This garage isn't owned by you.");
 				if(IsAPlane(GetPlayerVehicleID(playerid)) || IsAHelicopter(GetPlayerVehicleID(playerid)) || IsLoadableVehicle(GetPlayerVehicleID(playerid))) return SendErrorMessage(playerid, "Can't loaded this vehicle.");
-				if(GarageData[id][garageInside] >= GarageData[id][garageType]) return SendErrorMessage(playerid, "Can't put more vehicle to this garage.");
+				if(GarageInfo[id][garageInside] >= GarageInfo[id][garageType]) return SendErrorMessage(playerid, "Can't put more vehicle to this garage.");
 
-				GarageData[id][garageInside] ++;
+				GarageInfo[id][garageInside] ++;
 
-				VehicleData[vehicleid][vehInterior] = GARAGE_INTERIOR+GarageData[id][garageType];
-				VehicleData[vehicleid][vehVirtual] = GarageData[id][garageID]+1000;
+				VehicleData[vehicleid][vehInterior] = GARAGE_INTERIOR+GarageInfo[id][garageType];
+				VehicleData[vehicleid][vehVirtual] = GarageInfo[id][garageID]+1000;
 
-				SetVehiclePos(VehicleData[vehicleid][vehVehicleID], GarageData[id][garageLocInt][0], GarageData[id][garageLocInt][1], GarageData[id][garageLocInt][2]);
-				SetVehicleZAngle(VehicleData[vehicleid][vehVehicleID], GarageData[id][garageLocInt][3]);
+				SetVehiclePos(VehicleData[vehicleid][vehVehicleID], GarageInfo[id][garageLocInt][0], GarageInfo[id][garageLocInt][1], GarageInfo[id][garageLocInt][2]);
+				SetVehicleZAngle(VehicleData[vehicleid][vehVehicleID], GarageInfo[id][garageLocInt][3]);
 
-				LinkVehicleToInterior(VehicleData[vehicleid][vehVehicleID], GARAGE_INTERIOR+GarageData[id][garageType]);
+				LinkVehicleToInterior(VehicleData[vehicleid][vehVehicleID], GARAGE_INTERIOR+GarageInfo[id][garageType]);
 				SetVehicleVirtualWorld(VehicleData[vehicleid][vehVehicleID], VehicleData[vehicleid][vehVirtual]);
 
-				SetPlayerInterior(playerid, GARAGE_INTERIOR+GarageData[id][garageType]);
-				SetPlayerVirtualWorld(playerid, GarageData[id][garageID]+1000);
+				SetPlayerInterior(playerid, GARAGE_INTERIOR+GarageInfo[id][garageType]);
+				SetPlayerVirtualWorld(playerid, GarageInfo[id][garageID]+1000);
 
 				Vehicle_Save(vehicleid);
 				Garage_Sync(id);
 
-				PlayerData[playerid][pGarage] = GarageData[id][garageID];
+				PlayerData[playerid][pGarage] = GarageInfo[id][garageID];
 				SetCameraBehindPlayer(playerid);
 
 				SetPlayerWeather(playerid, 8);
 				SetPlayerTime(playerid, 20, 0);
 			}
-			else SendErrorMessage(playerid, "This vehicle not owned by you, can't put to this garage.");
+			else SendErrorMessage(playerid, "Harus kendaraan pribadi untuk menyimpan kedalam garasi!");
 		}
 		else 
 		{
-			SetPlayerPosEx(playerid, GarageData[id][garageLocInt][0], GarageData[id][garageLocInt][1], GarageData[id][garageLocInt][2]), SetPlayerFacingAngle(playerid, GarageData[id][garageLocInt][3]);
-			SetPlayerInterior(playerid, GARAGE_INTERIOR+GarageData[id][garageType]);
-			SetPlayerVirtualWorld(playerid, GarageData[id][garageID]+1000);
-			PlayerData[playerid][pGarage] = GarageData[id][garageID];
+			SetPlayerPosEx(playerid, GarageInfo[id][garageLocInt][0], GarageInfo[id][garageLocInt][1], GarageInfo[id][garageLocInt][2]), SetPlayerFacingAngle(playerid, GarageInfo[id][garageLocInt][3]);
+			SetPlayerInterior(playerid, GARAGE_INTERIOR+GarageInfo[id][garageType]);
+			SetPlayerVirtualWorld(playerid, GarageInfo[id][garageID]+1000);
+			PlayerData[playerid][pGarage] = GarageInfo[id][garageID];
 			SetCameraBehindPlayer(playerid);
 		}
 	}
@@ -476,10 +467,10 @@ CMD:garage(playerid, params[])
 			userid,
 			price;
 
-		if(GarageData[id][garageHouseLink]) 
+		if(GarageInfo[id][garageHouseLink]) 
 			return SendErrorMessage(playerid, "This garage can't sell by yourself, sell your house to sell this garage too.");
 		
-		if(GarageData[id][garageInside]) 
+		if(GarageInfo[id][garageInside]) 
 			return SendErrorMessage(playerid, "Take out all vehicle from this garage.");
 		
 		if(sscanf(string, "dd", userid, price)) 
@@ -508,19 +499,19 @@ CMD:garage(playerid, params[])
 	{
 		if((id = Garage_Nearest(playerid)) == -1) return SendErrorMessage(playerid, "You're not in nearest any garage.");
 		if(!Garage_IsOwner(playerid, id)) return SendErrorMessage(playerid, "This garage isn't owned by you.");
-		if(GarageData[id][garageHouseLink]) return SendErrorMessage(playerid, "Can't abandon this garage, this garage linked to other house id.");
+		if(GarageInfo[id][garageHouseLink]) return SendErrorMessage(playerid, "Can't abandon this garage, this garage linked to other house id.");
 
 		new 
 			confirm[8];
 
-		if(GarageData[id][garageInside]) return SendErrorMessage(playerid, "Take out all vehicle from this garage.");
+		if(GarageInfo[id][garageInside]) return SendErrorMessage(playerid, "Keluarkan semua kendaraan anda terlebih dahulu!.");
 		if(sscanf(string, "s[8]", confirm)) return SendSyntaxMessage(playerid, "/garage abandon 'confirm'");
 
-		GarageData[id][garageOwnerId] = 0;
+		GarageInfo[id][garageOwnerId] = 0;
 		Garage_Sync(id);
 
-		SendServerMessage(playerid, "You have abandoned your garage.");
-        Log_Save(E_LOG_GARAGE, sprintf("[%s] %s has abandoned garage ID: %d.", ReturnDate(), ReturnName(playerid), id));
+		SendServerMessage(playerid, "Kamu telah menghapus garage tersebut.");
+        Log_Save(E_LOG_GARAGE, sprintf("[%s] %s telah menghapus garage ID: %d.", ReturnDate(), ReturnName(playerid), id));
 	}
 	else if(!strcmp(category, "approve"))
 	{
@@ -539,8 +530,8 @@ CMD:garage(playerid, params[])
         SendServerMessage(playerid, "You have successfully purchased %s's garage for %s.", ReturnName(sellerid, 0), FormatNumber(price));
         SendServerMessage(sellerid, "%s has successfully purchased your garage for %s.", ReturnName(playerid, 0), FormatNumber(price));
 
-        format(GarageData[garageid][garageOwner], MAX_PLAYER_NAME, ReturnName(playerid, 0));
-        GarageData[garageid][garageOwnerId] = GetPlayerSQLID(playerid);
+        format(GarageInfo[garageid][garageOwner], MAX_PLAYER_NAME, ReturnName(playerid, 0));
+        GarageInfo[garageid][garageOwnerId] = GetPlayerSQLID(playerid);
 
         Garage_Sync(garageid);
 
@@ -557,10 +548,10 @@ CMD:garage(playerid, params[])
 	{
 		if((id = (Garage_Inside(playerid) == -1) ? (Garage_Nearest(playerid)) : (Garage_Inside(playerid))) != -1 && Garage_IsOwner(playerid, id))
 		{
-			if(!GarageData[id][garageLock]) GarageData[id][garageLock] = true;
-			else GarageData[id][garageLock] = false;
+			if(!GarageInfo[id][garageLock]) GarageInfo[id][garageLock] = true;
+			else GarageInfo[id][garageLock] = false;
 
-			SendServerMessage(playerid, "You have %s this garage.", GarageData[id][garageLock] ? ("Lock") : ("Unlock"));
+			SendServerMessage(playerid, "You have %s this garage.", GarageInfo[id][garageLock] ? ("Lock") : ("Unlock"));
 			Garage_Sync(id);
 			return 1;
 		}
@@ -568,7 +559,7 @@ CMD:garage(playerid, params[])
 	}
 	else if(!strcmp(category, "exit"))
 	{
-		if((id = Garage_Inside(playerid)) != -1 && IsPlayerInRangeOfPoint(playerid, 4, GarageData[id][garageLocInt][0], GarageData[id][garageLocInt][1], GarageData[id][garageLocInt][2]))
+		if((id = Garage_Inside(playerid)) != -1 && IsPlayerInRangeOfPoint(playerid, 4, GarageInfo[id][garageLocInt][0], GarageInfo[id][garageLocInt][1], GarageInfo[id][garageLocInt][2]))
 		{
 			if(IsPlayerInAnyVehicle(playerid))
 			{
@@ -583,13 +574,13 @@ CMD:garage(playerid, params[])
 					if(!Garage_IsOwner(playerid, id)) return SendErrorMessage(playerid, "This garage isn't owned by you.");
 
 					VehicleData[vehicleid][vehGarage] = 0;
-					GarageData[id][garageInside] --;
+					GarageInfo[id][garageInside] --;
 
 					VehicleData[vehicleid][vehInterior] = 0;
 					VehicleData[vehicleid][vehVirtual] = 0;
 
-					SetVehiclePos(VehicleData[vehicleid][vehVehicleID], GarageData[id][garageLoc][0], GarageData[id][garageLoc][1], GarageData[id][garageLoc][2]);
-					SetVehicleZAngle(VehicleData[vehicleid][vehVehicleID], GarageData[id][garageLoc][3]);
+					SetVehiclePos(VehicleData[vehicleid][vehVehicleID], GarageInfo[id][garageLoc][0], GarageInfo[id][garageLoc][1], GarageInfo[id][garageLoc][2]);
+					SetVehicleZAngle(VehicleData[vehicleid][vehVehicleID], GarageInfo[id][garageLoc][3]);
 
 					LinkVehicleToInterior(VehicleData[vehicleid][vehVehicleID], 0);
 					SetVehicleVirtualWorld(VehicleData[vehicleid][vehVehicleID], 0);
@@ -605,7 +596,7 @@ CMD:garage(playerid, params[])
 			}
 			else 
 			{
-				SetPlayerPosEx(playerid, GarageData[id][garageLoc][0], GarageData[id][garageLoc][1], GarageData[id][garageLoc][2]), SetPlayerFacingAngle(playerid, GarageData[id][garageLoc][3]);
+				SetPlayerPosEx(playerid, GarageInfo[id][garageLoc][0], GarageInfo[id][garageLoc][1], GarageInfo[id][garageLoc][2]), SetPlayerFacingAngle(playerid, GarageInfo[id][garageLoc][3]);
 
 				SetPlayerInterior(playerid, 0);
 				SetPlayerVirtualWorld(playerid, 0);
