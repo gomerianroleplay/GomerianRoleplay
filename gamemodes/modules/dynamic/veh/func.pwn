@@ -489,20 +489,20 @@ Vehicle_InsurancePrice(type)
 
 	switch(type)
 	{
-		case CATEGORY_BIKE: price = 2500;
-		case CATEGORY_BOAT: price = 5000;
-		case CATEGORY_PUBLIC: price = 5500;
-		case CATEGORY_SPORT: price = 5000;
-		case CATEGORY_SALOON: price = 7000;
+		case CATEGORY_BIKE: price = 2000;
+		case CATEGORY_BOAT: price = 7000;
+		case CATEGORY_PUBLIC: price = 1000;
+		case CATEGORY_SPORT: price = 7500;
+		case CATEGORY_SALOON: price = 5000;
 		case CATEGORY_TRAILER: price = 6500;
 		case CATEGORY_OFFROAD: price = 6000;
-		case CATEGORY_UNIQUE: price = 5000;
-		case CATEGORY_LOWRIDER: price = 5500;
+		case CATEGORY_UNIQUE: price = 4000;
+		case CATEGORY_LOWRIDER: price = 4500;
 		case CATEGORY_AIRPLANE: price = 15000;
-		case CATEGORY_INDUSTRIAL: price = 5050;
+		case CATEGORY_INDUSTRIAL: price = 4000;
 		case CATEGORY_HELICOPTER: price = 15000;
-		case CATEGORY_CONVERTIBLE: price = 5000;
-		case CATEGORY_STATIONWAGON: price = 5000;
+		case CATEGORY_CONVERTIBLE: price = 4000;
+		case CATEGORY_STATIONWAGON: price = 3500;
 		default: price = 4500;
 	}
 	return price;

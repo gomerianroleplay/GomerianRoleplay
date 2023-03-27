@@ -88,8 +88,8 @@
                 "StaticLocations"
             ],
             "rcon_password": "gass",
-            "port": 7787,
-            "hostname": "Gomerian Roleplay | Development",
+            "port": 7777,
+            "hostname": "Gomerian Roleplay | Pre-Released",
             "maxplayers": 100,
             "language": "English",
             "mapname": "San Andreas",

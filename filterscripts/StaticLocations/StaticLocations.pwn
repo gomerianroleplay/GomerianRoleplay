@@ -189,7 +189,7 @@ public OnFilterScriptInit()
   "WHITE"Type "YELLOW"/claiminsurance"WHITE" to release vehicle\
   ", 1111.6217, -1795.6040, 16.5938, 1239);
     // Take pill
-    AddStaticLocation(LOCATION_TAKEPILLS, "[Medical Treatment]\n\
+    AddStaticLocation(LOCATION_TAKEPILLS, "[Medical Pharmacy]\n\
   "WHITE"Type "YELLOW"/takepills"WHITE" to get the pills\
   ", 1833.0256, -1077.9353, 41.6537, 1239, .interiorid = 110, .worldid = 100_000);
     // Treatment

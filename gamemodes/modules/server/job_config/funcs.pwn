@@ -1215,15 +1215,15 @@ void:JobConfig_InitEnum(E_SERVER_JOB:job = JOB_UNKNOWN, bool:reset_orm = true)
   {
     JobConfig[BUS_DRIVER_SQL_ID] = 0;
     JobConfig[BUS_DRIVER_ENABLED] = 1;
-    JobConfig[BUS_DRIVER_BASE_SALARY] = 500;
+    JobConfig[BUS_DRIVER_BASE_SALARY] = 1000;
     JobConfig[BUS_DRIVER_BONUS_CHANCE] = 100.00;
     JobConfig[BUS_DRIVER_BONUS_MINIMUM] = 100;
-    JobConfig[BUS_DRIVER_BONUS_MAXIMUM] = 200;
+    JobConfig[BUS_DRIVER_BONUS_MAXIMUM] = 500;
     JobConfig[BUS_DRIVER_EXIT_DELAY] = 300;
     JobConfig[BUS_DRIVER_FAIL_DELAY] = 600;
     JobConfig[BUS_DRIVER_SUCCESS_DELAY] = 1_200;
     JobConfig[BUS_DRIVER_MINIMUM_HEALTH] = 600.0;
-    JobConfig[BUS_DRIVER_MAX_SPEED] = 80.0;
+    JobConfig[BUS_DRIVER_MAX_SPEED] = 90.0;
     JobConfig[BUS_DRIVER_CREATED_AT] = 0;
     JobConfig[BUS_DRIVER_UPDATED_AT] = 0;
   }
