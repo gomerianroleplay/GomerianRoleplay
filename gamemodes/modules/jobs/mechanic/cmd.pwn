@@ -178,11 +178,14 @@ CMD:mechanicmenu(playerid, params[])
 			Mechanic_SetRequiredComponent(playerid, MECH_SERVICE_REPAIR_TIRE, componentUsed[level][repair_tire]);
 			Mechanic_SetRequiredComponent(playerid, MECH_SERVICE_INTERIM_MT, interim_mt_component);
 
-			// Memunculkan menu repair engine dan tire.
+			// Memunculkan menu mechanic center repair engine, repair body, change color, upgrade dan tire.
 			mechanic_menu =
 				(Mechanic_GetRequiredComponent(playerid, MECH_SERVICE_REPAIR_ENGINE) > 0 ? MECH_MENU_REPAIR_ENGINE : 0) |
+				(is_four_wheel_vehicle && Mechanic_GetRequiredComponent(playerid, MECH_SERVICE_REPAIR_BODY) > 0 ? MECH_SERVICE_REPAIR_BODY : 0) |
+				(is_vehicle_has_tire && Mechanic_GetRequiredComponent(playerid, MECH_SERVICE_CHANGE_COLOR) > 0 ? MECH_MENU_CHANGE_COLOR : 0) |
 				(!IsABicycle(vehicleid) && is_vehicle_has_tire && Mechanic_GetRequiredComponent(playerid, MECH_SERVICE_REPAIR_TIRE) ? MECH_MENU_REPAIR_TIRE : 0) |
-				(IsABike(vehicleid) && Mechanic_GetRequiredComponent(playerid, MECH_SERVICE_INTERIM_MT) > 0 ? MECH_MENU_INTERIM_MT : 0)
+				(is_vehicle_has_tire && Mechanic_GetRequiredComponent(playerid, MECH_SERVICE_UPGRADE) > 0 ? MECH_MENU_UPGRADE : 0) |
+				(IsABike(vehicleid) && Mechanic_GetRequiredComponent(playerid, MECH_SERVICE_INTERIM_MT) > 0 ? MECH_MENU_INTERIM_MT : 0) 
 			;
 		}
 	}

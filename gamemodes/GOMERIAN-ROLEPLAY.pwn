@@ -16474,11 +16474,11 @@ public OnPlayerText(playerid, text[])
             SetPlayerChatBubble(playerid, sprintf("(Phone): %s", text), X11_WHITE, 10.0, 5000);
         }
 
-        if(!IsPlayerInAnyVehicle(playerid) && !PlayerData[playerid][pInjured] && !PlayerData[playerid][pLoopAnim] && !IsPlayerOnPhone(playerid) && !PlayerData[playerid][pDisableAnim] && !AccountData[playerid][pAdminDuty] && GetPlayerSpecialAction(playerid) != SPECIAL_ACTION_USEJETPACK && !GetPlayerDrugeEffect(playerid))
-        {
-            ApplyAnimation(playerid, "GANGS", "prtial_gngtlkA", 4.1, 0, 1, 1, 1, strlen(text) * 100, 1);
-            SetTimerEx("StopChatting", strlen(text) * 100, false, "d", playerid);
-        }
+        // if(!IsPlayerInAnyVehicle(playerid) && !PlayerData[playerid][pInjured] && !PlayerData[playerid][pLoopAnim] && !IsPlayerOnPhone(playerid) && !PlayerData[playerid][pDisableAnim] && !AccountData[playerid][pAdminDuty] && GetPlayerSpecialAction(playerid) != SPECIAL_ACTION_USEJETPACK && !GetPlayerDrugeEffect(playerid))
+        // {
+        //     ApplyAniApplyAnimationmation(playerid, "GANGS", "prtial_gngtlkA", 4.1, 0, 1, 1, 1, strlen(text) * 100, 1);
+        //     SetTimerEx("StopChatting", strlen(text) * 100, false, "d", playerid);
+        // }
 
         if(PlayerData[playerid][pFactionCall])
         {
@@ -17594,6 +17594,7 @@ DCMD:verify(user, channel, params[])
 		DCC_SendChannelMessage(Whitelist, str);
 		return 1;
 	}
+    
 	new zQuery[256];
 	mysql_format(g_iHandle, zQuery, sizeof(zQuery), "SELECT * FROM `accounts` WHERE `DiscordID` = '%e' LIMIT 1", userId);
 	new Cache:ex = mysql_query(g_iHandle, zQuery, true);
@@ -17649,6 +17650,7 @@ public SendActivationCode(message[], userId[], owner[])
 		mysql_tquery(g_iHandle,zquery);
 
         DCC_SetGuildMemberNickname(DCC_FindGuildById("1083377645665927188"), target, message);
+        DCC_AddGuildMemberRole(DCC_FindGuildById("1083377645665927188"), target, DCC_FindRoleById("1083762502418042901"));
         
 		printf("[LOGS] Created account for Discord '%s' with Username '%s' and Code '%s'", owner, message, verif);
 	}
@@ -35162,7 +35164,7 @@ Dialog:SidejobGuide(playerid, response, listitem, inputtext[])
                 * Jika setuju dengan aturan, kendarai mobil ke arah yang di tandai di radar map anda.\n\
                 * Ikuti radar untuk mengikuti rute kamu.\n\n\
                 "COL_LIGHTGREEN"Perintah:"WHITE"\n\
-                * Gunakan /limitspeed 75 supaya tidak gagal dalam bekerja.\n\n\
+                * Gunakan /limitspeed 90 supaya tidak gagal dalam bekerja.\n\n\
                 "COL_LIGHTGREEN"Penting:"WHITE"\n\
                 * Saat berada dalam mobil, jangan coba untuk turun sebelum anda menghentikan pekerjaan-\n  \
                   itu akan membuat anda gagal dan tidak mendapatkan bonus.\n\
