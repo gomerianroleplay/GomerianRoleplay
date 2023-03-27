@@ -5,6 +5,9 @@
 	Idea by: Jogjagamers
 */
 
+#include <YSI_Coding\y_hooks>
+
+
 Function:FurnObject_Load(index)
 {
 	new query[32];

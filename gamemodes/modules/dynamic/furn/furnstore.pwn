@@ -4,8 +4,8 @@
 	Made by: Agus Syahputra
 	Idea by: Jogjagamers
 */
-
-Function:FurnStore_Load()
+#include <YSI_Coding\y_hooks>
+public FurnStore_Load()
 {
 	for(new index = 0; index != cache_num_rows(); index++)
 	{
@@ -38,7 +38,7 @@ Function:FurnStore_Load()
 	return 1;
 }
 
-Function:OnFurnstoreCreated(index)
+public OnFurnstoreCreated(index)
 {
 	storeData[index][storeID] = cache_insert_id();
 
@@ -806,7 +806,7 @@ timer productionTimers[1000](playerid)
 	}
 }
 
-Function:editFurnObject(playerid, objectid, response, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, Float:offx, Float:offy, Float:offz)
+public editFurnObject(playerid, objectid, response, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, Float:offx, Float:offy, Float:offz)
 {
 	if(response == EDIT_RESPONSE_CANCEL)
     {
@@ -840,7 +840,7 @@ Function:editFurnObject(playerid, objectid, response, Float:x, Float:y, Float:z,
 	return 1;
 }
 
-Function:editLokasiFurn(playerid, objectid, response, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, Float:offx, Float:offy, Float:offz)
+public editLokasiFurn(playerid, objectid, response, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, Float:offx, Float:offy, Float:offz)
 {
 	if(response == EDIT_RESPONSE_CANCEL)
     {

@@ -183,6 +183,7 @@ public OnGameModeInit()
 #include "modules/misc/imports.pwn"
 
 // Core Files
+#include "modules/misc/alltextures.pwn"
 #include "modules/dynamic/hunt/core.pwn"
 #include "modules/dynamic/corps/core.pwn"
 #include "modules/dynamic/actor/core.pwn"
@@ -201,6 +202,7 @@ public OnGameModeInit()
 #include "modules/dynamic/cade/core.pwn"
 #include "modules/dynamic/speed/core.pwn"
 #include "modules/dynamic/ccp/core.pwn"
+#include "modules/dynamic/furn/core.pwn"
 
 
 
@@ -323,6 +325,9 @@ public OnGameModeInit()
 #include "modules/dynamic/fire/cmd.pwn"
 
 #include "modules\dynamic\vending.pwn"
+
+#include "modules/dynamic/furn/furnobject.pwn"
+#include "modules/dynamic/furn/furnstore.pwn"
 
 //===Deadbody===
 #include "modules/dynamic/corps/func.pwn"
@@ -15538,7 +15543,7 @@ static LoadServerMapIcon()
     CreateDynamicMapIcon(1481.1840,-1770.0223,18.7958, 2, -1, -1, 0, -1, _, MAPICON_GLOBAL); //City Hall
     CreateDynamicMapIcon(1654.2096,-1660.8616,22.5156, 36, -1, -1, 0, -1, _, MAPICON_GLOBAL); //Newbie School
     CreateDynamicMapIcon(2303.6799,-16.0679,26.4844, 52, -1, -1, 0, -1, _, MAPICON_GLOBAL); //Bank Palomino
-    CreateDynamicMapIcon(2334.9365,-1351.7225,24.0318, 26, -1, -1, 0, -1, _, MAPICON_GLOBAL); //Mechanic Center
+    CreateDynamicMapIcon(2513.0500, -1540.6337, 25.6305, 26, -1, -1, 0, -1, _, MAPICON_GLOBAL); //Mechanic Center
 
     print("Successfull loaded static mapicon.");
     return 1;
@@ -15756,8 +15761,8 @@ OnGameModeInit_Setup()
     mysql_pquery(g_iHandle, "SELECT * FROM `garbage` ORDER BY `garbageID` ASC", "Garbage_Load", "");
     mysql_pquery(g_iHandle, "SELECT * FROM `objecttext`", "ObjectText_Load", "");
     mysql_pquery(g_iHandle, "SELECT * FROM `workshop`", "Workshop_Load", "");
-//    mysql_pquery(g_iHandle, "SELECT * FROM `furnstore` ORDER BY `id` ASC", "FurnStore_Load", "");
-//    mysql_pquery(g_iHandle, "SELECT * FROM `furnobject` ORDER BY `id` ASC", "FurnObject_Load", "");
+    mysql_pquery(g_iHandle, "SELECT * FROM `furnstore` ORDER BY `id` ASC", "FurnStore_Load", "");
+    mysql_pquery(g_iHandle, "SELECT * FROM `furnobject` ORDER BY `id` ASC", "FurnObject_Load", "");
 
     SetModelPreviewRotation(18875, 90.0, 180.0, 0.0);
     SetModelPreviewRotation(2703, -105.0, 0.0, -15.0);
@@ -30970,7 +30975,7 @@ Dialog:OtherLocation(playerid, response, listitem, inputtext[])
             case 1: SetPlayerWaypoint(playerid, inputtext, 1953.6633,-1997.0308,13.5469);
             case 2: SetPlayerWaypoint(playerid, inputtext, 128.7940,-1813.1044,2.2147);
             case 3: SetPlayerWaypoint(playerid, inputtext, 2246.1946,-2016.3121,13.5469);
-            case 4: SetPlayerWaypoint(playerid, inputtext, 2427.5293,-2089.8679,13.5469);
+            case 4: SetPlayerWaypoint(playerid, inputtext, 2513.0500, -1540.6337, 25.6305);
             case 5: SetPlayerWaypoint(playerid, inputtext, 1111.6385,-1795.5822,16.5938);
             case 6: SetPlayerWaypoint(playerid, inputtext, 1081.1970,-1696.7852,13.5469);
             case 7: SetPlayerWaypoint(playerid, inputtext, 588.4249,-1239.4244,17.82159);

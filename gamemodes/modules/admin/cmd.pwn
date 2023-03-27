@@ -303,7 +303,7 @@ CMD:worldtime(playerid, params[])
     {
         new string:toggle[4];
 
-        if (sscanf(args, "s[3]", interval))
+        if (sscanf(args, "s[3]", toggle))
         {
             SendSyntaxMessage(playerid, "/worldtime sync [on/off]");
             SendSyntaxMessage(playerid, "HELP: Set world time sync with server time.");
