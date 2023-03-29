@@ -152,7 +152,7 @@ CMD:craft(playerid, params[])
 		return ShowPlayerFooter(playerid, "~r~ERROR: ~w~Kamu tidak bekerja sebagai arms dealer.");
 
 	if(PlayerData[playerid][pScore] < 4)
-		return SendErrorMessage(playerid, "They must level 2 to use this.");
+		return SendErrorMessage(playerid, "They must level 4 to use this.");
 
 	Dialog_Show(playerid, Crafting, DIALOG_STYLE_LIST, "Crafting", "Bobby Pin\t20 Materials", "Create", "Cancel");		
 	return 1;

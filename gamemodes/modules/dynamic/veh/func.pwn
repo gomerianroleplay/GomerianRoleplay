@@ -489,20 +489,20 @@ Vehicle_InsurancePrice(type)
 
 	switch(type)
 	{
-		case CATEGORY_BIKE: price = 2500;
-		case CATEGORY_BOAT: price = 5000;
-		case CATEGORY_PUBLIC: price = 5500;
-		case CATEGORY_SPORT: price = 5000;
-		case CATEGORY_SALOON: price = 7000;
+		case CATEGORY_BIKE: price = 2000;
+		case CATEGORY_BOAT: price = 7000;
+		case CATEGORY_PUBLIC: price = 1000;
+		case CATEGORY_SPORT: price = 7500;
+		case CATEGORY_SALOON: price = 5000;
 		case CATEGORY_TRAILER: price = 6500;
 		case CATEGORY_OFFROAD: price = 6000;
-		case CATEGORY_UNIQUE: price = 5000;
-		case CATEGORY_LOWRIDER: price = 5500;
+		case CATEGORY_UNIQUE: price = 4000;
+		case CATEGORY_LOWRIDER: price = 4500;
 		case CATEGORY_AIRPLANE: price = 15000;
-		case CATEGORY_INDUSTRIAL: price = 5050;
+		case CATEGORY_INDUSTRIAL: price = 4000;
 		case CATEGORY_HELICOPTER: price = 15000;
-		case CATEGORY_CONVERTIBLE: price = 5000;
-		case CATEGORY_STATIONWAGON: price = 5000;
+		case CATEGORY_CONVERTIBLE: price = 4000;
+		case CATEGORY_STATIONWAGON: price = 3500;
 		default: price = 4500;
 	}
 	return price;
@@ -737,12 +737,13 @@ Vehicle_Save(vehicleid, save_mode = VEHICLE_SAVE_ALL)
 					VehicleData[vehicleid][vehTogNeon]
 				);
 
-				mysql_format(g_iHandle, query, sizeof(query), "%s, `vehwoods` = '%d', `vehcomponent` = '%d', `parking` = '%d', `house_parking` = '%d', `doorstatus` = '%d', `enginestatus` = '%d'",
+				mysql_format(g_iHandle, query, sizeof(query), "%s, `vehwoods` = '%d', `vehcomponent` = '%d', `parking` = '%d', `house_parking` = '%d', `garage` = '%d', `doorstatus` = '%d', `enginestatus` = '%d'",
 					query,
 					VehicleData[vehicleid][vehComponent],
 					VehicleData[vehicleid][vehWoods],
 					VehicleData[vehicleid][vehParking],
 					VehicleData[vehicleid][vehHouseParking],
+					VehicleData[vehicleid][vehGarage],
 					VehicleData[vehicleid][vehDoorStatus],
 					VehicleData[vehicleid][vehEngineStatus]
 				);
@@ -1176,7 +1177,7 @@ Vehicle_PlayerTotalCount(playerid)
 {
 	new Cache:execute, total = 0;
 
-	execute = mysql_query(g_iHandle, sprintf("SELECT `id` FROM `server_vehicles` WHERE `extraid`='%d' AND `type`='%d';", GetPlayerSQLID(playerid), VEHICLE_TYPE_PLAYER));
+	execute = mysql_query(g_iHandle, sprintf("SELECT `id` FROM `server_vehicles` WHERE `extraid`='%d' AND `type`='%d' AND `parking`= 0 AND `house_parking` = -1 AND `garage` = 0;", GetPlayerSQLID(playerid), VEHICLE_TYPE_PLAYER));
 
 	if(cache_num_rows())
 		total = cache_num_rows();
@@ -1623,14 +1624,14 @@ Vehicle_RentInfo(playerid)
 
 	new output[256];
 
-	strcat(output, "Model\tDurasi\n");
+	strcat(output, "ID\tModel\tDurasi\n");
 
 	foreach(new i : RentedVehicles<playerid>)
 	{
 		new times[3];
 		GetElapsedTime(Vehicle_GetRentTime(i), times[0], times[1], times[2]);
 
-		strcat(output, sprintf(""LIGHTBLUE"%s\t"YELLOW"%d jam %d menit %d detik\n", GetVehicleNameByModel(VehicleData[i][vehModel]), times[0], times[1], times[2]));
+		strcat(output, sprintf(""LIGHTBLUE"%d\t"LIGHTBLUE"%s\t"YELLOW"%d jam %d menit %d detik\n", VehicleData[i][vehVehicleID], GetVehicleNameByModel(VehicleData[i][vehModel]), times[0], times[1], times[2]));
 	}
 	Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_TABLIST_HEADERS, "Vehicle Rental(s)", output, "Close", "");
 	return 1;

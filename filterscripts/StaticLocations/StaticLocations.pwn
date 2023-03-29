@@ -95,7 +95,7 @@ static AddStaticLocation(E_STATIC_LOCATION_TYPE:type, const text[], Float:x, Flo
 
     gStaticLocations[gLastStaticLocationID][LOCATION_TYPE] = type;
     gStaticLocations[gLastStaticLocationID][AREA_ID] = CreateDynamicSphere(x, y, z, 3.0, worldid, interiorid);
-    gStaticLocations[gLastStaticLocationID][PICKUP_ID] = CreateDynamicPickup(pickup_model_id, 1, x, y, z, worldid, interiorid);
+    gStaticLocations[gLastStaticLocationID][PICKUP_ID] = CreateDynamicPickup(pickup_model_id, 23, x, y, z, worldid, interiorid);
     gStaticLocations[gLastStaticLocationID][TEXT3D_ID] = CreateDynamic3DTextLabel(text, 0xFFFFFFFF, x, y, z, 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, worldid, interiorid);
     Streamer_SetIntData(STREAMER_TYPE_AREA, gStaticLocations[gLastStaticLocationID][AREA_ID], E_STREAMER_EXTRA_ID, AREA_EXTRAID_OFFSET + gLastStaticLocationID);
 
@@ -182,14 +182,14 @@ public OnFilterScriptInit()
     // Advertisement
     AddStaticLocation(LOCATION_ADVERTISEMENT, "[Advertisement]\n\
   "WHITE"Type "YELLOW"/ad"WHITE" to make advertisement\
-  ", 1128.3390, -1465.8599, 15.7595, 1239);
+  ", 667.5563, -1396.4820, 801.3587, 1239, -1, 7174, 7);
     // Insurance
     AddStaticLocation(LOCATION_INSURANCE, "[Insurance Center]\n\
   "WHITE"Type "YELLOW"/buyinsurance"WHITE" to buy insurance\n\
   "WHITE"Type "YELLOW"/claiminsurance"WHITE" to release vehicle\
   ", 1111.6217, -1795.6040, 16.5938, 1239);
     // Take pill
-    AddStaticLocation(LOCATION_TAKEPILLS, "[Medical Treatment]\n\
+    AddStaticLocation(LOCATION_TAKEPILLS, "[Medical Pharmacy]\n\
   "WHITE"Type "YELLOW"/takepills"WHITE" to get the pills\
   ", 1833.0256, -1077.9353, 41.6537, 1239, .interiorid = 110, .worldid = 100_000);
     // Treatment

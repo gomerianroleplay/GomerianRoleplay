@@ -10,7 +10,7 @@ CMD:admins(playerid, params[])
 
         strcat(output, "ID\tName (Admin Name)\tDuty\tOnline Time (minutes)\n");
 
-        foreach (new i : Player) if (IsPlayerConnected(i) && AccountData[i][pAdmin])
+        foreach (new i : Player) if (IsPlayerConnected(i) && AccountData[i][pAdmin] && !AccountData[i][pAdminHide])
             {
                 strcat(output, sprintf("%d\t%s (%s)\t%s\t%d\n", i, NormalName(i), ReturnAdminName(i), (AccountData[i][pAdminDuty]) ? ("Yes") : ("No"), ((gettime() - AccountData[i][pLoginDate]) / 60)));
                 count++;
@@ -31,6 +31,52 @@ CMD:admins(playerid, params[])
         }
 
         if (!count) SendClientMessage(playerid, X11_WHITE, "* No admin/helper online.");
+    }
+    return 1;
+}
+
+CMD:hidename(playerid, params[])
+{
+    //new count = 0;
+    new hide;
+    if (sscanf(params, "i", hide)) return SendSyntaxMessage(playerid, "0/1");
+
+    if (GetAdminLevel(playerid)<8)
+    {
+        if(hide == 1)
+        {
+            if(IsValidDynamic3DTextLabel(PlayerData[playerid][pNameTag])){
+                DestroyDynamic3DTextLabel(PlayerData[playerid][pNameTag]);
+            }
+        }else{
+            ResetNameTag(playerid, true);
+        }
+            
+        // new output[1500];
+
+        // strcat(output, "ID\tName (Admin Name)\tDuty\tOnline Time (minutes)\n");
+
+        // foreach (new i : Player) if (IsPlayerConnected(i) && AccountData[i][pAdmin] && !AccountData[i][pAdminHide])
+        //     {
+        //         strcat(output, sprintf("%d\t%s (%s)\t%s\t%d\n", i, NormalName(i), ReturnAdminName(i), (AccountData[i][pAdminDuty]) ? ("Yes") : ("No"), ((gettime() - AccountData[i][pLoginDate]) / 60)));
+        //         count++;
+        //     }
+
+        // if (!count) SendClientMessage(playerid, X11_WHITE, "* No admin/helper online.");
+        // else Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_TABLIST_HEADERS, "Admin/Helper list", output, "Close", "");
+    }
+    else
+    {
+        //SendClientMessage(playerid, X11_GREY_60, "Admin/Helper list:");
+
+        // foreach (new i : Player) if (IsPlayerConnected(i) && AccountData[i][pAdmin] && AccountData[i][pAdminDuty] && AccountData[i][pAdminHide] != 1)
+        // {
+        //     if (!strcmp(AccountData[i][pAdminRankName], "None")) SendClientMessageEx(playerid, X11_WHITE, "* (%s) %s (ID: %d), AOD: %s%s", gAdminLevel[AccountData[i][pAdmin]], ReturnAdminName(i), i, (AccountData[i][pAdminDuty]) ? (GREEN) : (RED), (AccountData[i][pAdminDuty]) ? ("Yes") : ("No"));
+        //     else SendClientMessageEx(playerid, X11_WHITE, "* (%s) %s (ID: %d), AOD: %s%s", ReturnAdminRankName(i), ReturnAdminName(i), i, (AccountData[i][pAdminDuty]) ? (GREEN) : (RED), (AccountData[i][pAdminDuty]) ? ("Yes") : ("No"));
+        //     count++;
+        // }
+
+        // if (!count) SendClientMessage(playerid, X11_WHITE, "* No admin/helper online.");
     }
     return 1;
 }
@@ -303,7 +349,7 @@ CMD:worldtime(playerid, params[])
     {
         new string:toggle[4];
 
-        if (sscanf(args, "s[3]", interval))
+        if (sscanf(args, "s[3]", toggle))
         {
             SendSyntaxMessage(playerid, "/worldtime sync [on/off]");
             SendSyntaxMessage(playerid, "HELP: Set world time sync with server time.");
@@ -1583,6 +1629,25 @@ CMD:maxenergy(playerid, params[])
     SetPlayerHunger(playerid, 100);
     SetPlayerEnergy(playerid, 100);
     SendServerMessage(playerid, "Kamu telah melakukan refill untuk "GREEN"body status mu.");
+    return 1;
+}
+
+CMD:resetbat(playerid, params[])
+{
+    if (CheckAdmin(playerid, 8))
+        return PermissionError(playerid);
+
+    PlayerData[playerid][pPhoneBattery] = 0;
+
+    PlayerTextDrawSetString(playerid, BatteryIndicatorMaximize[playerid], sprintf("%.2f%", PlayerData[playerid][pPhoneBattery]));
+    PlayerTextDrawSetString(playerid, BatteryIndicatorMinimize[playerid], sprintf("%.2f%", PlayerData[playerid][pPhoneBattery]));
+
+    /*SetPlayerProgressBarValue(playerid, BarBawah[playerid], PlayerData[playerid][pPhoneBattery]);
+    SetPlayerProgressBarColour(playerid, BarBawah[playerid], ConvertHBEColor(floatround(PlayerData[playerid][pPhoneBattery]), true));
+
+    SetPlayerProgressBarValue(playerid, BarAtas[playerid], PlayerData[playerid][pPhoneBattery]);
+    SetPlayerProgressBarColour(playerid, BarAtas[playerid], ConvertHBEColor(floatround(PlayerData[playerid][pPhoneBattery]), true));*/
+    SendServerMessage(playerid, "Kamu telah melakukan reset battery");
     return 1;
 }
 

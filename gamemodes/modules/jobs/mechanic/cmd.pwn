@@ -178,11 +178,14 @@ CMD:mechanicmenu(playerid, params[])
 			Mechanic_SetRequiredComponent(playerid, MECH_SERVICE_REPAIR_TIRE, componentUsed[level][repair_tire]);
 			Mechanic_SetRequiredComponent(playerid, MECH_SERVICE_INTERIM_MT, interim_mt_component);
 
-			// Memunculkan menu repair engine dan tire.
+			// Memunculkan menu mechanic center repair engine, repair body, repai dan tire.
 			mechanic_menu =
 				(Mechanic_GetRequiredComponent(playerid, MECH_SERVICE_REPAIR_ENGINE) > 0 ? MECH_MENU_REPAIR_ENGINE : 0) |
+				(is_four_wheel_vehicle && Mechanic_GetRequiredComponent(playerid, MECH_SERVICE_REPAIR_BODY) > 0 ? MECH_MENU_REPAIR_BODY : 0) |
+				(is_vehicle_has_tire && Mechanic_GetRequiredComponent(playerid, MECH_SERVICE_CHANGE_COLOR) > 0 ? MECH_MENU_CHANGE_COLOR : 0) |
 				(!IsABicycle(vehicleid) && is_vehicle_has_tire && Mechanic_GetRequiredComponent(playerid, MECH_SERVICE_REPAIR_TIRE) ? MECH_MENU_REPAIR_TIRE : 0) |
-				(IsABike(vehicleid) && Mechanic_GetRequiredComponent(playerid, MECH_SERVICE_INTERIM_MT) > 0 ? MECH_MENU_INTERIM_MT : 0)
+				(is_vehicle_has_tire && Mechanic_GetRequiredComponent(playerid, MECH_SERVICE_UPGRADE) > 0 ? MECH_MENU_UPGRADE : 0) |
+				(IsABike(vehicleid) && Mechanic_GetRequiredComponent(playerid, MECH_SERVICE_INTERIM_MT) > 0 ? MECH_MENU_INTERIM_MT : 0) 
 			;
 		}
 	}
@@ -264,6 +267,10 @@ CMD:mechanicmenu(playerid, params[])
 		// Menetapkan jumlah komponen untuk memperbaiki ban.
 		Mechanic_SetRequiredComponent(playerid, MECH_SERVICE_REPAIR_TIRE, componentUsed[level][repair_tire]);
 		Mechanic_SetRequiredComponent(playerid, MECH_SERVICE_INTERIM_MT, 0);
+		Mechanic_SetRequiredComponent(playerid, MECH_SERVICE_REPAIR_BODY, componentUsed[level][repair_body]);
+		Mechanic_SetRequiredComponent(playerid, MECH_SERVICE_CHANGE_COLOR, componentUsed[level][repair_color]);
+		Mechanic_SetRequiredComponent(playerid, MECH_SERVICE_UPGRADE, componentUsed[level][upgrade]);
+		
 
 		// SendClientMessageEx(playerid, -1, "vehicleid=%d | IsABike=%d", vehicleid, IsABike(vehicleid));
 		// SendClientMessageEx(playerid, -1, "interim_mt_component=%d | interim_mt_work_time=%d | full_mt_component=%d | full_mt_work_time=%d", interim_mt_component, interim_mt_work_time, full_mt_component, full_mt_work_time);
@@ -272,6 +279,9 @@ CMD:mechanicmenu(playerid, params[])
 		mechanic_menu =
 			(Mechanic_GetRequiredComponent(playerid, MECH_SERVICE_HALF_REPAIR_ENGINE) > 0 ? MECH_MENU_HALF_REPAIR_ENGINE : 0) |
 			(is_vehicle_has_tire && Mechanic_GetRequiredComponent(playerid, MECH_SERVICE_REPAIR_TIRE) ? MECH_MENU_REPAIR_TIRE : 0) |
+			(is_four_wheel_vehicle && Mechanic_GetRequiredComponent(playerid, MECH_SERVICE_REPAIR_BODY) > 0 ? MECH_MENU_REPAIR_BODY : 0) |
+			(is_vehicle_has_tire && Mechanic_GetRequiredComponent(playerid, MECH_SERVICE_CHANGE_COLOR) > 0 ? MECH_MENU_CHANGE_COLOR : 0) |
+			(is_vehicle_has_tire && Mechanic_GetRequiredComponent(playerid, MECH_SERVICE_UPGRADE) > 0 ? MECH_MENU_UPGRADE : 0) |
 			(IsABike(vehicleid) && Mechanic_GetRequiredComponent(playerid, MECH_SERVICE_INTERIM_MT) > 0 ? MECH_MENU_INTERIM_MT : 0)
 		;
 	}

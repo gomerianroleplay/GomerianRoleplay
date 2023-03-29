@@ -22,7 +22,7 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 			SetPlayerVirtualWorld(playerid, (index + 2));
     		SetVehicleVirtualWorld(GetPlayerVehicleID(playerid), (index + 2));
-
+			//SendPlayerPos(playerid, -1745.0087, 982.0278, 17.5662, 0, 0, index + 2);
     		foreach(new i : Player) if(IsPlayerInVehicle(i, GetPlayerVehicleID(playerid)) && GetPlayerState(i) != PLAYER_STATE_DRIVER)
     		{
 		        SetPlayerVirtualWorld(i, (index + 2));
@@ -31,7 +31,7 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		}
 		else
 		{
-			//index = (GetPlayerVirtualWorld(playerid) - 2);
+			// index = (GetPlayerVirtualWorld(playerid) - 2);
 			index = Underground_Nearest(playerid);
 			if(IsPlayerInDynamicCP(playerid, UndergroundData[index][exitCP]) && IsPlayerInRangeOfPoint(playerid, 3.0, -1745.4021,987.9285,17.6099))
 			{
@@ -42,7 +42,7 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 				SetPlayerVirtualWorld(playerid, 0);
 	    		SetVehicleVirtualWorld(GetPlayerVehicleID(playerid), 0);
-
+				//SendPlayerPos(playerid, UndergroundData[index][underExitSpawn][0], UndergroundData[index][underExitSpawn][1], UndergroundData[index][underExitSpawn][2], 0, 0, 0);
 	    		foreach(new i : Player) if(IsPlayerInVehicle(i, GetPlayerVehicleID(playerid)) && GetPlayerState(i) != PLAYER_STATE_DRIVER)
 	    		{
 			        SetPlayerVirtualWorld(i, 0);

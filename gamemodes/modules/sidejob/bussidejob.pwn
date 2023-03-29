@@ -8,7 +8,7 @@
 #include <YSI_Coding\y_hooks>
 
 #define BUS_SALARY			400
-#define MAX_BUS_SPEED		80
+#define MAX_BUS_SPEED		93
 
 #define IsPlayerWorkInBus(%0)		busWorking[%0]
 #define SetPlayerWorkInBus(%0)		busWorking[%0]=true
@@ -601,7 +601,7 @@ ptask Player_BusUpdate[1000](playerid)
 		{
 			if(++PlayerData[playerid][pTestWarns] <= 3)
 			{
-				ShowPlayerFooter(playerid, sprintf("Hati-hati, batas kecapatan maksimal ~r~80 kmh ~w~(kesempatan ~y~%d/3~w~)", PlayerData[playerid][pTestWarns]), 3000, 1);
+				ShowPlayerFooter(playerid, sprintf("Hati-hati, batas kecapatan maksimal ~r~90 kmh ~w~(kesempatan ~y~%d/3~w~)", PlayerData[playerid][pTestWarns]), 3000, 1);
 				SetVehicleSpeed(GetPlayerVehicleID(playerid), 20);
 			}
 			else CancelBusProgress(playerid);

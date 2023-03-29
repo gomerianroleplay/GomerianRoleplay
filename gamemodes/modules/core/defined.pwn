@@ -6,8 +6,8 @@ Script Defined List
 
 #define SERVER_NAME                     "Roleplay"
 #define SERVER_URL                      "ComingSoon"
-#define SERVER_DISCORD					"https://discord.gg/Fp5UEdBNC6"
-#define SERVER_REVISION                 "Gomerian Roleplay"
+#define SERVER_DISCORD					"bit.ly/GC-RP"
+#define SERVER_REVISION                 "GC:RP V1.02"
 
 //==============================   SERVER MACROS 	=============================
 
@@ -35,7 +35,7 @@ Script Defined List
 
 #define MAX_ACC                         (4)
 #define MAX_CHARACTERS                  (4)
-#define MAX_WORKSHOP										(15)
+#define MAX_WORKSHOP					(15)
 #define MAX_DYNAMIC_JOBS                (25)
 #define MAX_IMPOUND_LOTS                (20)
 #define MAX_FACTIONS                    (15)

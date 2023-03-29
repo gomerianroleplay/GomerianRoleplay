@@ -87,7 +87,8 @@ new PlayerText:Credits[MAX_PLAYERS];
 new PlayerText:CarGPS[MAX_PLAYERS];
 new PlayerText:PhoneOff[MAX_PLAYERS];
 new PlayerText:ShareLocation[MAX_PLAYERS];
-new PlayerBar:BarAtas[MAX_PLAYERS];
+new PlayerText:BatteryIndicatorMaximize[MAX_PLAYERS];
+//new PlayerBar:BarAtas[MAX_PLAYERS];
 
 new PlayerText:PhoneTimeMinimize[MAX_PLAYERS];
 new PlayerText:PhoneTimeMaximize[MAX_PLAYERS];
@@ -99,7 +100,8 @@ new PlayerText:MinimizePhoneNumb[MAX_PLAYERS];
 new PlayerText:MinimizeWallpaper[MAX_PLAYERS];
 new PlayerText:PhoneOnButton[MAX_PLAYERS];
 new PlayerText:PhoneOnText[MAX_PLAYERS];
-new PlayerBar:BarBawah[MAX_PLAYERS];
+new PlayerText:BatteryIndicatorMinimize[MAX_PLAYERS];
+//new PlayerBar:BarBawah[MAX_PLAYERS];
 
 //Incoming Call
 // new PlayerText:IncomingNumber[MAX_PLAYERS];

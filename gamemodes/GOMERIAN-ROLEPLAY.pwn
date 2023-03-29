@@ -47,12 +47,10 @@ Server Update list URP v2.9a Blackjack!
 #pragma compat 1
 #pragma compress 0
 #pragma dynamic 1_048_576
-
+#define CGEN_MEMORY 40000
 #include <a_samp>                   //Credits to SA-MP
-#define CGEN_MEMORY 190000
 //Uncomment this if you want to use high-level debug mode
-#define DEBUG_MODE 
-
+//#define DEBUG_MODE
 
 /*==============================================================================
     Librarys
@@ -185,6 +183,7 @@ public OnGameModeInit()
 #include "modules/misc/imports.pwn"
 
 // Core Files
+#include "modules/misc/alltextures.pwn"
 #include "modules/dynamic/hunt/core.pwn"
 #include "modules/dynamic/corps/core.pwn"
 #include "modules/dynamic/actor/core.pwn"
@@ -203,6 +202,9 @@ public OnGameModeInit()
 #include "modules/dynamic/cade/core.pwn"
 #include "modules/dynamic/speed/core.pwn"
 #include "modules/dynamic/ccp/core.pwn"
+#include "modules/dynamic/furn/core.pwn"
+#include "modules/dynamic/garage/core.pwn"
+
 
 
 // Business Function
@@ -264,6 +266,11 @@ public OnGameModeInit()
 #include "modules/dynamic/hunt/cmd.pwn"
 #include "modules/dynamic/hunt/action.pwn"
 
+// IntheBleakMidWinter Properties
+#include "modules/IntheBleakMidWinter/AnnaHouse.pwn"
+
+
+
 #include "modules/dynamic/veh/vkeys.pwn"
 // #include "modules/dynamic/veh/chopshop.pwn"
 #include "modules/dynamic/veh/speedradar.pwn"
@@ -279,6 +286,10 @@ public OnGameModeInit()
 #include "modules\jobs\mechanic.pwn"
 #include "modules\jobs\farmer.pwn"
 #include "modules\jobs\jobskill.pwn"
+//#include "modules\jobs\lumber.pwn"
+
+#include "modules/dynamic/garage/cmd.pwn"
+#include "modules/dynamic/garage/action.pwn"
 
 #include "modules/dynamic/gate/cmd.pwn"
 #include "modules/dynamic/gate/action.pwn"
@@ -323,6 +334,9 @@ public OnGameModeInit()
 #include "modules/dynamic/fire/cmd.pwn"
 
 #include "modules\dynamic\vending.pwn"
+
+#include "modules/dynamic/furn/furnobject.pwn"
+#include "modules/dynamic/furn/furnstore.pwn"
 
 //===Deadbody===
 #include "modules/dynamic/corps/func.pwn"
@@ -433,6 +447,7 @@ public OnGameModeInit()
 #include "modules/core/server_entity.pwn"
 // Dynamic
 #include "modules\dynamic\apartment.pwn"
+// #include "modules\dynamic\garage.pwn"
 
 // Faction Goverment Feature
 // #include "modules\player\faction\gov.pwn"
@@ -1199,8 +1214,8 @@ timer getFish[30000](playerid)
     BaitEaten[playerid] = true;
     MancingTimer[playerid] = defer MancingGagal(playerid);
     Fishing(playerid);
-    SendServerMessage(playerid, "Umpan di tarik tahan tombol "YELLOW"SPRINT "WHITE"untuk menarik ikan dan lepas ketika hijau.");
-    ShowPlayerFooter(playerid, "Umpan di tarik tahan tombol ~y~SPRINT ~w~untuk menarik ikan dan lepas ketika hijau.");
+    SendServerMessage(playerid, "Umpan di tarik TEKAN dan TAHAN tombol "YELLOW"SPRINT (SPACE)"WHITE"untuk menarik ikan dan lepas ketika hijau.");
+    ShowPlayerFooter(playerid, "Umpan di tarik TEKAN dan TAHAN tombol ~y~SPRINT (SPACE) ~w~untuk menarik ikan dan lepas ketika hijau.");
     return 1;
 }
 
@@ -2111,7 +2126,7 @@ stock Float:cache_get_field_float(row, const field_name[])
 
 cache_get_field_int(row, const field_name[])
 {
-    new val;
+    new val=0;
     cache_get_value_name_int(row, field_name, val);
     return val;
 }
@@ -2274,8 +2289,8 @@ SetPlayerInPrison(playerid)
     SetPlayerPosEx(playerid, prisonArrays[idx][0], prisonArrays[idx][1], prisonArrays[idx][2] + 0.3);
     SetPlayerFacingAngle(playerid, prisonArrays[idx][3]);
 
-    // SetPlayerInterior(playerid, LSPD_JAIL);
-    // SetPlayerVirtualWorld(playerid, PRISON_WORLD);
+    SetPlayerInterior(playerid, LSPD_JAIL);
+    SetPlayerVirtualWorld(playerid, PRISON_WORLD);
 
     ClearAnimations(playerid);
     TextDrawHideForPlayer(playerid, gServerTextdraws[0]);
@@ -2911,8 +2926,8 @@ DestroyPhoneDraw(playerid)
     PlayerTextDrawDestroy(playerid, PhoneTimeMinimize[playerid]);
 	PlayerTextDrawDestroy(playerid, PhoneTimeMaximize[playerid]);
 
-    DestroyPlayerProgressBar(playerid, BarAtas[playerid]);
-    DestroyPlayerProgressBar(playerid, BarBawah[playerid]);
+    //DestroyPlayerProgressBar(playerid, BarAtas[playerid]);
+    //DestroyPlayerProgressBar(playerid, BarBawah[playerid]);
 	// PlayerTextDrawDestroy(playerid, IncomingNumber[playerid]);
 	// PlayerTextDrawDestroy(playerid, IncomingCall[playerid]);
     return 1;
@@ -5952,7 +5967,7 @@ AddStorage(playerid, amount, index)
                 money = 1300+bonus;
             }
             
-            AddPlayerSalary(playerid, money, "Revelt Wood Export Factory");
+            AddPlayerSalary(playerid, money, "San Andreas Wood Export Factory");
 
             VehicleData[index][vehWoods] -= (to_be_added > JOB_STOCK_LIMIT) ? sisa : amount;
 
@@ -6003,7 +6018,7 @@ AddStorageComponent(playerid, amount, index)
                 money = 1300+bonus;
             }
             
-            AddPlayerSalary(playerid, money, "Revelt Vehicle Component Import Factory");
+            AddPlayerSalary(playerid, money, "San Andreas Vehicle Component Import Factory");
 
             VehicleData[index][vehComponent] -= (to_be_added > JOB_STOCK_LIMIT) ? sisa : amount;
 
@@ -6844,7 +6859,7 @@ Business_Inside(playerid)
 {
     if(PlayerData[playerid][pBusiness] != -1)
     {
-        for (new i = 0; i != MAX_BUSINESSES; i ++) if(BusinessData[i][bizExists] && BusinessData[i][bizID] == PlayerData[playerid][pBusiness] && GetPlayerInterior(playerid) == BusinessData[i][bizInterior] && GetPlayerVirtualWorld(playerid) > 0) {
+        for (new i = 0; i != MAX_BUSINESSES; i ++) if(BusinessData[i][bizExists] && BusinessData[i][bizID] == PlayerData[playerid][pBusiness] && GetPlayerInterior(playerid) == BusinessData[i][bizInterior] && GetPlayerVirtualWorld(playerid) >= 0) {
             return i;
         }
     }
@@ -7379,7 +7394,7 @@ ShowStatsForPlayer(playerid, targetid)
 
         format(string, sizeof string, "%sHealth: ["RED"%.1f/100"WHITE"] | Armour: ["LIGHTBLUE"%.1f/100"WHITE"] | Interior: ["LIGHTBLUE"%d"WHITE"] | Virtual World: ["LIGHTBLUE"%d"WHITE"] | Last VID: ["LIGHTBLUE"%d"WHITE"] | Warnings: ["ORANGE"%d"WHITE"/"RED"20"WHITE"]", string, health, armour, GetPlayerInterior(targetid), GetPlayerVirtualWorld(targetid), GetPlayerLastVehicle(targetid), PlayerData[targetid][pWarnings]);
 
-        if(GetAdminLevel(targetid)) {
+        if(GetAdminLevel(targetid) && !AccountData[playerid][pAdminHide]) {
             format(string, sizeof string, "%s\n\n"ORANGE"Admin/Helper:"WHITE"\n", string);
             format(string, sizeof string, "%sDuty minute(s) : ["LIGHTBLUE"%d"WHITE"] | Accepted Report: ["LIGHTBLUE"%d"WHITE"] | Denied Report: ["LIGHTBLUE"%d"WHITE"] | Accept Stuck: ["LIGHTBLUE"%d"WHITE"] | Denied Stuck: ["LIGHTBLUE"%d"WHITE"]\n", string, AccountData[targetid][pAdminDutyTime], AccountData[targetid][pAdminAcceptReport], AccountData[targetid][pAdminDeniedReport], AccountData[targetid][pAdminAcceptStuck], AccountData[targetid][pAdminDeniedStuck]);
             format(string, sizeof string, "%sAnswered Question: ["LIGHTBLUE"%d"WHITE"] | Banned Record: ["LIGHTBLUE"%d"WHITE"] | Unbanned Record: ["LIGHTBLUE"%d"WHITE"] | Jail Record: ["LIGHTBLUE"%d"WHITE"]", string, AccountData[targetid][pAdminAnswer],AccountData[targetid][pAdminBanned], AccountData[targetid][pAdminUnbanned], AccountData[targetid][pAdminJail]);
@@ -9703,8 +9718,38 @@ CreatePhoneDraw(playerid)
 	PlayerTextDrawSetProportional(playerid, PhoneTimeMaximize[playerid], 1);
 	PlayerTextDrawSetSelectable(playerid, PhoneTimeMaximize[playerid], 0);
 
-    BarAtas[playerid] = CreatePlayerProgressBar(playerid, X_PHONE+220.000000, 289.000000, 10.000000, 2.000000, 16711935, 100.000000, progressbar_direction:1);
-	BarBawah[playerid] = CreatePlayerProgressBar(playerid, 450.000000, 435.000000, 10.000000, 2.000000, 16711935, 100.000000, progressbar_direction:1);
+
+    BatteryIndicatorMinimize[playerid] = CreatePlayerTextDraw(playerid, 430.000000, 433.000000, "100.00%");
+    PlayerTextDrawFont(playerid, BatteryIndicatorMinimize[playerid], 1);
+    PlayerTextDrawLetterSize(playerid, BatteryIndicatorMinimize[playerid], 0.133330, 0.599995);
+    PlayerTextDrawTextSize(playerid, BatteryIndicatorMinimize[playerid], 400.000000, 17.000000);
+    PlayerTextDrawSetOutline(playerid, BatteryIndicatorMinimize[playerid], 0);
+    PlayerTextDrawSetShadow(playerid, BatteryIndicatorMinimize[playerid], 0);
+    PlayerTextDrawAlignment(playerid, BatteryIndicatorMinimize[playerid], 1);
+    PlayerTextDrawColor(playerid, BatteryIndicatorMinimize[playerid], -1);
+    PlayerTextDrawBackgroundColor(playerid, BatteryIndicatorMinimize[playerid], 255);
+    PlayerTextDrawBoxColor(playerid, BatteryIndicatorMinimize[playerid], 50);
+    PlayerTextDrawUseBox(playerid, BatteryIndicatorMinimize[playerid], 0);
+    PlayerTextDrawSetProportional(playerid, BatteryIndicatorMinimize[playerid], 1);
+    PlayerTextDrawSetSelectable(playerid, BatteryIndicatorMinimize[playerid], 0);
+
+    BatteryIndicatorMaximize[playerid] = CreatePlayerTextDraw(playerid, 429.000000, 287.000000, "100.00%");
+    PlayerTextDrawFont(playerid, BatteryIndicatorMaximize[playerid], 1);
+    PlayerTextDrawLetterSize(playerid, BatteryIndicatorMaximize[playerid], 0.133330, 0.599995);
+    PlayerTextDrawTextSize(playerid, BatteryIndicatorMaximize[playerid], 400.000000, 17.000000);
+    PlayerTextDrawSetOutline(playerid, BatteryIndicatorMaximize[playerid], 0);
+    PlayerTextDrawSetShadow(playerid, BatteryIndicatorMaximize[playerid], 0);
+    PlayerTextDrawAlignment(playerid, BatteryIndicatorMaximize[playerid], 1);
+    PlayerTextDrawColor(playerid, BatteryIndicatorMaximize[playerid], -1);
+    PlayerTextDrawBackgroundColor(playerid, BatteryIndicatorMaximize[playerid], 255);
+    PlayerTextDrawBoxColor(playerid, BatteryIndicatorMaximize[playerid], 50);
+    PlayerTextDrawUseBox(playerid, BatteryIndicatorMaximize[playerid], 0);
+    PlayerTextDrawSetProportional(playerid, BatteryIndicatorMaximize[playerid], 1);
+    PlayerTextDrawSetSelectable(playerid, BatteryIndicatorMaximize[playerid], 0);
+
+
+    /*BarAtas[playerid] = CreatePlayerProgressBar(playerid, X_PHONE+220.000000, 289.000000, 10.000000, 2.000000, 16711935, 100.000000, progressbar_direction:1);
+	BarBawah[playerid] = CreatePlayerProgressBar(playerid, 450.000000, 435.000000, 10.000000, 2.000000, 16711935, 100.000000, progressbar_direction:1);*/
 
     return 1;
 }
@@ -12260,7 +12305,7 @@ Function:OnQueryFinished(extraid, threadid, race_check)
             if (race_check != g_MysqlRaceCheck[extraid])
                 return KickEx(extraid);
 
-            format(string, sizeof(string), "The Andreas Community Project - %s", ReturnName(extraid));
+            format(string, sizeof(string), "Gomerian Corp Project - %s", ReturnName(extraid));
 
             if(cache_num_rows()) {
                 //TextDrawShowForPlayer(extraid, gLoginTextdraws);
@@ -12299,7 +12344,7 @@ Function:OnQueryFinished(extraid, threadid, race_check)
                 
                 
                 if(is_active == 0)
-                    return Dialog_Show(extraid, PutCode, DIALOG_STYLE_INPUT, "Kode Verifikasi", WHITE"Isi kode disini untuk memverifikasi akun kamu\n(kode sudah dikirimkan ke Direct Message discord oleh BOT CP:RP):", "Verifikasi", "Kembali");
+                    return Dialog_Show(extraid, PutCode, DIALOG_STYLE_INPUT, "Kode Verifikasi", WHITE"Isi kode disini untuk memverifikasi akun kamu\n(kode sudah dikirimkan ke Direct Message discord oleh BOT GC:RP):", "Verifikasi", "Kembali");
 
                 if(is_registered == 1)
                 {
@@ -12308,12 +12353,12 @@ Function:OnQueryFinished(extraid, threadid, race_check)
                 }
                 else
                 {
-                    Dialog_Show(extraid, RegisterScreen, DIALOG_STYLE_PASSWORD, "REGISTER", ""WHITE"Selamat datang di The Andreas Community Project "YELLOW"%s"WHITE".\n\nMasukkan password untuk mendaftarkan akun: (password minimal 8 sampai dengan 32 karakter).", "Daftarkan", "Keluar", ReturnName(extraid));
+                    Dialog_Show(extraid, RegisterScreen, DIALOG_STYLE_PASSWORD, "REGISTER", ""WHITE"Selamat datang di Gomerian Corp Project "YELLOW"%s"WHITE".\n\nMasukkan password untuk mendaftarkan akun: (password minimal 8 sampai dengan 32 karakter).", "Daftarkan", "Keluar", ReturnName(extraid));
                 }
             }
             else 
             {
-                Dialog_Show(extraid, ShowOnly, DIALOG_STYLE_MSGBOX, string, "Your account is not registered!\n\nPlease register your account on our Discord:\n\n"YELLOW"https://discord.gg/EsMMBNCfkn", "Close", "", ReturnName(extraid));
+                Dialog_Show(extraid, ShowOnly, DIALOG_STYLE_MSGBOX, string, "Your account is not registered!\n\nPlease register your account on our Discord:\n\n"YELLOW"https://bit.ly/GC-RP", "Close", "", ReturnName(extraid));
                 KickEx(extraid, 500);
             }
         }
@@ -14192,7 +14237,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
         }
     }
     //Entrance key
-    if((GetPlayerState(playerid) == PLAYER_STATE_ONFOOT) && (newkeys & KEY_CTRL_BACK))
+    if((GetPlayerState(playerid) == PLAYER_STATE_ONFOOT) && (newkeys & KEY_CTRL_BACK) || (GetPlayerState(playerid) == PLAYER_STATE_DRIVER) && (newkeys & KEY_CROUCH))
     {
         static
             id = -1;
@@ -14281,12 +14326,15 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
             SetPlayerPos(playerid, BusinessData[id][bizInt][0], BusinessData[id][bizInt][1], BusinessData[id][bizInt][2]);
             SetPlayerFacingAngle(playerid, BusinessData[id][bizInt][3]);
             SetPlayerInterior(playerid, BusinessData[id][bizInterior]);
-            SetPlayerVirtualWorld(playerid, BusinessData[id][bizID] + 6000);
+            if(BusinessData[id][bizID] != 0){
+                SetPlayerVirtualWorld(playerid, BusinessData[id][bizID] + 6000);
+                SetPlayerWeather(playerid, 1);
+                SetPlayerTime(playerid, 12, 0);
+            }
             PlayerData[playerid][pBusiness] = BusinessData[id][bizID];
             Player_ToggleTelportAntiCheat(playerid, true);
 
-            SetPlayerWeather(playerid, 1);
-            SetPlayerTime(playerid, 12, 0);
+            
 
             if(strlen(BusinessData[id][bizMessage]) && strcmp(BusinessData[id][bizMessage], "NULL", true)) {
                 SendClientMessageEx(playerid, X11_TURQUOISE_1, "BUSINESS: "WHITE"%s", BusinessData[id][bizMessage]);
@@ -15504,7 +15552,7 @@ static LoadServerMapIcon()
     CreateDynamicMapIcon(1481.1840,-1770.0223,18.7958, 2, -1, -1, 0, -1, _, MAPICON_GLOBAL); //City Hall
     CreateDynamicMapIcon(1654.2096,-1660.8616,22.5156, 36, -1, -1, 0, -1, _, MAPICON_GLOBAL); //Newbie School
     CreateDynamicMapIcon(2303.6799,-16.0679,26.4844, 52, -1, -1, 0, -1, _, MAPICON_GLOBAL); //Bank Palomino
-    CreateDynamicMapIcon(2334.9365,-1351.7225,24.0318, 26, -1, -1, 0, -1, _, MAPICON_GLOBAL); //Mechanic Center
+    CreateDynamicMapIcon(2513.0500, -1540.6337, 25.6305, 26, -1, -1, 0, -1, _, MAPICON_GLOBAL); //Mechanic Center
 
     print("Successfull loaded static mapicon.");
     return 1;
@@ -15612,8 +15660,8 @@ static LoadServerPickup()
     // CreateDynamicPickup(1239, 23, 180.8817,1463.4524,10.6136, -1, 0);
     // CreateDynamic3DTextLabel("[Prison Foodcourt]\n"WHITE"Type "YELLOW"/foodcourt "WHITE"to open the menu.", COLOR_CLIENT, 180.8817,1463.4524,10.6136+0.5, 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, 0);
 
-    // CreateDynamicPickup(1239, 23, 180.8657,1469.2339,10.6136, -1, 0);
-    // CreateDynamic3DTextLabel("[Prison Foodcourt]\n"WHITE"Type "YELLOW"/foodcourt "WHITE"to open the menu.", COLOR_CLIENT, 180.8657,1469.2339,10.6136+0.5, 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, 0);
+    CreateDynamicPickup(1239, 23, -2008.2313,-514.5503,38.9319, PRISON_WORLD, LSPD_JAIL);
+    CreateDynamic3DTextLabel("[Prison Foodcourt]\n"WHITE"Type "YELLOW"/foodcourt "WHITE"to open the menu.", COLOR_CLIENT, -2008.2313,-514.5503,38.9319+0.5, 10.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, PRISON_WORLD, LSPD_JAIL);
 
 /*    for (new i = 0; i < sizeof(arrHospitalSpawns); i ++) {
         CreateDynamicMapIcon(arrHospitalSpawns[i][0], arrHospitalSpawns[i][1], arrHospitalSpawns[i][2], 22, 0);
@@ -15656,7 +15704,7 @@ static LoadGlobalTextdraws()
     TextDrawSetShadow(gServerTextdraws[1], 0);
 
     //  Server watermark
- 	gServerTextdraws[2] = TextDrawCreate(554.000000, 3.000000, "~b~~h~~h~The_Andreas _~w~Community_Project");
+ 	gServerTextdraws[2] = TextDrawCreate(554.000000, 3.000000, "~b~~h~~h~Gomerian_Corp_~w~Project");
 	TextDrawFont(gServerTextdraws[2], 1);
 	TextDrawLetterSize(gServerTextdraws[2], 0.366665, 1.700000);
 	TextDrawTextSize(gServerTextdraws[2], 400.000000, 191.500000);
@@ -15722,8 +15770,9 @@ OnGameModeInit_Setup()
     mysql_pquery(g_iHandle, "SELECT * FROM `garbage` ORDER BY `garbageID` ASC", "Garbage_Load", "");
     mysql_pquery(g_iHandle, "SELECT * FROM `objecttext`", "ObjectText_Load", "");
     mysql_pquery(g_iHandle, "SELECT * FROM `workshop`", "Workshop_Load", "");
-//    mysql_pquery(g_iHandle, "SELECT * FROM `furnstore` ORDER BY `id` ASC", "FurnStore_Load", "");
-//    mysql_pquery(g_iHandle, "SELECT * FROM `furnobject` ORDER BY `id` ASC", "FurnObject_Load", "");
+    mysql_pquery(g_iHandle, "SELECT * FROM `garage` ORDER BY `garageID` ASC", "Garage_Load", "");
+    mysql_pquery(g_iHandle, "SELECT * FROM `furnstore` ORDER BY `id` ASC", "FurnStore_Load", "");
+    mysql_pquery(g_iHandle, "SELECT * FROM `furnobject` ORDER BY `id` ASC", "FurnObject_Load", "");
 
     SetModelPreviewRotation(18875, 90.0, 180.0, 0.0);
     SetModelPreviewRotation(2703, -105.0, 0.0, -15.0);
@@ -16122,7 +16171,7 @@ public OnPlayerRequestClass(playerid, classid)
 
     if(IsValidRoleplayName(ReturnName(playerid)))
     {
-        SendErrorMessage(playerid, "U:RP Account Center tidak sesuai format!");
+        SendErrorMessage(playerid, "GC:RP Account Center tidak sesuai format!");
         SendErrorMessage(playerid, "Penggunaan Account Center harus mengikuti format nama biasa.");
         SendErrorMessage(playerid, "Sebagai contoh, Agung, Gajahduduk, KevinSanjaya, DimasNugroho dan lainnya.");
         KickEx(playerid);
@@ -16470,11 +16519,11 @@ public OnPlayerText(playerid, text[])
             SetPlayerChatBubble(playerid, sprintf("(Phone): %s", text), X11_WHITE, 10.0, 5000);
         }
 
-        if(!IsPlayerInAnyVehicle(playerid) && !PlayerData[playerid][pInjured] && !PlayerData[playerid][pLoopAnim] && !IsPlayerOnPhone(playerid) && !PlayerData[playerid][pDisableAnim] && !AccountData[playerid][pAdminDuty] && GetPlayerSpecialAction(playerid) != SPECIAL_ACTION_USEJETPACK && !GetPlayerDrugeEffect(playerid))
-        {
-            ApplyAnimation(playerid, "GANGS", "prtial_gngtlkA", 4.1, 0, 1, 1, 1, strlen(text) * 100, 1);
-            SetTimerEx("StopChatting", strlen(text) * 100, false, "d", playerid);
-        }
+        // if(!IsPlayerInAnyVehicle(playerid) && !PlayerData[playerid][pInjured] && !PlayerData[playerid][pLoopAnim] && !IsPlayerOnPhone(playerid) && !PlayerData[playerid][pDisableAnim] && !AccountData[playerid][pAdminDuty] && GetPlayerSpecialAction(playerid) != SPECIAL_ACTION_USEJETPACK && !GetPlayerDrugeEffect(playerid))
+        // {
+        //     ApplyAniApplyAnimationmation(playerid, "GANGS", "prtial_gngtlkA", 4.1, 0, 1, 1, 1, strlen(text) * 100, 1);
+        //     SetTimerEx("StopChatting", strlen(text) * 100, false, "d", playerid);
+        // }
 
         if(PlayerData[playerid][pFactionCall])
         {
@@ -17450,7 +17499,7 @@ CMD:jobdelay(playerid, params[])
 
 CMD:foodcourt(playerid, params[])
 {
-    if(IsPlayerInRangeOfPoint(playerid, 3.0, 180.8817,1458.1420,10.6136) || IsPlayerInRangeOfPoint(playerid, 3.0, 180.8817,1463.4524,10.6136) || IsPlayerInRangeOfPoint(playerid, 3.0, 180.8657,1469.2339,10.6136))
+    if(IsPlayerInRangeOfPoint(playerid, 3.0, -2008.2313,-514.5503,38.9319) || IsPlayerInRangeOfPoint(playerid, 3.0, -2008.2313,-514.5503,38.9319) || IsPlayerInRangeOfPoint(playerid, 3.0, -2008.2313,-514.5503,38.9319))
     {    
         Dialog_Show(playerid, FoodCourt, DIALOG_STYLE_LIST, "Food Court", "Bread (15 Stamps)\n"WHITE"Vegetables Soup (20 Stamps)\n"WHITE"Mineral Water (10 Stamps)", "Buy", "Close");
     }
@@ -17590,6 +17639,7 @@ DCMD:verify(user, channel, params[])
 		DCC_SendChannelMessage(Whitelist, str);
 		return 1;
 	}
+    
 	new zQuery[256];
 	mysql_format(g_iHandle, zQuery, sizeof(zQuery), "SELECT * FROM `accounts` WHERE `DiscordID` = '%e' LIMIT 1", userId);
 	new Cache:ex = mysql_query(g_iHandle, zQuery, true);
@@ -17630,7 +17680,7 @@ public SendActivationCode(message[], userId[], owner[])
 	else
 	{
 		new verif[32];
-        format(verif, sizeof(verif), "TACP-%d", RandomEx(1000, 9999));
+        format(verif, sizeof(verif), "GCRP-%d", RandomEx(1000, 9999));
 
 		new zstr[256];
 		format(zstr, sizeof(zstr), "**In-Game Activation Code**\n\n**WARNING:** Jangan berikan kode ini kepada siapapun!\nActivation Code: [ ||%s|| ]\n\nHINT: Klik kotak hitam untuk melihat Activation Code.", verif);
@@ -17645,6 +17695,7 @@ public SendActivationCode(message[], userId[], owner[])
 		mysql_tquery(g_iHandle,zquery);
 
         DCC_SetGuildMemberNickname(DCC_FindGuildById("1083377645665927188"), target, message);
+        DCC_AddGuildMemberRole(DCC_FindGuildById("1083377645665927188"), target, DCC_FindRoleById("1083762502418042901"));
         
 		printf("[LOGS] Created account for Discord '%s' with Username '%s' and Code '%s'", owner, message, verif);
 	}
@@ -17792,10 +17843,10 @@ CMD:fish(playerid, params[])
 
         switch(level)
         {
-            case 1: time = 120000; 
-            case 2: time = 90000; 
-            case 3: time = 60000; 
-            default: time = 30000; 
+            case 1: time = 60000; 
+            case 2: time = 45000; 
+            case 3: time = 30000; 
+            default: time = 20000; 
         }
         PlayerData[playerid][pFishingTime] = defer getFish[time](playerid);
         return 1;
@@ -17857,8 +17908,8 @@ CMD:buyrod(playerid, params[])
     ;
 
     new
-        rod_price = 250,
-        amount = Economy_GetAmountAfterSalesTax(rod_price)
+        rod_price = 250
+        //amount = Economy_GetAmountAfterSalesTax(rod_price)
     ;
     
     if(!IsPlayerInRangeOfPoint(playerid, 3.0, 1359.2423,1340.3364,10.8862))
@@ -17867,24 +17918,24 @@ CMD:buyrod(playerid, params[])
     if(Inventory_HasItem(playerid, "Fish Rod"))
         return SendErrorMessage(playerid, "Anda sudah memiliki pancingan.");
 
-    if(GetMoney(playerid) < amount)
-        return SendClientErrorMessage(playerid, "Anda tidak memiliki uang %s.", FormatNumber(amount));
+    if(GetMoney(playerid) < rod_price/*amount*/)
+        return SendErrorMessage(playerid, "Anda tidak memiliki uang %s.", FormatNumber(rod_price));
 
     if(sscanf(params, "s[8]", confirm))
-        return SendClientSyntaxMessage(playerid, "/buyrod ['confirm'] (harga pancingan yaitu: "GREEN"%s"GREY_80", '/buyrod confirm' untuk setuju)", FormatNumber(amount));
+        return SendSyntaxMessage(playerid, "/buyrod ['confirm'] (harga pancingan yaitu: "GREEN"%s"GREY_80", '/buyrod confirm' untuk setuju)", FormatNumber(rod_price));
 
     if(!strcmp(confirm, "confirm"))
     {
         if(Inventory_Add(playerid, "Fish Rod", 18632, 1) != -1)
         {
-            GiveMoney(playerid, -amount, ECONOMY_ADD_SUPPLY, "bought fish rod");
+            GiveMoney(playerid, -rod_price, ECONOMY_ADD_SUPPLY, "bought fish rod");
 
-            SendClientServerMessage(playerid, "Anda telah membeli pancingan dengan harga "COL_GREEN"%s dollar.", FormatNumber(amount));
+            SendServerMessage(playerid, "Anda telah membeli pancingan dengan harga "COL_GREEN"%s dollar.", FormatNumber(rod_price));
             return 1;
         }
     }
 
-    SendClientSyntaxMessage(playerid, "Harga untuk pancingan yaitu: "GREEN"%s"GREY_80", "WHITE"/buyrod confirm "GREY_80"untuk setuju.)", FormatNumber(amount));
+    //SendSyntaxMessage(playerid, "Harga untuk pancingan yaitu: "GREEN"%s"GREY_80", "WHITE"/buyrod confirm "GREY_80"untuk setuju.)", FormatNumber(amount));
     return 1;
 }
 CMD:training(playerid, params[])
@@ -18179,23 +18230,20 @@ CMD:credits(playerid, params[])
     strcat(credits, CYAN"Sourch Support\n");
     strcat(credits, WHITE"Y_Less, Incognito, Emmet_, Southclaws, Vince\n");
     strcat(credits, "Slice, maddinat0r, Zeex, Nexus and lainnya\n\n");
-    strcat(credits, CYAN"Unity Server Owner\n");
-    strcat(credits, WHITE"Kevynn Adam & Dimas Yudha\n");
-    strcat(credits, "U:RP Team yang telah membantu dalam mengembangkan U:RP\n\n");
+    strcat(credits, CYAN"Gomerian Corp Owner\n");
+    strcat(credits, WHITE"Kentuz & Kwetiaw\n");
+    strcat(credits, "GC:RP Team yang telah membantu dalam mengembangkan GC:RP\n\n");
     strcat(credits, CYAN"Script Development\n");
-    strcat(credits, WHITE"Leynardo Yosef (Scripter)\n");
-    strcat(credits, WHITE"Rachmad Setiawan (Scripter)\n");
-    strcat(credits, WHITE"Muhammad Prima (mapper)\n\n");
+    strcat(credits, WHITE"Leynardo Yosef (Scripter Base)\n");
+    strcat(credits, WHITE"Rachmad Setiawan (Scripter Base)\n");
+    strcat(credits, WHITE"Blockring (Scripter Development)\n");
+    strcat(credits, WHITE"GigUp (Scripter)\n");
+    strcat(credits, WHITE"Nandes (Manager In Game)\n\n");
     strcat(credits, CYAN"Lifetime Donations\n");
-    strcat(credits, WHITE"Rizki Brian (Aldrichea)\n");
-    strcat(credits, WHITE"Togi Samuel Simarmata (Luckystar)\n");
-    strcat(credits, WHITE"Afiriyan Choirul Anam (Irul)\n");
-    strcat(credits, WHITE"Vicky Yaphyaputra  (Mingxi)\n");
-    strcat(credits, WHITE"Ahmad Ghozali (Xauz)\n");
-    strcat(credits, WHITE"David Martin (matematika)\n\n");
+    strcat(credits, WHITE"LuckyAL(Supporter)\n\n");
     strcat(credits, CYAN"Server Mapping\n");
-    strcat(credits, WHITE"Kim <3\n\n");
-    strcat(credits, "* TA:CP Player yang senantiasa memberikan waktu luangnya bermain di The Andreas Community Project!\n\n");
+    strcat(credits, WHITE"-\n\n");
+    strcat(credits, "* GC:RP Player yang senantiasa memberikan waktu luangnya bermain di Gomerian Corp Project!\n\n");
     Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_MSGBOX, "CREDITS", credits, "Close", "");
     return 1;
 }
@@ -18506,18 +18554,18 @@ CMD:ame(playerid, params[])
 
     return 1;
 }
-CMD:melow(playerid, params[])
+CMD:lme(playerid, params[])
 {
     if(PlayerData[playerid][pHospital] != -1) return 0;
     if(isnull(params))
-        return SendSyntaxMessage(playerid, "/melow [action]");
+        return SendSyntaxMessage(playerid, "/lme [action]");
 
     if(strlen(params) > 64) {
-        SendNearbyMessage(playerid, 8.0, X11_PLUM, "* %s (low) %.64s ..", ReturnName(playerid, 0, 1), params);
-        SendNearbyMessage(playerid, 8.0, X11_PLUM, ".. %s", params[64]);
+        SendNearbyMessage(playerid, 8.0, X11_ORCHID, "* %s (low) %.64s ..", ReturnName(playerid, 0, 1), params);
+        SendNearbyMessage(playerid, 8.0, X11_ORCHID, ".. %s", params[64]);
     }
     else {
-        SendNearbyMessage(playerid, 8.0, X11_PLUM, "* %s (low) %s", ReturnName(playerid, 0, 1), params);
+        SendNearbyMessage(playerid, 8.0, X11_ORCHID, "* %s (low) %s", ReturnName(playerid, 0, 1), params);
     }
     return 1;
 }
@@ -18587,11 +18635,11 @@ CMD:dolow(playerid, params[])
         return SendSyntaxMessage(playerid, "/do [description]");
 
     if(strlen(params) > 64) {
-        SendNearbyMessage(playerid, 8.0, X11_PLUM, "* %.64s ..", params);
-        SendNearbyMessage(playerid, 8.0, X11_PLUM, ".. %s (( (low) %s ))", params[64], ReturnName(playerid, 0, 1));
+        SendNearbyMessage(playerid, 8.0, X11_ORCHID, "* %.64s ..", params);
+        SendNearbyMessage(playerid, 8.0, X11_ORCHID, ".. %s (( (low) %s ))", params[64], ReturnName(playerid, 0, 1));
     }
     else {
-        SendNearbyMessage(playerid, 8.0, X11_PLUM, "* %s (( (low) %s ))", params, ReturnName(playerid, 0, 1));
+        SendNearbyMessage(playerid, 8.0, X11_ORCHID, "* %s (( (low) %s ))", params, ReturnName(playerid, 0, 1));
     }
     return 1;
 }
@@ -18829,6 +18877,8 @@ CMD:help(playerid, params[])
 
 CMD:changepass(playerid, params[])
 {
+    if(CheckAdmin(playerid, 1))
+        return PermissionError(playerid);
     Dialog_Show(playerid, ChangePassword, DIALOG_STYLE_PASSWORD, "Ganti Password", WHITE"Masukkan password lamamu:", "Masuk", "Keluar");
     return 1;
 }
@@ -19430,8 +19480,8 @@ CMD:setcustomskin(playerid, params[])
     if(userid == INVALID_PLAYER_ID)
         return SendErrorMessage(playerid, "You have specified an invalid player.");
 
-    if(skinid < 20001 || skinid > 20074)
-        return SendErrorMessage(playerid, "Invalid skin ID. Skins range from 20001 to 20074.");
+    if(skinid < 20001 || skinid > 20077)
+        return SendErrorMessage(playerid, "Invalid skin ID. Skins range from 20001 to 20077.");
 
     SetPlayerSkinEx(userid, skinid);
 
@@ -23497,7 +23547,8 @@ ToggleMinimizePhone(playerid)
         PlayerTextDrawHide(playerid, MinimizePhoneNumb[playerid]);
         PlayerTextDrawHide(playerid, MinimizeWallpaper[playerid]);
         PlayerTextDrawHide(playerid, PhoneTimeMinimize[playerid]);
-        HidePlayerProgressBar(playerid, BarBawah[playerid]);
+        PlayerTextDrawHide(playerid, BatteryIndicatorMinimize[playerid]);
+        //HidePlayerProgressBar(playerid, BarBawah[playerid]);
         SetPVarInt(playerid, "TogMinimizePhone", 1);
     }
     else
@@ -23506,7 +23557,8 @@ ToggleMinimizePhone(playerid)
         PlayerTextDrawShow(playerid, MinimizePhoneNumb[playerid]);
         PlayerTextDrawShow(playerid, MinimizeWallpaper[playerid]);
         PlayerTextDrawShow(playerid, PhoneTimeMinimize[playerid]);
-        ShowPlayerProgressBar(playerid, BarBawah[playerid]);
+        PlayerTextDrawShow(playerid, BatteryIndicatorMinimize[playerid]);
+        //ShowPlayerProgressBar(playerid, BarBawah[playerid]);
         SetPVarInt(playerid, "TogMinimizePhone", 0);
     }
 }
@@ -23516,7 +23568,8 @@ HideMinimizePhone(playerid)
 	PlayerTextDrawHide(playerid, MinimizePhoneNumb[playerid]);
     PlayerTextDrawHide(playerid, MinimizeWallpaper[playerid]);
     PlayerTextDrawHide(playerid, PhoneTimeMinimize[playerid]);
-    HidePlayerProgressBar(playerid, BarBawah[playerid]);
+    PlayerTextDrawHide(playerid, BatteryIndicatorMinimize[playerid]);
+    //HidePlayerProgressBar(playerid, BarBawah[playerid]);
     return 1;
 }
 ShowMinimizePhone(playerid)
@@ -23524,21 +23577,24 @@ ShowMinimizePhone(playerid)
     if(PlayerData[playerid][pPhoneOff])
     {
         PlayerTextDrawShow(playerid, MinimizeBG[playerid]);
-        HidePlayerProgressBar(playerid, BarBawah[playerid]);
+        //HidePlayerProgressBar(playerid, BarBawah[playerid]);
         PlayerTextDrawHide(playerid, MinimizePhoneNumb[playerid]);
         PlayerTextDrawHide(playerid, PhoneTimeMinimize[playerid]);
         PlayerTextDrawShow(playerid, MinimizeWallpaper[playerid]);
-
+        PlayerTextDrawShow(playerid, BatteryIndicatorMinimize[playerid]);
+        
+        PlayerTextDrawHide(playerid, BatteryIndicatorMaximize[playerid]);
         PlayerTextDrawHide(playerid, PhoneOnButton[playerid]);
         PlayerTextDrawHide(playerid, PhoneOnText[playerid]);        
     }
     else
     {
         PlayerTextDrawShow(playerid, MinimizeBG[playerid]);
-        ShowPlayerProgressBar(playerid, BarBawah[playerid]);
+        //ShowPlayerProgressBar(playerid, BarBawah[playerid]);
         PlayerTextDrawShow(playerid, MinimizePhoneNumb[playerid]);
         PlayerTextDrawShow(playerid, MinimizeWallpaper[playerid]);
         PlayerTextDrawShow(playerid, PhoneTimeMinimize[playerid]);
+        PlayerTextDrawShow(playerid, BatteryIndicatorMinimize[playerid]);
     }
     return 1;
 }
@@ -23555,16 +23611,18 @@ TogglePhone(playerid)
         PlayerTextDrawHide(playerid, MinimizePhoneNumb[playerid]);
         PlayerTextDrawHide(playerid, MinimizeWallpaper[playerid]);
         PlayerTextDrawHide(playerid, PhoneTimeMinimize[playerid]);
-        HidePlayerProgressBar(playerid, BarBawah[playerid]);
+        PlayerTextDrawHide(playerid, BatteryIndicatorMinimize[playerid]);
+        //HidePlayerProgressBar(playerid, BarBawah[playerid]);
         SetPVarInt(playerid, "TogglePhone", 0);
     }
     else
     {
         PlayerTextDrawShow(playerid, MinimizeBG[playerid]);
-        ShowPlayerProgressBar(playerid, BarBawah[playerid]);
+        //ShowPlayerProgressBar(playerid, BarBawah[playerid]);
         PlayerTextDrawShow(playerid, MinimizePhoneNumb[playerid]);
         PlayerTextDrawShow(playerid, MinimizeWallpaper[playerid]);
         PlayerTextDrawShow(playerid, PhoneTimeMinimize[playerid]);
+        PlayerTextDrawShow(playerid, BatteryIndicatorMinimize[playerid]);
         SetPVarInt(playerid, "TogglePhone", 1);
     }
 
@@ -23591,7 +23649,8 @@ ClosePhone(playerid)
     PlayerTextDrawHide(playerid, CarGPS[playerid]);
     PlayerTextDrawHide(playerid, PhoneOff[playerid]);
     PlayerTextDrawHide(playerid, PhoneTimeMaximize[playerid]);
-    HidePlayerProgressBar(playerid, BarAtas[playerid]);
+    PlayerTextDrawHide(playerid, BatteryIndicatorMaximize[playerid]);
+    //HidePlayerProgressBar(playerid, BarAtas[playerid]);
     ShowMinimizePhone(playerid);
     CancelSelectTextDrawEx(playerid);    
     return 1;
@@ -23628,7 +23687,8 @@ OpenPhone(playerid)
         PlayerTextDrawHide(playerid, CarGPS[playerid]);
         PlayerTextDrawHide(playerid, PhoneOff[playerid]);
         PlayerTextDrawHide(playerid, PhoneTimeMaximize[playerid]);
-        HidePlayerProgressBar(playerid, BarAtas[playerid]);
+        PlayerTextDrawHide(playerid, BatteryIndicatorMinimize[playerid]);
+        //HidePlayerProgressBar(playerid, BarAtas[playerid]);
 
         HideMinimizePhone(playerid);
         SelectTextDrawEx(playerid, 0xFF0000FF);        
@@ -23654,7 +23714,8 @@ OpenPhone(playerid)
         PlayerTextDrawShow(playerid, CarGPS[playerid]);
         PlayerTextDrawShow(playerid, PhoneOff[playerid]);
         PlayerTextDrawShow(playerid, PhoneTimeMaximize[playerid]);
-        ShowPlayerProgressBar(playerid, BarAtas[playerid]);
+        PlayerTextDrawShow(playerid, BatteryIndicatorMaximize[playerid]);
+        //ShowPlayerProgressBar(playerid, BarAtas[playerid]);
 
         PlayerTextDrawHide(playerid, PhoneOnButton[playerid]);
         PlayerTextDrawHide(playerid, PhoneOnText[playerid]);
@@ -26396,7 +26457,7 @@ CMD:gps(playerid, params[])
     if(PlayerData[playerid][pInjured] || PlayerData[playerid][pLoading] > 0 || PlayerData[playerid][pUnloading] != -1 || PlayerData[playerid][pDeliverShipment] > 0)
         return SendErrorMessage(playerid, "You can't use this command at the moment.");
 
-    Dialog_Show(playerid, MainGPS, DIALOG_STYLE_LIST, "GPS System", "Custom Locations\nFind House\nFind Business\nFind Entrance\nFind Job\nFind Tree\nFind Dealership\nFind Workshop\nFind Garage\nOther\nFind Cargo", "Select", "Cancel");
+    Dialog_Show(playerid, MainGPS, DIALOG_STYLE_LIST, "GPS System", "Custom Locations\nFind House\nFind Business\nFind Entrance\nFind Job\nFind Sidejob\nFind Tree\nFind Dealership\nFind Workshop\nFind Garage\nOther\nFind Cargo", "Select", "Cancel");
     return 1;
 }
 
@@ -30880,9 +30941,10 @@ Dialog:MainGPS(playerid, response, listitem, inputtext[])
             case 2: Dialog_Show(playerid, FindBusiness, DIALOG_STYLE_LIST, "Find Business", "Retail Store\nWeapon Store\nClothing Store\nFast Food\nDealership\nGas Station\nFurniture Store\nElectronic Store\nBar & Lounge", "Submit", "Cancel");
             case 3: Dialog_Show(playerid, FindEntrance, DIALOG_STYLE_LIST, "Find Entrance", "Nearest DMV\nNearest Bank\nNearest Warehouse\nNearest City Hall", "Select", "Back");
             case 4: Dialog_Show(playerid, FindJob, DIALOG_STYLE_LIST, "Find Job", "Trucker\nMechanic\nTaxi Driver\nCargo Unloader\nMiner\nFood Vendor\nPackage Sorter\nArms Dealer\nLumberjack\nHauler\nFarmer", "Select", "Cancel");
-            case 5: Show_Lumber(playerid);
-            case 6: Dealership_GPS(playerid);
-            case 7:
+            case 5: Dialog_Show(playerid, FindSidejob, DIALOG_STYLE_LIST, "Find Sidejob", "Bus Driver\nBoxville\nMoney Transport\nSweeper\nTrashmaster", "Select", "Close");
+            case 6: Show_Lumber(playerid);
+            case 7: Dealership_GPS(playerid);
+            case 8:
             {
                 new string[255];
                 format(string, sizeof(string), "#\tName\n");
@@ -30891,8 +30953,8 @@ Dialog:MainGPS(playerid, response, listitem, inputtext[])
                 }
                 Dialog_Show(playerid, ListWorkshop, DIALOG_STYLE_TABLIST_HEADERS, "GPS Workshop", string, "Select", "Close");
             }
-            case 9: Dialog_Show(playerid, OtherLocation, DIALOG_STYLE_LIST, "Other Location", "Component Warehouse\nWheels & Hydraulics Shop\nFish Shop\nModshop\nMechanic Center\nSweeper Sidejob\nInsurance Center\nBus Sidejob\nDMV\nRodeo Bank\nAdvertisement Agency\nButcher\nPublic Parking Downtown\nPublic Parking Market\nMoney Transporter Sidejob\nBoxville Sidejob\nTrashmaster\nFarm Warehouse", "Select", "Close");
-            case 10: Dialog_Show(playerid, FindCargo, DIALOG_STYLE_LIST, "Find Cargo (Trucker Only)", "Retail Cargo\nClothes Cargo\nFuel Cargo\nFood Cargo\nFurniture Cargo\nElectronics Cargo\nAmmunation Cargo\nBar Cargo", "Select", "Close");
+            case 10: Dialog_Show(playerid, OtherLocation, DIALOG_STYLE_LIST, "Other Location", "Component Warehouse\nWheels & Hydraulics Shop\nFish Shop\nModshop\nMechanic Center\nInsurance Center\nDMV\nRodeo Bank\nAdvertisement Agency\nButcher\nPublic Parking Downtown\nPublic Parking Market\nFarm Warehouse", "Select", "Close");
+            case 11: Dialog_Show(playerid, FindCargo, DIALOG_STYLE_LIST, "Find Cargo (Trucker Only)", "Retail Cargo\nClothes Cargo\nFuel Cargo\nFood Cargo\nFurniture Cargo\nElectronics Cargo\nAmmunation Cargo\nBar Cargo", "Select", "Close");
         }
     }
     return 1;
@@ -30923,20 +30985,15 @@ Dialog:OtherLocation(playerid, response, listitem, inputtext[])
             case 1: SetPlayerWaypoint(playerid, inputtext, 1953.6633,-1997.0308,13.5469);
             case 2: SetPlayerWaypoint(playerid, inputtext, 128.7940,-1813.1044,2.2147);
             case 3: SetPlayerWaypoint(playerid, inputtext, 2246.1946,-2016.3121,13.5469);
-            case 4: SetPlayerWaypoint(playerid, inputtext, 2427.5293,-2089.8679,13.5469);
-            case 5: SetPlayerWaypoint(playerid, inputtext, 1700.1438,-1543.4144,13.3828); 
-            case 6: SetPlayerWaypoint(playerid, inputtext, 1111.6385,-1795.5822,16.5938);
-            case 7: SetPlayerWaypoint(playerid, inputtext, 1789.9645,-1911.4059,13.5041);
-            case 8: SetPlayerWaypoint(playerid, inputtext, 1081.1970,-1696.7852,13.5469);
-            case 9: SetPlayerWaypoint(playerid, inputtext, 588.4249,-1239.4244,17.82159);
-            case 10: SetPlayerWaypoint(playerid, inputtext, 643.9781,-1357.1801,13.5695);
-            case 11: SetPlayerWaypoint(playerid, inputtext, -384.0056,-1438.9092,26.3203);
-            case 12: SetPlayerWaypoint(playerid, inputtext, 1630.7808,-1139.1279,23.9063);
-            case 13: SetPlayerWaypoint(playerid, inputtext, 1224.6685,-1376.7126,14.9861);
-            case 14: SetPlayerWaypoint(playerid, inputtext, 891.3865,-1208.2157,16.9766);
-            case 15: SetPlayerWaypoint(playerid, inputtext, 1363.1598,-1648.3190,13.3828);
-            case 16: SetPlayerWaypoint(playerid, inputtext, 2286.7566,-1981.7808,13.5699);
-            case 17: SetPlayerWaypoint(playerid, inputtext, -64.8065,-1120.8037,1.0781);
+            case 4: SetPlayerWaypoint(playerid, inputtext, 2513.0500, -1540.6337, 25.6305);
+            case 5: SetPlayerWaypoint(playerid, inputtext, 1111.6385,-1795.5822,16.5938);
+            case 6: SetPlayerWaypoint(playerid, inputtext, 1081.1970,-1696.7852,13.5469);
+            case 7: SetPlayerWaypoint(playerid, inputtext, 588.4249,-1239.4244,17.82159);
+            case 8: SetPlayerWaypoint(playerid, inputtext, 643.9781,-1357.1801,13.5695);
+            case 9: SetPlayerWaypoint(playerid, inputtext, -384.0056,-1438.9092,26.3203);
+            case 10: SetPlayerWaypoint(playerid, inputtext, 1630.7808,-1139.1279,23.9063);
+            case 11: SetPlayerWaypoint(playerid, inputtext, 1224.6685,-1376.7126,14.9861);
+            case 12: SetPlayerWaypoint(playerid, inputtext, -64.8065,-1120.8037,1.0781);
         }
         SendServerMessage(playerid, "Waypoint %s marked on your map.", inputtext);
     }
@@ -31054,6 +31111,21 @@ Dialog:FindJob(playerid, response, listitem, inputtext[])
         }
     }
     else cmd_gps(playerid, "\1");
+    return 1;
+}
+
+Dialog:FindSidejob(playerid, response, listitem, inputtext[])
+{
+    if(response) {
+        switch(listitem) {
+            case 0: SetPlayerWaypoint(playerid, inputtext, 1789.9645,-1911.4059,13.5041);
+            case 1: SetPlayerWaypoint(playerid, inputtext, 1622.4833,-1887.6677,13.548);
+            case 2: SetPlayerWaypoint(playerid, inputtext, 891.3865,-1208.2157,16.9766);
+            case 3: SetPlayerWaypoint(playerid, inputtext, 1700.1438,-1543.4144,13.3828);
+            case 4: SetPlayerWaypoint(playerid, inputtext, 2286.7566,-1981.7808,13.5699);
+        }
+        SendServerMessage(playerid, "Waypoint %s marked on your map.", inputtext);
+    }
     return 1;
 }
 
@@ -34026,7 +34098,7 @@ Dialog:PutCode(playerid, response, listitem, inputtext[])
     if(strcmp(AccountData[playerid][pVerifyCode], inputtext))
     {
         SendErrorMessage(playerid, "Kode Verifikasi salah, mohon di cek kembali.");
-        return Dialog_Show(playerid, PutCode, DIALOG_STYLE_INPUT, "Kode Verifikasi", WHITE"Isi kode disini untuk memverifikasi akun kamu\n(kode sudah dikirimkan ke Direct Message discord oleh BOT CP:RP):", "Verifikasi", "Kembali");
+        return Dialog_Show(playerid, PutCode, DIALOG_STYLE_INPUT, "Kode Verifikasi", WHITE"Isi kode disini untuk memverifikasi akun kamu\n(kode sudah dikirimkan ke Direct Message discord oleh BOT GC:RP):", "Verifikasi", "Kembali");
     }
 
     SendClientMessage(playerid, X11_LIGHTBLUE, "ACCOUNT: {FFFFFF}Your ACP successfully activated!");
@@ -34877,7 +34949,7 @@ Dialog:Help(playerid, response, listitem, inputtext[]) {
             case 0:
             {
                 SendClientMessage(playerid, X11_LIGHTGREEN, "HELP >> Account Commands:");
-                SendCustomMessage(playerid, "ACCOUNT", "/changepass, /lastlogged, /properties, /showidcard, /levels.");
+                SendCustomMessage(playerid, "ACCOUNT", "/properties, /showidcard, /levels.");
             }
             case 1:
             {
@@ -34905,7 +34977,7 @@ Dialog:Help(playerid, response, listitem, inputtext[]) {
             {
                 SendClientMessage(playerid, X11_LIGHTGREEN, "HELP >> Chat Commands:");
                 SendCustomMessage(playerid, "CHAT", "/s(hout), /l(ow), /me, /do, /ame, /ado, /o(oc), /live.");
-                SendCustomMessage(playerid, "CHAT", "/me(low), /do(low), /pr(low).");
+                SendCustomMessage(playerid, "CHAT", "/lme, /do(low), /pr(low).");
             }
             case 4: {
                 if(PlayerData[playerid][pFactionMod])
@@ -35078,7 +35150,7 @@ Dialog:Help(playerid, response, listitem, inputtext[]) {
                 SendCustomMessage(playerid, "KEYS", ""YELLOW"C Tahan: "WHITE"Untuk animasi duduk. "YELLOW"C + SPACE: "WHITE"Untuk animasi mengangkat tangan.");
                 SendCustomMessage(playerid, "KEYS", ""YELLOW"H: "WHITE"Untuk masuk/keluar entrance/business/dan lainnya. "YELLOW"C (jongkok) + N: "WHITE"Untuk mengambil item yang ada di dekatmu.");
             }
-            case 13: Dialog_Show(playerid, SidejobGuide, DIALOG_STYLE_LIST, "Select Sidejob", "Trashmaster\nSweeper\nBus", "Select", "Close");
+            case 13: Dialog_Show(playerid, SidejobGuide, DIALOG_STYLE_LIST, "Select Sidejob", "Trashmaster\nSweeper\nBus\nBoxville", "Select", "Close");
             case 14: cmd_viphelp(playerid, "\0");
             case 15:
             {
@@ -35104,7 +35176,9 @@ Dialog:SidejobGuide(playerid, response, listitem, inputtext[])
     {
         switch(listitem)
         {
-            case 0: Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_MSGBOX, "Trashmaster Sidejob", ""WHITE"Pekerjaan trashmaster bertujuan untuk membersikhan sampah yang ada dikota ini.\n\n\
+            case 0: 
+            {
+                Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_MSGBOX, "Trashmaster Sidejob", ""WHITE"Pekerjaan trashmaster bertujuan untuk membersikhan sampah yang ada dikota ini.\n\n\
                 Anda bisa menemukan pekerjaan dengan menggunakan GPS (/gps).\n\n\
                 "COL_LIGHTGREEN"Langkah-langkah:"WHITE"\n\
                 * Pergi ke lokasi kerja.\n\
@@ -35121,6 +35195,58 @@ Dialog:SidejobGuide(playerid, response, listitem, inputtext[])
                 * Saat berada dalam mobil, jangan coba untuk turun sebelum anda menghentikan pekerjaan-\n  \
                   itu akan membuat anda gagal dan tidak mendapatkan bonus.\n\
                 * Anda akan delay 15 menit setelah melakukan pekerjaan ini, termasuk gagal saat bekerja.", "Close", "");
+            }
+            case 1:
+            {
+                Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_MSGBOX, "Sweeper Sidejob", ""WHITE"Pekerjaan Sweeper bertujuan untuk membersikhan jalanan yang ada dikota ini.\n\n\
+                Anda bisa menemukan pekerjaan dengan menggunakan GPS (/gps).\n\n\
+                "COL_LIGHTGREEN"Langkah-langkah:"WHITE"\n\
+                * Pergi ke lokasi kerja.\n\
+                * Baca dialog yang di berikan untuk melihat peraturan sebelum memulai pekerjaan.\n\
+                * Jika setuju dengan aturan, kendarai mobil ke arah yang di tandai di radar map anda.\n\
+                * Ikuti radar untuk mengikuti rute kamu.\n\n\
+                "COL_LIGHTGREEN"Penting:"WHITE"\n\
+                * Saat berada dalam mobil, jangan coba untuk turun sebelum anda menghentikan pekerjaan-\n  \
+                  itu akan membuat anda gagal dan tidak mendapatkan bonus.\n\
+                * Anda akan delay 15 menit setelah melakukan pekerjaan ini, termasuk gagal saat bekerja.", "Close", "");
+            }
+            case 2:
+            {
+                Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_MSGBOX, "Bus Sidejob", ""WHITE"Pekerjaan bus bertujuan untuk mengantarkan orang dari rute tertentu ke rute lain.\n\n\
+                Anda bisa menemukan pekerjaan dengan menggunakan GPS (/gps).\n\n\
+                "COL_LIGHTGREEN"Langkah-langkah:"WHITE"\n\
+                * Pergi ke lokasi kerja.\n\
+                * Baca dialog yang di berikan untuk melihat peraturan sebelum memulai pekerjaan.\n\
+                * Jika setuju dengan aturan, kendarai mobil ke arah yang di tandai di radar map anda.\n\
+                * Ikuti radar untuk mengikuti rute kamu.\n\n\
+                "COL_LIGHTGREEN"Perintah:"WHITE"\n\
+                * Gunakan /limitspeed 90 supaya tidak gagal dalam bekerja.\n\n\
+                "COL_LIGHTGREEN"Penting:"WHITE"\n\
+                * Saat berada dalam mobil, jangan coba untuk turun sebelum anda menghentikan pekerjaan-\n  \
+                  itu akan membuat anda gagal dan tidak mendapatkan bonus.\n\
+                * Anda akan delay 15 menit setelah melakukan pekerjaan ini, termasuk gagal saat bekerja.", "Close", "");
+            }
+            case 3:
+            {
+                Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_MSGBOX, "Boxville Sidejob", ""WHITE"Pekerjaan boxville bertujuan untuk mengantarkan paket ke rumah-rumah.\n\n\
+                Anda bisa menemukan pekerjaan dengan menggunakan GPS (/gps).\n\n\
+                "COL_LIGHTGREEN"Langkah-langkah:"WHITE"\n\
+                * Pergi ke lokasi kerja.\n\
+                * Baca dialog yang di berikan untuk melihat peraturan sebelum memulai pekerjaan.\n\
+                * Jika setuju dengan aturan, kendarai mobil ke arah yang di tandai di radar map anda.\n\
+                * Anda akan melihat tampilan di sebelah kiri layar, tampilan itu sebagai indikator (bantuan)-\n  \
+                  untuk melihat jumlah rumah yang bisa anda antarkan paketnya.\n\
+                * Antarkan paket sebanyak mungkin, setelah itu bawa kembali ke lokasi yang ditentukan untuk-\n  \
+                  menukarkan dengan bonus.\n\n\
+                "COL_LIGHTGREEN"Perintah:"WHITE"\n\
+                * "YELLOW"H: mengambil atau memasukan paket dari dalam mobil box."WHITE"\n\
+                * /deliverpacket: mengantar paket didepan pintu rumah.\n\
+                * /stopboxville: menukarkan sampah untuk mendapatkan bonus.\n\n\
+                "COL_LIGHTGREEN"Penting:"WHITE"\n\
+                * Saat berada dalam mobil, anda hanya diberi waktu 5 menit untuk turun mengantarkan paket-\n  \
+                  jika melebihi waktu tersebut, itu akan membuat anda gagal dan tidak mendapatkan bonus.\n\
+                * Anda akan delay 15 menit setelah melakukan pekerjaan ini, termasuk gagal saat bekerja.", "Close", "");
+            }
         }
     }
     return 1;

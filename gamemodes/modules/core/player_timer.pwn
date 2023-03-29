@@ -302,11 +302,15 @@ ptask Player_ChargingTimer[1000](playerid)
             {
                 PlayerData[playerid][pPhoneBattery] += 10;
                 ChargePhone[playerid] = 1;
-                SetPlayerProgressBarValue(playerid, BarBawah[playerid], PlayerData[playerid][pPhoneBattery]);
+
+                PlayerTextDrawSetString(playerid, BatteryIndicatorMaximize[playerid], sprintf("%.2f%", PlayerData[playerid][pPhoneBattery]));
+                PlayerTextDrawSetString(playerid, BatteryIndicatorMinimize[playerid], sprintf("%.2f%", PlayerData[playerid][pPhoneBattery]));
+
+                /*SetPlayerProgressBarValue(playerid, BarBawah[playerid], PlayerData[playerid][pPhoneBattery]);
                 SetPlayerProgressBarColour(playerid, BarBawah[playerid], ConvertHBEColor(floatround(PlayerData[playerid][pPhoneBattery]), true));
 
                 SetPlayerProgressBarValue(playerid, BarAtas[playerid], PlayerData[playerid][pPhoneBattery]);
-                SetPlayerProgressBarColour(playerid, BarAtas[playerid], ConvertHBEColor(floatround(PlayerData[playerid][pPhoneBattery]), true));
+                SetPlayerProgressBarColour(playerid, BarAtas[playerid], ConvertHBEColor(floatround(PlayerData[playerid][pPhoneBattery]), true));*/
             }
             else
             {
@@ -330,11 +334,15 @@ ptask Player_ChargingTimer[1000](playerid)
         {
             PlayerData[playerid][pPhoneBattery] -= 0.5;
             BatteryCounter[playerid] = 0;
-            SetPlayerProgressBarValue(playerid, BarBawah[playerid], PlayerData[playerid][pPhoneBattery]);
+
+            PlayerTextDrawSetString(playerid, BatteryIndicatorMaximize[playerid], sprintf("%.2f%", PlayerData[playerid][pPhoneBattery]));
+            PlayerTextDrawSetString(playerid, BatteryIndicatorMinimize[playerid], sprintf("%.2f%", PlayerData[playerid][pPhoneBattery]));
+
+            /*etPlayerProgressBarValue(playerid, BarBawah[playerid], PlayerData[playerid][pPhoneBattery]);
             SetPlayerProgressBarColour(playerid, BarBawah[playerid], ConvertHBEColor(floatround(PlayerData[playerid][pPhoneBattery]), true));
 
             SetPlayerProgressBarValue(playerid, BarAtas[playerid], PlayerData[playerid][pPhoneBattery]);
-            SetPlayerProgressBarColour(playerid, BarAtas[playerid], ConvertHBEColor(floatround(PlayerData[playerid][pPhoneBattery]), true));
+            SetPlayerProgressBarColour(playerid, BarAtas[playerid], ConvertHBEColor(floatround(PlayerData[playerid][pPhoneBattery]), true));*/
         }
         else
         {
@@ -671,11 +679,15 @@ ptask Player_TextdrawUpdate[1000](playerid)
     {
         PlayerTextDrawSetString(playerid, PhoneNumber[playerid], sprintf("No Card"));
         PlayerTextDrawSetString(playerid, MinimizePhoneNumb[playerid], sprintf("No Card"));
-        SetPlayerProgressBarValue(playerid, BarBawah[playerid], PlayerData[playerid][pPhoneBattery]);
+
+        PlayerTextDrawSetString(playerid, BatteryIndicatorMaximize[playerid], sprintf("%.2f%", PlayerData[playerid][pPhoneBattery]));
+        PlayerTextDrawSetString(playerid, BatteryIndicatorMinimize[playerid], sprintf("%.2f%", PlayerData[playerid][pPhoneBattery]));
+
+        /*SetPlayerProgressBarValue(playerid, BarBawah[playerid], PlayerData[playerid][pPhoneBattery]);
         SetPlayerProgressBarColour(playerid, BarBawah[playerid], ConvertHBEColor(floatround(PlayerData[playerid][pPhoneBattery]), true));
 
         SetPlayerProgressBarValue(playerid, BarAtas[playerid], PlayerData[playerid][pPhoneBattery]);
-        SetPlayerProgressBarColour(playerid, BarAtas[playerid], ConvertHBEColor(floatround(PlayerData[playerid][pPhoneBattery]), true));
+        SetPlayerProgressBarColour(playerid, BarAtas[playerid], ConvertHBEColor(floatround(PlayerData[playerid][pPhoneBattery]), true));*/
 
         // Sudah di-handle oleh module server/realtime_clock
         // PlayerTextDrawSetString(playerid, PhoneTimeMaximize[playerid], sprintf("%d:00", ServerData[ServerTime]));
@@ -685,11 +697,17 @@ ptask Player_TextdrawUpdate[1000](playerid)
     {
         PlayerTextDrawSetString(playerid, PhoneNumber[playerid], sprintf("#%d", PlayerData[playerid][pPhone]));
         PlayerTextDrawSetString(playerid, MinimizePhoneNumb[playerid], sprintf("#%d", PlayerData[playerid][pPhone]));
-        SetPlayerProgressBarValue(playerid, BarBawah[playerid], PlayerData[playerid][pPhoneBattery]);
+
+
+        PlayerTextDrawSetString(playerid, BatteryIndicatorMaximize[playerid], sprintf("%.2f%", PlayerData[playerid][pPhoneBattery]));
+        PlayerTextDrawSetString(playerid, BatteryIndicatorMinimize[playerid], sprintf("%.2f%", PlayerData[playerid][pPhoneBattery]));
+
+
+        /*SetPlayerProgressBarValue(playerid, BarBawah[playerid], PlayerData[playerid][pPhoneBattery]);
         SetPlayerProgressBarColour(playerid, BarBawah[playerid], ConvertHBEColor(floatround(PlayerData[playerid][pPhoneBattery]), true));
 
         SetPlayerProgressBarValue(playerid, BarAtas[playerid], PlayerData[playerid][pPhoneBattery]);
-        SetPlayerProgressBarColour(playerid, BarAtas[playerid], ConvertHBEColor(floatround(PlayerData[playerid][pPhoneBattery]), true));
+        SetPlayerProgressBarColour(playerid, BarAtas[playerid], ConvertHBEColor(floatround(PlayerData[playerid][pPhoneBattery]), true));*/
 
         // Sudah di-handle oleh module server/realtime_clock
         // PlayerTextDrawSetString(playerid, PhoneTimeMaximize[playerid], sprintf("%d:00", ServerData[ServerTime]));

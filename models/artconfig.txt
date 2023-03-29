@@ -68,21 +68,23 @@ AddCharModel(240, 20061, "cordl.dff", "cordl.txd");
 
 
 
-AddCharModel(13, 20062, "bfyst.dff", "bfyst.txd"); 
+AddCharModel(0, 20062, "bfyst.dff", "bfyst.txd"); 
 
-AddCharModel(252, 20063, "wmyro1.dff", "wmyro1.txd");
+AddCharModel(0, 20063, "wmyro1.dff", "wmyro1.txd");
 
-AddCharModel(252, 20064, "wmyva2_1.dff", "wmyva2_1.txd");
+AddCharModel(0, 20064, "wmyva2_1.dff", "wmyva2_1.txd");
 
-AddCharModel(252, 20065, "wmyva2_2.dff", "wmyva2_2.txd");
+AddCharModel(0, 20065, "wmyva2_2.dff", "wmyva2_2.txd");
 
-AddCharModel(252, 20066, "wmyva2_3.dff", "wmyva2_3.txd");
+AddCharModel(0, 20066, "wmyva2_3.dff", "wmyva2_3.txd");
 
-AddCharModel(252, 20067, "wmyva2_3.dff", "wmyva2_3.txd");
+AddCharModel(0, 20067, "wmyva2_3.dff", "wmyva2_3.txd");
 
-AddCharModel(252, 20068, "wmyva2_4.dff", "wmyva2_4.txd");
+AddCharModel(0, 20068, "wmyva2_4.dff", "wmyva2_4.txd");
 
-AddCharModel(252, 20069, "wmyva2_5.dff", "wmyva2_5.txd");
+AddCharModel(0, 20069, "wmyva2_5.dff", "wmyva2_5.txd");
+
+AddCharModel(0, 20069, "wmyva2_6.dff", "wmyva2_6.txd");
 
 
 
@@ -91,6 +93,13 @@ AddCharModel(265, 20071, "bmygss.dff", "bmygss.txd");
 AddCharModel(280, 20072, "wmygss1.dff", "wmygss1.txd");
 AddCharModel(280, 20073, "wmygss2.dff", "wmygss2.txd");
 AddCharModel(292, 20074, "hmygss.dff", "hmygss.txd");
+
+AddCharModel(216, 20075, "wmyva2_6.dff", "wmyva2_6.txd");
+AddCharModel(216, 20076, "anna01.dff", "anna01.txd");
+AddCharModel(216, 20077, "jenn01.dff", "jenn01.txd");
+
+
+
 
 AddSimpleModel(-1,19379, -2000, "wallzzz.dff", "wallzzz.txd");
 AddSimpleModel(-1,1942, -2001, "SWATArmour1.dff", "SWATArmour1.txd");
