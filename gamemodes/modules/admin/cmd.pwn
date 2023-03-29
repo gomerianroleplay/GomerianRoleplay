@@ -354,6 +354,26 @@ CMD:a(playerid, params[])
     return 1;
 }
 
+CMD:hidename(playerid, params[])
+{
+    if (CheckAdmin(playerid, 8))
+        return PermissionError(playerid);
+    //if (PlayerData[playerid][pMaskOn]) return SendErrorMessage(playerid, "You're using a mask remove the mask first");
+    new hide;
+	if(sscanf(params, "d", hide)) return SendClientMessageEx(playerid, COLOR_WHITE, "USAGE: 0/1");
+
+    if(hide == 1){
+        
+        new string[32];
+        format(string, sizeof(string), "Berubah hewan");
+        UpdateDynamic3DTextLabelText(PlayerData[playerid][pNameTag], X11_WHITE, string);
+    }else{
+        ResetNameTag(playerid, true);
+        SendNearbyMessage(playerid, 15.0, X11_PLUM, "berubah manusia", ReturnName(playerid, 0));
+    }
+    return 1;
+}
+
 CMD:aduty(playerid, params[])
 {
     if (CheckAdmin(playerid, 1))
