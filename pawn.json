@@ -74,7 +74,7 @@
     },
     "runtimes": [
         {
-            "name": "dev",
+            "name": "main",
             "version": "0.3.DL-R1",
             "mode": "server",
             "echo": "Loading server development configuration...",
@@ -128,7 +128,7 @@
             }
         },
         {
-            "name": "live:debug",
+            "name": "amar",
             "version": "0.3.DL-R1",
             "mode": "server",
             "echo": "Loading server live configuration...",
@@ -138,18 +138,16 @@
             "filterscripts": [
                 "CustomInteriors",
                 "CustomExteriors",
-                "Server01",
-                "FastDL",
                 "StaticLocations"
             ],
-            "rcon_password": "E8uMwCAYgzwuNFsx",
-            "port": 7777,
-            "hostname": "EarlyLife Roleplay",
+            "rcon_password": "123",
+            "port": 7787,
+            "hostname": "Development-area",
             "maxplayers": 100,
             "language": "English",
             "mapname": "San Andreas",
             "weburl": "bit.ly/GC-RP",
-            "gamemodetext": "Gamemode Revision",
+            "gamemodetext": "Bug-Hunter",
             "announce": false,
             "lanmode": false,
             "query": true,
@@ -178,12 +176,13 @@
             "cookielogging": false,
             "output": true,
             "extra": {
+                "useartwork": "0",
                 "long_call_time": "0",
-                "discord_bot_token": "123456789"
+                "discord_bot_token": "."
             }
         },
         {
-            "name": "live",
+            "name": "abc",
             "version": "0.3.DL-R1",
             "mode": "server",
             "echo": "Loading server live configuration...",
@@ -193,12 +192,11 @@
             "filterscripts": [
                 "CustomInteriors",
                 "CustomExteriors",
-                "FastDL",
                 "StaticLocations"
             ],
-            "rcon_password": "E8uMwCAYgzwuNFsx",
+            "rcon_password": "SETTING SENDIRI",
             "port": 7777,
-            "hostname": "EarlyLife Roleplay",
+            "hostname": "DEVELOPMENT-AREA",
             "maxplayers": 100,
             "language": "English",
             "mapname": "San Andreas",
@@ -232,8 +230,9 @@
             "cookielogging": false,
             "output": true,
             "extra": {
+                "useartwork": "0",
                 "long_call_time": "0",
-                "discord_bot_token": "123456789"
+                "discord_bot_token": "ISI SENDIRI"
             }
         },
         {
