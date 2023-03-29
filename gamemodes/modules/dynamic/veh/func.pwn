@@ -737,12 +737,13 @@ Vehicle_Save(vehicleid, save_mode = VEHICLE_SAVE_ALL)
 					VehicleData[vehicleid][vehTogNeon]
 				);
 
-				mysql_format(g_iHandle, query, sizeof(query), "%s, `vehwoods` = '%d', `vehcomponent` = '%d', `parking` = '%d', `house_parking` = '%d', `doorstatus` = '%d', `enginestatus` = '%d'",
+				mysql_format(g_iHandle, query, sizeof(query), "%s, `vehwoods` = '%d', `vehcomponent` = '%d', `parking` = '%d', `house_parking` = '%d', `garage` = '%d', `doorstatus` = '%d', `enginestatus` = '%d'",
 					query,
 					VehicleData[vehicleid][vehComponent],
 					VehicleData[vehicleid][vehWoods],
 					VehicleData[vehicleid][vehParking],
 					VehicleData[vehicleid][vehHouseParking],
+					VehicleData[vehicleid][vehGarage],
 					VehicleData[vehicleid][vehDoorStatus],
 					VehicleData[vehicleid][vehEngineStatus]
 				);
@@ -1176,7 +1177,7 @@ Vehicle_PlayerTotalCount(playerid)
 {
 	new Cache:execute, total = 0;
 
-	execute = mysql_query(g_iHandle, sprintf("SELECT `id` FROM `server_vehicles` WHERE `extraid`='%d' AND `type`='%d';", GetPlayerSQLID(playerid), VEHICLE_TYPE_PLAYER));
+	execute = mysql_query(g_iHandle, sprintf("SELECT `id` FROM `server_vehicles` WHERE `extraid`='%d' AND `type`='%d' AND `parking`= 0 AND `house_parking` = -1 AND `garage` = 0;", GetPlayerSQLID(playerid), VEHICLE_TYPE_PLAYER));
 
 	if(cache_num_rows())
 		total = cache_num_rows();

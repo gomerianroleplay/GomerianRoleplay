@@ -53,8 +53,8 @@ hook OnPlayerDisconnectEx(playerid, reason)
 
 hook OnScriptInit()
 {
-	CreateDynamicMapIcon(1613.1182,-1891.2689,13.5469, 56, -1, 0, 0, -1, _, MAPICON_GLOBAL);
-	CreateDynamicPickup(1239, 23, 1613.1182,-1891.2689,13.5469);
+	CreateDynamicMapIcon(1632.9908,-1908.9866,13.5521, 56, -1, 0, 0, -1, _, MAPICON_GLOBAL);
+	CreateDynamicPickup(1239, 23, 1632.9908,-1908.9866,13.5521);
 	CreateDynamic3DTextLabel("[Box Ville]\n"WHITE"Gunakan "YELLOW"/stopboxville"WHITE" untuk mendapatkan upah", COLOR_CLIENT, 1613.1182,-1891.2689,13.5469+0.5, 5.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0);
 }
 

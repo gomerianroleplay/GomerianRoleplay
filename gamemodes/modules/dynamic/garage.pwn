@@ -76,7 +76,7 @@ stock Garage_Save(id)
 		GarageInfo[id][garageInside],
 		GarageInfo[id][garageHouseLink]
 	);
-	format(query, sizeof(query), "%s, `Price`='%d', `Type`='%d', `Lock`='%d', `LocationInt`='%.02f|%.02f|%.02f|%.02f' WHERE `garageID` = '%d'", 
+	format(query, sizeof(query), "%s, `Price`='%d', `Type`='%d', `Lock`='%d', `LocationInt`='%.02f|%.02f|%.02f|%.02f' WHERE `ID` = '%d'", 
 		query,
 		GarageInfo[id][garagePrice],
 		GarageInfo[id][garageType],

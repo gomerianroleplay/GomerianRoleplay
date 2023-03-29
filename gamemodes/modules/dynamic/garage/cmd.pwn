@@ -170,6 +170,8 @@ CMD:garage(playerid, params[])
                 if (GarageInfo[garage_id][garageInside] >= GarageInfo[garage_id][garageType]) return SendErrorMessage(playerid, "Can't put more vehicle to this garage.");
 
                 GarageInfo[garage_id][garageInside] ++;
+                VehicleData[vehicleid][vehGarage] = 1;
+                VehicleData[vehicleid][vehState] = 8;
 
                 VehicleData[vehicleid][vehInterior] = GarageInfo[garage_id][Interior];
                 VehicleData[vehicleid][vehVirtual] = GarageInfo[garage_id][garageID] + 1000;
@@ -315,6 +317,7 @@ CMD:garage(playerid, params[])
                     if (!Garage_IsOwner(playerid, garage_id)) return SendErrorMessage(playerid, "This garage isn't owned by you.");
 
                     VehicleData[vehicleid][vehGarage] = 0;
+                    VehicleData[vehicleid][vehState] = 1;
                     GarageInfo[garage_id][garageInside] --;
 
                     VehicleData[vehicleid][vehInterior] = 0;

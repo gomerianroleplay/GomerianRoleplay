@@ -31,7 +31,7 @@
     ],
     "local": true,
     "runtime": {
-        "version": "0.3.7",
+        "version": "0.3.DL-R1",
         "mode": "server",
         "rcon_password": "password",
         "port": 7777,
@@ -75,7 +75,7 @@
     "runtimes": [
         {
             "name": "dev",
-            "version": "0.3.7",
+            "version": "0.3.DL-R1",
             "mode": "server",
             "echo": "Loading server development configuration...",
             "gamemodes": [
@@ -129,7 +129,7 @@
         },
         {
             "name": "live:debug",
-            "version": "0.3.7",
+            "version": "0.3.DL-R1",
             "mode": "server",
             "echo": "Loading server live configuration...",
             "gamemodes": [
@@ -184,7 +184,7 @@
         },
         {
             "name": "live",
-            "version": "0.3.7",
+            "version": "0.3.DL-R1",
             "mode": "server",
             "echo": "Loading server live configuration...",
             "gamemodes": [
@@ -238,7 +238,7 @@
         },
         {
             "name": "test:logger",
-            "version": "0.3.7",
+            "version": "0.3.DL-R1",
             "mode": "y_testing",
             "gamemodes": [
                 "y_testing_logger"

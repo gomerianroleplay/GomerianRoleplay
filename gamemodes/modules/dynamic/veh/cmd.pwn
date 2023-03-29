@@ -750,6 +750,11 @@ CMD:vehicle(playerid, params[])
 			if(ReturnVehicleHealth(vehicleid) <= 300)
 				return ShowPlayerFooter(playerid, "~r~ERROR: ~w~Mesin kendaraan rusak, gagal menghidupkan mesin!.");
 
+			// if((new idvehlock = Vehicle_Nearest(playerid)) != -1){
+			// 	index = Vehicle_ReturnID(idvehlock);
+			// 	if(VehicleData[index][vehLockTire]) return ShowPlayerFooter(playerid, "~r~ERROR: ~w~Kendaraan di ~r~Tire Lock~w~, gagal menghidupkan mesin!.");
+			// }
+
 			if((vehicle_index = Vehicle_ReturnID(vehicleid)) != RETURN_INVALID_VEHICLE_ID)
 			{
 				if(VehicleData[vehicle_index][vehFuel] <= 0)
@@ -766,6 +771,9 @@ CMD:vehicle(playerid, params[])
 
 				if(Vehicle_GetType(vehicle_index) == VEHICLE_TYPE_NONE && !GetAdminLevel(playerid))
 					return ShowPlayerFooter(playerid, "~r~ERROR: ~w~Kendaraan ini hanya dapat dioperasikan oleh admin!");
+				
+				if(VehicleData[vehicle_index][vehLockTire]) 
+					return ShowPlayerFooter(playerid, "~r~ERROR: ~w~Kendaraan di ~r~Tire Lock~w~, gagal menghidupkan mesin!.");
 			}
 
 			if(GetEngineStatus(vehicleid))
@@ -981,7 +989,8 @@ CMD:vehicle(playerid, params[])
 					LIGHTBLUE"Impounded", 
 					LIGHTBLUE"Parked",  
 					LIGHTBLUE"House Parked",
-					LIGHTBLUE"Apartment Parked"
+					LIGHTBLUE"Apartment Parked",
+					LIGHTBLUE"Garage Parked"
 				};
 
 			execute = mysql_query(g_iHandle, sprintf("SELECT `model`, `state`, `insurance` FROM `server_vehicles` WHERE `extraid`='%d' AND `type`='%d';", GetPlayerSQLID(playerid), VEHICLE_TYPE_PLAYER));
@@ -1325,7 +1334,8 @@ CMD:playercarlist(playerid, params[])
 			LIGHTBLUE"Impounded",
 			LIGHTBLUE"Parked",
 			LIGHTBLUE"House Parked",
-			LIGHTBLUE"Apartment Parked"
+			LIGHTBLUE"Apartment Parked",
+			LIGHTBLUE"Garage Parked"
 		};
 
 	execute = mysql_query(g_iHandle, sprintf("SELECT `model`, `state`, `insurance` FROM `server_vehicles` WHERE `extraid`='%d' AND `type`='%d';", GetPlayerSQLID(targetid), VEHICLE_TYPE_PLAYER));

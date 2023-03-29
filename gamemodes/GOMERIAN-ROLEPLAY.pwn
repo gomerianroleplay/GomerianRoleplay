@@ -266,6 +266,11 @@ public OnGameModeInit()
 #include "modules/dynamic/hunt/cmd.pwn"
 #include "modules/dynamic/hunt/action.pwn"
 
+// IntheBleakMidWinter Properties
+#include "modules/IntheBleakMidWinter/AnnaHouse.pwn"
+
+
+
 #include "modules/dynamic/veh/vkeys.pwn"
 // #include "modules/dynamic/veh/chopshop.pwn"
 #include "modules/dynamic/veh/speedradar.pwn"
@@ -7389,7 +7394,7 @@ ShowStatsForPlayer(playerid, targetid)
 
         format(string, sizeof string, "%sHealth: ["RED"%.1f/100"WHITE"] | Armour: ["LIGHTBLUE"%.1f/100"WHITE"] | Interior: ["LIGHTBLUE"%d"WHITE"] | Virtual World: ["LIGHTBLUE"%d"WHITE"] | Last VID: ["LIGHTBLUE"%d"WHITE"] | Warnings: ["ORANGE"%d"WHITE"/"RED"20"WHITE"]", string, health, armour, GetPlayerInterior(targetid), GetPlayerVirtualWorld(targetid), GetPlayerLastVehicle(targetid), PlayerData[targetid][pWarnings]);
 
-        if(GetAdminLevel(targetid)) {
+        if(GetAdminLevel(targetid) && !AccountData[playerid][pAdminHide]) {
             format(string, sizeof string, "%s\n\n"ORANGE"Admin/Helper:"WHITE"\n", string);
             format(string, sizeof string, "%sDuty minute(s) : ["LIGHTBLUE"%d"WHITE"] | Accepted Report: ["LIGHTBLUE"%d"WHITE"] | Denied Report: ["LIGHTBLUE"%d"WHITE"] | Accept Stuck: ["LIGHTBLUE"%d"WHITE"] | Denied Stuck: ["LIGHTBLUE"%d"WHITE"]\n", string, AccountData[targetid][pAdminDutyTime], AccountData[targetid][pAdminAcceptReport], AccountData[targetid][pAdminDeniedReport], AccountData[targetid][pAdminAcceptStuck], AccountData[targetid][pAdminDeniedStuck]);
             format(string, sizeof string, "%sAnswered Question: ["LIGHTBLUE"%d"WHITE"] | Banned Record: ["LIGHTBLUE"%d"WHITE"] | Unbanned Record: ["LIGHTBLUE"%d"WHITE"] | Jail Record: ["LIGHTBLUE"%d"WHITE"]", string, AccountData[targetid][pAdminAnswer],AccountData[targetid][pAdminBanned], AccountData[targetid][pAdminUnbanned], AccountData[targetid][pAdminJail]);
@@ -19475,8 +19480,8 @@ CMD:setcustomskin(playerid, params[])
     if(userid == INVALID_PLAYER_ID)
         return SendErrorMessage(playerid, "You have specified an invalid player.");
 
-    if(skinid < 20001 || skinid > 20074)
-        return SendErrorMessage(playerid, "Invalid skin ID. Skins range from 20001 to 20074.");
+    if(skinid < 20001 || skinid > 20077)
+        return SendErrorMessage(playerid, "Invalid skin ID. Skins range from 20001 to 20077.");
 
     SetPlayerSkinEx(userid, skinid);
 
