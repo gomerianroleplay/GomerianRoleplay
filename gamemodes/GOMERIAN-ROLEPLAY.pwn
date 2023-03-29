@@ -10424,7 +10424,6 @@ ResetStatistics(playerid)
     PlayerData[playerid][pInjuredTag] = Text3D:INVALID_STREAMER_ID;
     PlayerData[playerid][pTutorialObjectGate] = INVALID_STREAMER_ID;
 
-    PlayerData[playerid][pCuttingBar] = INVALID_PLAYER_BAR_ID;
     PlayerData[playerid][pAcceptInspect] = INVALID_PLAYER_ID;
     PlayerData[playerid][pOnDrag] = INVALID_PLAYER_ID;
     PlayerData[playerid][pDraggedBy] = INVALID_PLAYER_ID;
@@ -10438,6 +10437,7 @@ ResetStatistics(playerid)
     PlayerData[playerid][pDisableRADIO] = true;
     // PlayerData[playerid][pFactionStock] = 0;
     PlayerData[playerid][pBeanBullets] = 0;
+    PlayerData[playerid][pCuttingProgress] = 0;
 
     selectCategory[playerid] = selectIndex[playerid] = -1;
 
@@ -12214,8 +12214,6 @@ Function:OnQueryFinished(extraid, threadid, race_check)
                 }
 
                 TextDrawHideForPlayer(extraid, gLoginTextdraws);
-
-                PlayerData[extraid][pCuttingBar]    = CreatePlayerProgressBar(extraid, 498.0, 104.0, 113.0, 6.2, 0x15a014FF, 100, progressbar_direction:0);
 
                 // //RelationStatus
                 // RelationshipProgressBar[extraid][0] = CreatePlayerProgressBar(extraid, 403.000000, 438.000000, 79.000000, 4.000000, -16776992, 100.000000, 0);
