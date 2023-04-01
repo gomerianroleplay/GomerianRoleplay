@@ -14248,6 +14248,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
             Entrance_UpdateRecentTeleport(playerid);
             Entrance_Enter(playerid, id);
+            SetPlayerPosEx(playerid, EntranceData[id][entranceInt][0], EntranceData[id][entranceInt][1], EntranceData[id][entranceInt][2], 2500);
         }
         if((id = Entrance_Inside(playerid, true)) != -1) {
             if(Entrance_HasRecentTeleport(playerid))
