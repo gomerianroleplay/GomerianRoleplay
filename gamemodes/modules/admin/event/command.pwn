@@ -131,6 +131,11 @@ CMD:event(playerid, params[])
 
 		//Team Selection
 		
+		if(PlayerData[playerid][pOnDuty])
+			//PlayerData[playerid][pOnDuty] = 0;
+			return SendErrorMessage(playerid, "Kamu harus off-duty untuk join event.");
+
+
 		ResetPlayerWeapons(playerid);
 		eventJoin[playerid] = 1;
 		
