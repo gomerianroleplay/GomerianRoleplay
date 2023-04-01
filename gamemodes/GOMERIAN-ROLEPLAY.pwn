@@ -30945,15 +30945,7 @@ Dialog:MainGPS(playerid, response, listitem, inputtext[])
             case 5: Dialog_Show(playerid, FindSidejob, DIALOG_STYLE_LIST, "Find Sidejob", "Bus Driver\nBoxville\nMoney Transport\nSweeper\nTrashmaster", "Select", "Close");
             case 6: Show_Lumber(playerid);
             case 7: Dealership_GPS(playerid);
-            case 8:
-            {
-                new string[255];
-                format(string, sizeof(string), "#\tName\n");
-                for(new id = 0; id < MAX_WORKSHOP; id++) if(WorkshopData[id][wExists]) {
-                    format(string, sizeof(string), "%s%d\t%s\n", string, id, WorkshopData[id][wName]);
-                }
-                Dialog_Show(playerid, ListWorkshop, DIALOG_STYLE_TABLIST_HEADERS, "GPS Workshop", string, "Select", "Close");
-            }
+            case 8: Workshop_GPS(playerid);
             case 10: Dialog_Show(playerid, OtherLocation, DIALOG_STYLE_LIST, "Other Location", "Component Warehouse\nWheels & Hydraulics Shop\nFish Shop\nModshop\nMechanic Center\nInsurance Center\nDMV\nRodeo Bank\nAdvertisement Agency\nButcher\nPublic Parking Downtown\nPublic Parking Market\nFarm Warehouse", "Select", "Close");
             case 11: Dialog_Show(playerid, FindCargo, DIALOG_STYLE_LIST, "Find Cargo (Trucker Only)", "Retail Cargo\nClothes Cargo\nFuel Cargo\nFood Cargo\nFurniture Cargo\nElectronics Cargo\nAmmunation Cargo\nBar Cargo", "Select", "Close");
         }
@@ -30999,6 +30991,21 @@ Dialog:OtherLocation(playerid, response, listitem, inputtext[])
         SendServerMessage(playerid, "Waypoint %s marked on your map.", inputtext);
     }
     return 1;
+}
+
+Workshop_GPS(playerid)
+{
+	new output[500], count;
+
+	strcat(output, "ID\tName\n");
+
+	foreach(new i : Workshop)
+		strcat(output, sprintf("%d\t%s\n", i, WorkshopData[i][wName])), count++;
+
+	if(count) Dialog_Show(playerid, ListWorkshop, DIALOG_STYLE_TABLIST_HEADERS, "Workshop", output, "Track", "Close");
+	else SendErrorMessage(playerid, "Tidak ada workshop yang dispawn!");
+
+	return 1;
 }
 
 Dialog:ListWorkshop(playerid, response, listitem, inputtext[])
