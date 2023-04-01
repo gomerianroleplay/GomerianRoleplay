@@ -3,8 +3,7 @@
 
 public OnPlayerClickMap(playerid, Float:fX, Float:fY, Float:fZ)
 {
-    if (!(AccountData[playerid][pAdminDuty]))
-        return 0;
+    if (!(AccountData[playerid][pAdminDuty])) return 0;
     if (AccountData[playerid][pAdmin] > 1)
 
     {
