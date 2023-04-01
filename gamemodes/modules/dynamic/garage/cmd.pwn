@@ -28,6 +28,8 @@ CMD:destroygarage(playerid, params[])
 
     if (sscanf(params, "d", garage_id)) return SendErrorMessage(playerid, "/destroygarage [garage id]");
     if (!GarageInfo[garage_id][garageExists]) return SendErrorMessage(playerid, "Invalid garage id.");
+    if (GarageInfo[garage_id][garageInside] != 0) return SendErrorMessage(playerid, "Masih ada kendaraan di dalam garage");
+
 
     SendServerMessage(playerid, "You have successfully destroy garage ID: %d.", garage_id);
     Garage_Destroy(garage_id);
@@ -176,14 +178,15 @@ CMD:garage(playerid, params[])
                 VehicleData[vehicleid][vehInterior] = GarageInfo[garage_id][Interior];
                 VehicleData[vehicleid][vehVirtual] = GarageInfo[garage_id][garageID] + 1000;
 
-                SetVehiclePos(VehicleData[vehicleid][vehVehicleID], GarageInfo[garage_id][garageLocInt][0], GarageInfo[garage_id][garageLocInt][1], GarageInfo[garage_id][garageLocInt][2]);
-                SetVehicleZAngle(VehicleData[vehicleid][vehVehicleID], GarageInfo[garage_id][garageLocInt][3]);
+                SendPlayerPos(playerid, GarageInfo[garage_id][garageLocInt][0], GarageInfo[garage_id][garageLocInt][1], GarageInfo[garage_id][garageLocInt][2], 0, VehicleData[vehicleid][vehInterior], VehicleData[vehicleid][vehVirtual]);
+                // SetVehiclePos(VehicleData[vehicleid][vehVehicleID], GarageInfo[garage_id][garageLocInt][0], GarageInfo[garage_id][garageLocInt][1], GarageInfo[garage_id][garageLocInt][2]);
+                // SetVehicleZAngle(VehicleData[vehicleid][vehVehicleID], GarageInfo[garage_id][garageLocInt][3]);
 
                 LinkVehicleToInterior(VehicleData[vehicleid][vehVehicleID], GarageInfo[garage_id][Interior]);
                 SetVehicleVirtualWorld(VehicleData[vehicleid][vehVehicleID], VehicleData[vehicleid][vehVirtual]);
 
-                SetPlayerInterior(playerid, GarageInfo[garage_id][Interior]);
-                SetPlayerVirtualWorld(playerid, GarageInfo[garage_id][garageID] + 1000);
+                // SetPlayerInterior(playerid, GarageInfo[garage_id][Interior]);
+                // SetPlayerVirtualWorld(playerid, GarageInfo[garage_id][garageID] + 1000);
 
                 Vehicle_Save(vehicleid);
                 Garage_Sync(garage_id);
