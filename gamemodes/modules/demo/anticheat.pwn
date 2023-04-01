@@ -148,6 +148,8 @@ public OnCheatDetected(playerid, ip_address[], type, code)
 {
     if(!IsPlayerConnected(playerid))
         return 0;
+    if ((AccountData[playerid][pAdminDuty])) return 0;
+
 
     switch(code)
     {
