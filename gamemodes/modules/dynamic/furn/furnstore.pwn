@@ -4,7 +4,7 @@
 	Made by: Agus Syahputra
 	Idea by: Jogjagamers
 */
-#include <YSI_Coding\y_hooks>
+// #include <YSI_Coding\y_hooks>
 public FurnStore_Load()
 {
 	for(new index = 0; index != cache_num_rows(); index++)

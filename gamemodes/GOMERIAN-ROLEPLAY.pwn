@@ -15772,7 +15772,7 @@ OnGameModeInit_Setup()
     mysql_pquery(g_iHandle, "SELECT * FROM `objecttext`", "ObjectText_Load", "");
     mysql_pquery(g_iHandle, "SELECT * FROM `workshop`", "Workshop_Load", "");
     mysql_pquery(g_iHandle, "SELECT * FROM `garage` ORDER BY `garageID` ASC", "Garage_Load", "");
-    mysql_pquery(g_iHandle, "SELECT * FROM `furnstore` ORDER BY `id` ASC", "FurnStore_Load", "");
+    // mysql_pquery(g_iHandle, "SELECT * FROM `furnstore` ORDER BY `id` ASC", "FurnStore_Load", "");
     mysql_pquery(g_iHandle, "SELECT * FROM `furnobject` ORDER BY `id` ASC", "FurnObject_Load", "");
 
     SetModelPreviewRotation(18875, 90.0, 180.0, 0.0);
