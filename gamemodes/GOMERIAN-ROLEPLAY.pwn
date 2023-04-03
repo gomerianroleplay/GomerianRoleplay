@@ -10429,7 +10429,6 @@ ResetStatistics(playerid)
     PlayerData[playerid][pInjuredTag] = Text3D:INVALID_STREAMER_ID;
     PlayerData[playerid][pTutorialObjectGate] = INVALID_STREAMER_ID;
 
-    PlayerData[playerid][pCuttingBar] = INVALID_PLAYER_BAR_ID;
     PlayerData[playerid][pAcceptInspect] = INVALID_PLAYER_ID;
     PlayerData[playerid][pOnDrag] = INVALID_PLAYER_ID;
     PlayerData[playerid][pDraggedBy] = INVALID_PLAYER_ID;
@@ -10443,6 +10442,7 @@ ResetStatistics(playerid)
     PlayerData[playerid][pDisableRADIO] = true;
     // PlayerData[playerid][pFactionStock] = 0;
     PlayerData[playerid][pBeanBullets] = 0;
+    PlayerData[playerid][pCuttingProgress] = 0;
 
     selectCategory[playerid] = selectIndex[playerid] = -1;
 
@@ -12219,8 +12219,6 @@ Function:OnQueryFinished(extraid, threadid, race_check)
                 }
 
                 TextDrawHideForPlayer(extraid, gLoginTextdraws);
-
-                PlayerData[extraid][pCuttingBar]    = CreatePlayerProgressBar(extraid, 498.0, 104.0, 113.0, 6.2, 0x15a014FF, 100, progressbar_direction:0);
 
                 // //RelationStatus
                 // RelationshipProgressBar[extraid][0] = CreatePlayerProgressBar(extraid, 403.000000, 438.000000, 79.000000, 4.000000, -16776992, 100.000000, 0);
@@ -30946,6 +30944,18 @@ Dialog:MainGPS(playerid, response, listitem, inputtext[])
             case 6: Show_Lumber(playerid);
             case 7: Dealership_GPS(playerid);
             case 8: Workshop_GPS(playerid);
+            case 9:
+            {
+                new string[128], count = -1;
+                strcat(string,"Garage ID\tGarage Name\n");
+                for (new i = 0; i != MAX_GARAGE; i ++) if(GarageInfo[i][garageExists] && Garage_IsOwner(playerid, i))
+                {
+                    strcat(string, sprintf("%d\t%s\n", i, GarageInfo[i][garageOwner]));
+                    count = i;
+                }
+                if(count == -1) return SendErrorMessage(playerid, "You don't have garage.");
+                Dialog_Show(playerid, FindGarage, DIALOG_STYLE_TABLIST_HEADERS, "Find Garage", string, "Find", "Cancel");
+            }
             case 10: Dialog_Show(playerid, OtherLocation, DIALOG_STYLE_LIST, "Other Location", "Component Warehouse\nWheels & Hydraulics Shop\nFish Shop\nModshop\nMechanic Center\nInsurance Center\nDMV\nRodeo Bank\nAdvertisement Agency\nButcher\nPublic Parking Downtown\nPublic Parking Market\nFarm Warehouse", "Select", "Close");
             case 11: Dialog_Show(playerid, FindCargo, DIALOG_STYLE_LIST, "Find Cargo (Trucker Only)", "Retail Cargo\nClothes Cargo\nFuel Cargo\nFood Cargo\nFurniture Cargo\nElectronics Cargo\nAmmunation Cargo\nBar Cargo", "Select", "Close");
         }
@@ -31026,6 +31036,18 @@ Dialog:FindHouse(playerid, response, listitem, inputtext[])
         new i = ListedHouse[playerid][listitem];
         SetPlayerWaypoint(playerid, HouseData[i][houseAddress], HouseData[i][housePos][0], HouseData[i][housePos][1], HouseData[i][housePos][2]);
         SendServerMessage(playerid, "Waypoint set to \"%s\" (marked on radar).", HouseData[i][houseAddress]);
+    }
+    else cmd_gps(playerid, "\1");
+    return 1;
+}
+
+Dialog:FindGarage(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        new i = listitem;
+        SetPlayerWaypoint(playerid, GarageInfo[i][garageOwner], GarageInfo[i][garageLoc][0], GarageInfo[i][garageLoc][1], GarageInfo[i][garageLoc][2]);
+        SendServerMessage(playerid, "Waypoint set to \"%s\" (marked on radar).", GarageInfo[i][garageOwner]);
     }
     else cmd_gps(playerid, "\1");
     return 1;

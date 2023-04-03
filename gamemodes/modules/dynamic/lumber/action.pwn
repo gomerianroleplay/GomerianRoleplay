@@ -37,20 +37,22 @@ timer HarvestingLumber[1000](playerid)
     {
         if (GetPlayerWeapon(playerid) == WEAPON_CHAINSAW)
         {
-            new Float:time, level = GetLumberLevel(playerid);
+            new time, level = GetLumberLevel(playerid);
 
             switch (level)
             {
-                case 1: time = 2.0;
-                case 2: time = 5.0;
-                case 3: time = 7.5;
+                case 1: time = 20;
+                case 2: time = 25;
+                case 3: time = 30;
+                case 4: time = 45;
+                case 5: time = 55;
                 default:
-                    time = 10.0;
+                    time = 70;
             }
 
-            new Float:value = (GetPlayerProgressBarValue(playerid, PlayerData[playerid][pCuttingBar]) + time);
+            new value = PlayerData[playerid][pCuttingProgress] += time;
 
-            if (value >= 100.0)
+            if (value >= 1000)
             {
                 Reset_Lumber(playerid);
                 MoveDynamicObject(LumberData[id][lumberObject], LumberData[id][lumberPos][0], LumberData[id][lumberPos][1], LumberData[id][lumberPos][2] - 1.0, 0.025, LumberData[id][lumberRot][0], LumberData[id][lumberRot][1] - 80.0, RandomFloat(0.0, 360.0) + LumberData[id][lumberRot][2]);
@@ -60,8 +62,7 @@ timer HarvestingLumber[1000](playerid)
                 Lumber_Save(id, SAVE_LUMBER_CUTTING);
                 return 1;
             }
-            SetPlayerProgressBarValue(playerid, PlayerData[playerid][pCuttingBar], value);
-            GameTextForPlayer(playerid, "~g~~h~Memotong pohon ..", 1000, 4);
+            ShowPlayerFooter(playerid, sprintf("~w~Progress ~g~%d/1000", value), 1000);
         }
     }
     return 1;
@@ -100,9 +101,6 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
             SetPVarInt(playerid, "lumber_cutting", id);
 
             lumber_timer[playerid] = repeat HarvestingLumber(playerid);
-
-            SetPlayerProgressBarValue(playerid, PlayerData[playerid][pCuttingBar], 0.0);
-            ShowPlayerProgressBar(playerid, PlayerData[playerid][pCuttingBar]);
 
             ApplyAnimation(playerid, "CRACK", "null", 4.0, 0, 0, 0, 1, 0, 1);
             ApplyAnimation(playerid, "CHAINSAW", "WEAPON_csaw", 4.1, 1, 0, 0, 1, 0, 1);

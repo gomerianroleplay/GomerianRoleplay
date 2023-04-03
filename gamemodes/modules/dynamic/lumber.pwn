@@ -123,8 +123,7 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
                     SetPlayerArmedWeapon(playerid, WEAPON_CHAINSAW);
                     SetPlayerLookAt(playerid, LumberData[id][lumber_pos][0], LumberData[id][lumber_pos][1]);
 
-                    SetPlayerProgressBarValue(playerid, PlayerData[playerid][pCuttingBar], 0.0);
-                    ShowPlayerProgressBar(playerid, PlayerData[playerid][pCuttingBar]);
+                    PlayerData[playerid][pCuttingProgress] = 0;
 
                     ApplyAnimation(playerid, "CRACK", "null", 4.0, 0, 0, 0, 1, 0, 1);
                     ApplyAnimation(playerid, "CHAINSAW", "WEAPON_csaw", 4.1, 1, 0, 0, 1, 0, 1);
@@ -293,11 +292,11 @@ Lumber_Stop(playerid) {
     {
         cutting_lumber[playerid]        = -1;
         stop timer_lumber[playerid];
+        PlayerData[playerid][pCuttingProgress] = 0;
 
         ClearAnimations(playerid);
         SetPlayerArmedWeapon(playerid, 0);
         TogglePlayerControllable(playerid, 1);
-        HidePlayerProgressBar(playerid, PlayerData[playerid][pCuttingBar]);
     }
     return 1;
 }
@@ -566,9 +565,9 @@ timer Lumber_Player_Tim[1000](playerid)
         if(GetPlayerWeapon(playerid) == 9 && IsPlayerInDynamicCP(playerid, LumberData[id][lumber_cp]))
         {
             new 
-                Float: value = (GetPlayerProgressBarValue(playerid, PlayerData[playerid][pCuttingBar]) + 2.0);
+                value = PlayerData[playerid][pCuttingProgress] += 20;
             
-            if(value >= 50.0)
+            if(value >= 500)
             {
                 MoveDynamicObject(LumberData[id][lumber_obj], LumberData[id][lumber_pos][0], LumberData[id][lumber_pos][1], LumberData[id][lumber_pos][2]+0.03, 0.025, LumberData[id][lumber_rot][0], LumberData[id][lumber_rot][1] - 80.0, RandomFloat(0.0,360.0)+LumberData[id][lumber_rot][2]);
 
@@ -578,7 +577,8 @@ timer Lumber_Player_Tim[1000](playerid)
                 LumberData[id][lumber_cut]      = 1;
                 return 1;
             }
-            SetPlayerProgressBarValue(playerid, PlayerData[playerid][pCuttingBar], value);
+
+            PlayerData[playerid][pCuttingProgress] = value;
         }
         else
         {
