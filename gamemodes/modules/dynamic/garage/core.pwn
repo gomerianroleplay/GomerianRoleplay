@@ -112,7 +112,7 @@ Garage_Create(playerid, price, type)
         GarageInfo[garage_id][garageLock] = 1; //bool
         GarageInfo[garage_id][garageHouseLink] = 0;
         mysql_tquery(g_iHandle, sprintf("INSERT INTO `garage` (`Price`) VALUES (%d)", GarageInfo[garage_id][garagePrice]), "Garage_Created", "d", garage_id);
-        return INVALID_ITERATOR_SLOT;
+        return garage_id;
     }
     return INVALID_ITERATOR_SLOT;
 }
