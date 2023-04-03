@@ -202,17 +202,12 @@ Garage_Exists(garage_id)
 
 Garage_Nearest(playerid)
 {
-    new id = -1, Float:playerdist, Float:tempdist = 9999.0;
-    foreach (new i : Garages)
+    for (new i = 0; i != MAX_GARAGE; i++) if(GarageInfo[i][garageExists] && IsPlayerInRangeOfPoint(playerid, 2.5, GarageInfo[i][GarageLoc][0], GarageInfo[i][GarageLoc][1], GarageInfo[i][GarageLoc][2]))
     {
-        playerdist = GetPlayerDistanceFromPoint(playerid, GarageInfo[i][garageLoc][0], GarageInfo[i][garageLoc][1], GarageInfo[i][garageLoc][2]);
-        if (playerdist <= tempdist)
-        {
-            tempdist = playerdist;
-            id = i;
-        }
+        //if(GetPlayerInterior(playerid) == GarageInfo[i][houseExterior] && GetPlayerVirtualWorld(playerid) == GarageInfo[i][houseExteriorVW])
+        return i;
     }
-    return id;
+    return -1;
 }
 
 Garage_Reset(garage_id)
