@@ -28,6 +28,7 @@ CMD:destroygarage(playerid, params[])
 
     if (sscanf(params, "d", garage_id)) return SendErrorMessage(playerid, "/destroygarage [garage id]");
     if (!GarageInfo[garage_id][garageExists]) return SendErrorMessage(playerid, "Invalid garage id.");
+    if (GarageInfo[garage_id][garageInside] != 0) return SendErrorMessage(playerid, "Masih ada kendaraan di Garage.");
 
     SendServerMessage(playerid, "You have successfully destroy garage ID: %d.", garage_id);
     Garage_Destroy(garage_id);
@@ -156,54 +157,87 @@ CMD:garage(playerid, params[])
     }
     else if (!strcmp(category, "enter"))
     {
+        new vehicleid = -1, vehicle_index = -1;
         if ((garage_id = Garage_Nearest(playerid)) == -1) return SendErrorMessage(playerid, "You're not in nearest any garage.");
         if (GarageInfo[garage_id][garageLock]) return GameTextForPlayer(playerid, "~r~Locked", 1500, 1);
         if (IsPlayerInAnyVehicle(playerid))
         {
-            static vehicleid = -1;
-
-            if ((vehicleid = GetPlayerVehicleID(playerid)) != -1)
+            vehicleid = GetPlayerVehicleID(playerid);
+            vehicle_index = Vehicle_ReturnID(vehicleid);
+            if (!Vehicle_IsOwned(playerid, vehicleid)) return SendErrorMessage(playerid, "This is not your vehicle.");
+            if (!Garage_IsOwner(playerid, garage_id)) return SendErrorMessage(playerid, "This garage isn't owned by you.");
+            if (IsAPlane(GetPlayerVehicleID(playerid)) || IsAHelicopter(GetPlayerVehicleID(playerid)) || IsLoadableVehicle(GetPlayerVehicleID(playerid))) return SendErrorMessage(playerid, "Can't loaded this vehicle.");
+            if (GarageInfo[garage_id][garageInside] >= GarageInfo[garage_id][garageType]) return SendErrorMessage(playerid, "Can't put more vehicle to this garage.");
+            
+            
+            if(vehicle_index == -1)
+                return 0;
+            
+            if(Vehicle_IsOwned(playerid, vehicle_index))
             {
-                if (!Vehicle_IsOwned(playerid, vehicleid)) return SendErrorMessage(playerid, "This is not your vehicle.");
-                if (!Garage_IsOwner(playerid, garage_id)) return SendErrorMessage(playerid, "This garage isn't owned by you.");
-                if (IsAPlane(GetPlayerVehicleID(playerid)) || IsAHelicopter(GetPlayerVehicleID(playerid)) || IsLoadableVehicle(GetPlayerVehicleID(playerid))) return SendErrorMessage(playerid, "Can't loaded this vehicle.");
-                if (GarageInfo[garage_id][garageInside] >= GarageInfo[garage_id][garageType]) return SendErrorMessage(playerid, "Can't put more vehicle to this garage.");
-
-                GarageInfo[garage_id][garageInside] ++;
-                VehicleData[vehicleid][vehGarage] = 1;
-                VehicleData[vehicleid][vehState] = 8;
-
-                VehicleData[vehicleid][vehInterior] = GarageInfo[garage_id][Interior];
-                VehicleData[vehicleid][vehVirtual] = GarageInfo[garage_id][garageID] + 1000;
-
-                SetVehiclePos(VehicleData[vehicleid][vehVehicleID], GarageInfo[garage_id][garageLocInt][0], GarageInfo[garage_id][garageLocInt][1], GarageInfo[garage_id][garageLocInt][2]);
-                SetVehicleZAngle(VehicleData[vehicleid][vehVehicleID], GarageInfo[garage_id][garageLocInt][3]);
-
-                LinkVehicleToInterior(VehicleData[vehicleid][vehVehicleID], GarageInfo[garage_id][Interior]);
-                SetVehicleVirtualWorld(VehicleData[vehicleid][vehVehicleID], VehicleData[vehicleid][vehVirtual]);
-
-                SetPlayerInterior(playerid, GarageInfo[garage_id][Interior]);
-                SetPlayerVirtualWorld(playerid, GarageInfo[garage_id][garageID] + 1000);
-
-                Vehicle_Save(vehicleid);
+                if(VehicleData[vehicle_index][vehModel] == 508)
+                {
+                    foreach(new i : Player) 
+                    {
+                        new vw = GetPlayerVirtualWorld(i);
+                        if(vw > MIN_VIRTUAL_WORLD && vw < MAX_VIRTUAL_WORLD && (vw-MIN_VIRTUAL_WORLD) == VehicleData[vehicle_index][vehVehicleID])
+                        {
+                            SetOutsideRV(i, VehicleData[vehicle_index][vehVehicleID]);					
+                        }
+                    }
+                }
+                GarageInfo[garage_id][garageInside]++;
+                //GiveMoney(playerid, -100, ECONOMY_ADD_SUPPLY, "paid vehicle parking lot");
+                Vehicle_Save(vehicle_index);
+                mysql_tquery(g_iHandle, sprintf("UPDATE server_vehicles SET `garage`='%d',`state`='%d' WHERE `id`='%d';", GarageInfo[garage_id][garageID], VEHICLE_STATE_GARAGE, VehicleData[vehicle_index][vehIndex]));
                 Garage_Sync(garage_id);
-
-                PlayerData[playerid][pGarage] = GarageInfo[garage_id][garageID];
-                SetCameraBehindPlayer(playerid);
-
-                SetPlayerWeather(playerid, 8);
-                SetPlayerTime(playerid, 20, 0);
+                Vehicle_Delete(vehicle_index, false);
+                SendServerMessage(playerid, "You park your vehicle on private garage");
             }
-            else SendErrorMessage(playerid, "Harus kendaraan pribadi untuk menyimpan kedalam garasi!");
+            // static vehicleid = -1;
+
+            // if ((vehicleid = GetPlayerVehicleID(playerid)) != -1)
+            // {
+            //     if (!Vehicle_IsOwned(playerid, vehicleid)) return SendErrorMessage(playerid, "This is not your vehicle.");
+            //     if (!Garage_IsOwner(playerid, garage_id)) return SendErrorMessage(playerid, "This garage isn't owned by you.");
+            //     if (IsAPlane(GetPlayerVehicleID(playerid)) || IsAHelicopter(GetPlayerVehicleID(playerid)) || IsLoadableVehicle(GetPlayerVehicleID(playerid))) return SendErrorMessage(playerid, "Can't loaded this vehicle.");
+            //     if (GarageInfo[garage_id][garageInside] >= GarageInfo[garage_id][garageType]) return SendErrorMessage(playerid, "Can't put more vehicle to this garage.");
+
+            //     GarageInfo[garage_id][garageInside] ++;
+            //     VehicleData[vehicleid][vehGarage] = 1;
+            //     VehicleData[vehicleid][vehState] = 8;
+
+            //     VehicleData[vehicleid][vehInterior] = GarageInfo[garage_id][Interior];
+            //     VehicleData[vehicleid][vehVirtual] = GarageInfo[garage_id][garageID] + 1000;
+
+            //     SetVehiclePos(VehicleData[vehicleid][vehVehicleID], GarageInfo[garage_id][garageLocInt][0], GarageInfo[garage_id][garageLocInt][1], GarageInfo[garage_id][garageLocInt][2]);
+            //     SetVehicleZAngle(VehicleData[vehicleid][vehVehicleID], GarageInfo[garage_id][garageLocInt][3]);
+
+            //     LinkVehicleToInterior(VehicleData[vehicleid][vehVehicleID], GarageInfo[garage_id][Interior]);
+            //     SetVehicleVirtualWorld(VehicleData[vehicleid][vehVehicleID], VehicleData[vehicleid][vehVirtual]);
+
+            //     SetPlayerInterior(playerid, GarageInfo[garage_id][Interior]);
+            //     SetPlayerVirtualWorld(playerid, GarageInfo[garage_id][garageID] + 1000);
+
+            //     Vehicle_Save(vehicleid);
+            //     Garage_Sync(garage_id);
+
+            //     PlayerData[playerid][pGarage] = GarageInfo[garage_id][garageID];
+            //     SetCameraBehindPlayer(playerid);
+
+            //     SetPlayerWeather(playerid, 8);
+            //     SetPlayerTime(playerid, 20, 0);
+            // }
+            // else SendErrorMessage(playerid, "Harus kendaraan pribadi untuk menyimpan kedalam garasi!");
         }
-        else
-        {
-            SetPlayerPosEx(playerid, GarageInfo[garage_id][garageLocInt][0], GarageInfo[garage_id][garageLocInt][1], GarageInfo[garage_id][garageLocInt][2]), SetPlayerFacingAngle(playerid, GarageInfo[garage_id][garageLocInt][3]);
-            SetPlayerInterior(playerid, GarageInfo[garage_id][Interior]);
-            SetPlayerVirtualWorld(playerid, GarageInfo[garage_id][garageID] + 1000);
-            PlayerData[playerid][pGarage] = GarageInfo[garage_id][garageID];
-            SetCameraBehindPlayer(playerid);
-        }
+        // else
+        // {
+        //     SetPlayerPosEx(playerid, GarageInfo[garage_id][garageLocInt][0], GarageInfo[garage_id][garageLocInt][1], GarageInfo[garage_id][garageLocInt][2]), SetPlayerFacingAngle(playerid, GarageInfo[garage_id][garageLocInt][3]);
+        //     SetPlayerInterior(playerid, GarageInfo[garage_id][Interior]);
+        //     SetPlayerVirtualWorld(playerid, GarageInfo[garage_id][garageID] + 1000);
+        //     PlayerData[playerid][pGarage] = GarageInfo[garage_id][garageID];
+        //     SetCameraBehindPlayer(playerid);
+        // }
     }
     else if (!strcmp(category, "sell"))
     {
@@ -299,58 +333,98 @@ CMD:garage(playerid, params[])
             Garage_Sync(garage_id);
             return 1;
         }
-        SendErrorMessage(playerid, "You're not inside/outside your garage.");
+        SendErrorMessage(playerid, "You're not near your garage.");
     }
     else if (!strcmp(category, "exit"))
     {
-        if ((garage_id = Garage_Inside(playerid)) != -1 && IsPlayerInRangeOfPoint(playerid, 4, GarageInfo[garage_id][garageLocInt][0], GarageInfo[garage_id][garageLocInt][1], GarageInfo[garage_id][garageLocInt][2]))
+        static id = -1;
+        new Cache:execute, output[255], garage_index;
+        id = Garage_Nearest(playerid);
+        
+        if(id == -1)
+            return SendErrorMessage(playerid, "You are not near any garage!");
+
+        garage_index = GarageInfo[id][garageID];
+
+        if(garage_index == -1)
+            return 0;
+
+        execute = mysql_query(g_iHandle, sprintf("SELECT `id`, `model` FROM `server_vehicles` WHERE `garage` ='%d' AND `extraid`='%d' AND `type`='%d';", garage_index, GetPlayerSQLID(playerid), VEHICLE_TYPE_PLAYER));
+
+        if(!IsPlayerInAnyVehicle(playerid) && Garage_IsOwner(playerid, id))
         {
-            if (IsPlayerInAnyVehicle(playerid))
+            if(cache_num_rows())
             {
-                if (GetPlayerState(playerid) != PLAYER_STATE_DRIVER) return SendErrorMessage(playerid, "You must in driver to enter this garage.");
-
-                static vehicleid = -1;
-
-                if ((vehicleid = GetPlayerVehicleID(playerid)) != -1)
+                strcat(output, sprintf("Model\n"));
+                for(new i = 0; i != cache_num_rows(); i++)
                 {
-                    if (!Vehicle_IsOwned(playerid, vehicleid)) return SendErrorMessage(playerid, "This is not your vehicle.");
-                    if (!Garage_IsOwner(playerid, garage_id)) return SendErrorMessage(playerid, "This garage isn't owned by you.");
+                    new 
+                        vid = cache_get_field_int(i, "id"),
+                        model = cache_get_field_int(i, "model")
+                    ;
 
-                    VehicleData[vehicleid][vehGarage] = 0;
-                    VehicleData[vehicleid][vehState] = 1;
-                    GarageInfo[garage_id][garageInside] --;
+                    g_selected_vehicle[playerid][i] = vid;
 
-                    VehicleData[vehicleid][vehInterior] = 0;
-                    VehicleData[vehicleid][vehVirtual] = 0;
-
-                    SetVehiclePos(VehicleData[vehicleid][vehVehicleID], GarageInfo[garage_id][garageLoc][0], GarageInfo[garage_id][garageLoc][1], GarageInfo[garage_id][garageLoc][2]);
-                    SetVehicleZAngle(VehicleData[vehicleid][vehVehicleID], GarageInfo[garage_id][garageLoc][3]);
-
-                    LinkVehicleToInterior(VehicleData[vehicleid][vehVehicleID], 0);
-                    SetVehicleVirtualWorld(VehicleData[vehicleid][vehVehicleID], 0);
-
-                    SetPlayerInterior(playerid, 0);
-                    SetPlayerVirtualWorld(playerid, 0);
-
-                    Garage_Sync(garage_id);
-
-                    PlayerData[playerid][pGarage] = -1;
-                    SetCameraBehindPlayer(playerid);
+                    strcat(output, sprintf(WHITE"%s\n", GetVehicleNameByModel(model)));
                 }
+                Dialog_Show(playerid, GarageUnparkVehicle, DIALOG_STYLE_TABLIST_HEADERS, "Garage Parking", output, "Unpark", "Close");
             }
-            else
-            {
-                SetPlayerPosEx(playerid, GarageInfo[garage_id][garageLoc][0], GarageInfo[garage_id][garageLoc][1], GarageInfo[garage_id][garageLoc][2]), SetPlayerFacingAngle(playerid, GarageInfo[garage_id][garageLoc][3]);
-
-                SetPlayerInterior(playerid, 0);
-                SetPlayerVirtualWorld(playerid, 0);
-                PlayerData[playerid][pGarage] = -1;
-                SetCameraBehindPlayer(playerid);
-            }
-            return 1;
+            else ShowPlayerFooter(playerid, "~r~ERROR: ~w~Tidak ada kendaraanmu pada Garage!");
         }
-        SendErrorMessage(playerid, "You're not in nearest any garage.");
+        else SendErrorMessage(playerid, "You're not in range of your garage!");
+
+        cache_delete(execute);
+        return 1;
     }
+    // {
+    //     if ((garage_id = Garage_Inside(playerid)) != -1 && IsPlayerInRangeOfPoint(playerid, 4, GarageInfo[garage_id][garageLocInt][0], GarageInfo[garage_id][garageLocInt][1], GarageInfo[garage_id][garageLocInt][2]))
+    //     {
+    //         if (IsPlayerInAnyVehicle(playerid))
+    //         {
+    //             if (GetPlayerState(playerid) != PLAYER_STATE_DRIVER) return SendErrorMessage(playerid, "You must in driver to enter this garage.");
+
+    //             static vehicleid = -1;
+
+    //             if ((vehicleid = GetPlayerVehicleID(playerid)) != -1)
+    //             {
+    //                 if (!Vehicle_IsOwned(playerid, vehicleid)) return SendErrorMessage(playerid, "This is not your vehicle.");
+    //                 if (!Garage_IsOwner(playerid, garage_id)) return SendErrorMessage(playerid, "This garage isn't owned by you.");
+
+    //                 VehicleData[vehicleid][vehGarage] = 0;
+    //                 VehicleData[vehicleid][vehState] = 1;
+    //                 GarageInfo[garage_id][garageInside] --;
+
+    //                 VehicleData[vehicleid][vehInterior] = 0;
+    //                 VehicleData[vehicleid][vehVirtual] = 0;
+
+    //                 SetVehiclePos(VehicleData[vehicleid][vehVehicleID], GarageInfo[garage_id][garageLoc][0], GarageInfo[garage_id][garageLoc][1], GarageInfo[garage_id][garageLoc][2]);
+    //                 SetVehicleZAngle(VehicleData[vehicleid][vehVehicleID], GarageInfo[garage_id][garageLoc][3]);
+
+    //                 LinkVehicleToInterior(VehicleData[vehicleid][vehVehicleID], 0);
+    //                 SetVehicleVirtualWorld(VehicleData[vehicleid][vehVehicleID], 0);
+
+    //                 SetPlayerInterior(playerid, 0);
+    //                 SetPlayerVirtualWorld(playerid, 0);
+
+    //                 Garage_Sync(garage_id);
+
+    //                 PlayerData[playerid][pGarage] = -1;
+    //                 SetCameraBehindPlayer(playerid);
+    //             }
+    //         }
+    //         else
+    //         {
+    //             SetPlayerPosEx(playerid, GarageInfo[garage_id][garageLoc][0], GarageInfo[garage_id][garageLoc][1], GarageInfo[garage_id][garageLoc][2]), SetPlayerFacingAngle(playerid, GarageInfo[garage_id][garageLoc][3]);
+
+    //             SetPlayerInterior(playerid, 0);
+    //             SetPlayerVirtualWorld(playerid, 0);
+    //             PlayerData[playerid][pGarage] = -1;
+    //             SetCameraBehindPlayer(playerid);
+    //         }
+    //         return 1;
+    //     }
+    //     SendErrorMessage(playerid, "You're not in nearest any garage.");
+    // }
     else if(!strcmp(category, "interior"))
     {
         GetPlayerPos(playerid, GarageInfo[garage_id][garageLocInt][0], GarageInfo[garage_id][garageLocInt][1], GarageInfo[garage_id][garageLocInt][2]);
@@ -375,4 +449,66 @@ CMD:garage(playerid, params[])
         return 1;
     }
     return 1;
+}
+
+CMD:nearestgarage(playerid, params[])
+{
+    if (CheckAdmin(playerid, 3))
+        return PermissionError(playerid);
+
+    new
+        id = -1;
+
+    if((id = Garage_Nearest(playerid)) != -1) SendServerMessage(playerid, "You are standing near garage "YELLOW"ID: %d.", id);
+    else SendServerMessage(playerid, "Kamu tidak berada didekat garage manapun!");
+
+    return 1;
+}
+
+CMD:gotogarage(playerid, params[])
+{
+    if(CheckAdmin(playerid, 5))
+        return PermissionError(playerid);
+
+	static 
+		id;
+
+    if(sscanf(params, "d", id))
+        return SendSyntaxMessage(playerid, "/gotogarage [garage ID]");
+
+    if(!Iter_Contains(Garages, id))
+        return SendErrorMessage(playerid, "You have specified an invalid garage ID.");
+
+    SetPlayerPos(playerid, GarageInfo[id][garageLoc][0], GarageInfo[id][garageLoc][1]+1, GarageInfo[id][garageLoc][2]);
+    //SetPlayerInterior(playerid, GateData[id][gateInterior]);
+    //SetPlayerVirtualWorld(playerid, GateData[id][gateWorld]);
+
+    SendServerMessage(id, "You have teleported to Garage ID: %d.", id);
+    return 1;
+}
+
+Dialog:GarageUnparkVehicle(playerid, response, listitem, inputtext[]) 
+{
+	if(response)
+	{
+		new id = g_selected_vehicle[playerid][listitem],
+			garageid = Garage_Nearest(playerid)
+		;
+
+		if(garageid == -1)
+			return 0;
+
+		mysql_tquery(g_iHandle, sprintf("UPDATE server_vehicles SET `garage`='-1',`state`='%d' WHERE `id`='%d';", VEHICLE_STATE_SPAWNED ,id));
+		
+		mysql_tquery(g_iHandle, sprintf("SELECT * FROM `server_vehicles` WHERE `id`='%d';", id), "VehicleLoaded", "d", playerid);
+
+		GarageInfo[garageid][garageInside]--;
+		if(GarageInfo[garageid][garageInside] <= 0)
+		{
+			GarageInfo[garageid][garageInside] = 0;
+		}
+		SendServerMessage(playerid, "Kamu telah mengeluarkan "CYAN"%s "WHITE"dari "YELLOW"Garage.", inputtext);
+		Garage_Sync(garageid);
+	}
+	return 1;
 }
