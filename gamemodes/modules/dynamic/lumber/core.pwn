@@ -266,11 +266,11 @@ Lumber_Exists(lumber_id)
 Reset_Lumber(playerid)
 {
     stop lumber_timer[playerid];
+    PlayerData[playerid][pCuttingProgress] = 0;
     SetPVarInt(playerid, "lumber_cutting", -1);
 
     ClearAnimations(playerid);
     TogglePlayerControllable(playerid, 1);
-    HidePlayerProgressBar(playerid, PlayerData[playerid][pCuttingBar]);
 }
 
 Show_Lumber(playerid) 

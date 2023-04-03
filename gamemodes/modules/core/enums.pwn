@@ -377,7 +377,7 @@ enum playerData {
     pExecute,
     pTakeItems,
     PlayerBar:pDrinkBar,
-    PlayerBar:pCuttingBar,
+    pCuttingProgress,
     pPlaceAd,
     pAdvertise[120],
     Timer:pAdvertiseTimer,

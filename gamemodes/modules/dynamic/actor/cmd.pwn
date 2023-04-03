@@ -6,6 +6,7 @@ SSCANF:ActorMenu(string[])
  	else if(!strcmp(string,"cash",true)) return 4;
  	else if(!strcmp(string,"anim",true)) return 5;
  	else if(!strcmp(string,"info",true)) return 6;
+ 	else if(!strcmp(string,"anim",true)) return 7;
  	return 0;
 }
 
@@ -35,7 +36,7 @@ CMD:actormenu(playerid, params[])
 	if(sscanf(params, "k<ActorMenu>S()[128]", action, nextParams))
 	{
 		SendSyntaxMessage(playerid, "/actormenu [entity]");
-		SendSyntaxMessage(playerid, "ENTITY: [create/delete/type/cash/info]");
+		SendSyntaxMessage(playerid, "ENTITY: [create/delete/type/cash/info/anim]");
 		return 1;
 	}
 
@@ -94,7 +95,7 @@ CMD:actormenu(playerid, params[])
 		default: 
 		{
 			SendSyntaxMessage(playerid, "/actormenu [entity]");
-			SendSyntaxMessage(playerid, "ENTITY: [create/delete/type/cash/info]");
+			SendSyntaxMessage(playerid, "ENTITY: [create/delete/type/cash/info/anim]");
 		}
 	}
 	return 1;
