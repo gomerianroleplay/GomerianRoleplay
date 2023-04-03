@@ -1003,6 +1003,7 @@ CMD:vehicle(playerid, params[])
 					new model = cache_get_field_int(i, "model"),
 						states = cache_get_field_int(i, "state"),
 						insurance = cache_get_field_int(i, "insurance");
+						//vehid = cache_get_field_int(i, "id");
 
 					strcat(output, sprintf(WHITE"%s\t%s\t%d\n", GetVehicleNameByModel(model), state_list[states], insurance));
 				}

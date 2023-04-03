@@ -178,12 +178,13 @@ CMD:garage(playerid, params[])
                 VehicleData[vehicleid][vehInterior] = GarageInfo[garage_id][Interior];
                 VehicleData[vehicleid][vehVirtual] = GarageInfo[garage_id][garageID] + 1000;
 
-                SendPlayerPos(playerid, GarageInfo[garage_id][garageLocInt][0], GarageInfo[garage_id][garageLocInt][1], GarageInfo[garage_id][garageLocInt][2], 0, VehicleData[vehicleid][vehInterior], VehicleData[vehicleid][vehVirtual]);
+                
                 // SetVehiclePos(VehicleData[vehicleid][vehVehicleID], GarageInfo[garage_id][garageLocInt][0], GarageInfo[garage_id][garageLocInt][1], GarageInfo[garage_id][garageLocInt][2]);
                 // SetVehicleZAngle(VehicleData[vehicleid][vehVehicleID], GarageInfo[garage_id][garageLocInt][3]);
 
-                LinkVehicleToInterior(VehicleData[vehicleid][vehVehicleID], GarageInfo[garage_id][Interior]);
-                SetVehicleVirtualWorld(VehicleData[vehicleid][vehVehicleID], VehicleData[vehicleid][vehVirtual]);
+                // LinkVehicleToInterior(VehicleData[vehicleid][vehVehicleID], GarageInfo[garage_id][Interior]);
+                // SetVehicleVirtualWorld(GetPlayerVehicleID(playerid), VehicleData[vehicleid][vehVirtual]);
+                SendPlayerPos(playerid, GarageInfo[garage_id][garageLocInt][0], GarageInfo[garage_id][garageLocInt][1], GarageInfo[garage_id][garageLocInt][2], 0, VehicleData[vehicleid][vehInterior], VehicleData[vehicleid][vehVirtual]);
 
                 // SetPlayerInterior(playerid, GarageInfo[garage_id][Interior]);
                 // SetPlayerVirtualWorld(playerid, GarageInfo[garage_id][garageID] + 1000);
