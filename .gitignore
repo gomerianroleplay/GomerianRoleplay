@@ -84,3 +84,6 @@ mysql.ini
 
 # log samp in linux
 nohup.out
+
+#automation
+*.sh

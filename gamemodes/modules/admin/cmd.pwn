@@ -35,51 +35,51 @@ CMD:admins(playerid, params[])
     return 1;
 }
 
-CMD:hidename(playerid, params[])
-{
-    //new count = 0;
-    new hide;
-    if (sscanf(params, "i", hide)) return SendSyntaxMessage(playerid, "0/1");
+// CMD:hidename(playerid, params[])
+// {
+//     //new count = 0;
+//     new hide;
+//     if (sscanf(params, "i", hide)) return SendSyntaxMessage(playerid, "0/1");
 
-    if (GetAdminLevel(playerid)<8)
-    {
-        if(hide == 1)
-        {
-            if(IsValidDynamic3DTextLabel(PlayerData[playerid][pNameTag])){
-                DestroyDynamic3DTextLabel(PlayerData[playerid][pNameTag]);
-            }
-        }else{
-            ResetNameTag(playerid, true);
-        }
+//     if (GetAdminLevel(playerid)<8)
+//     {
+//         if(hide == 1)
+//         {
+//             if(IsValidDynamic3DTextLabel(PlayerData[playerid][pNameTag])){
+//                 DestroyDynamic3DTextLabel(PlayerData[playerid][pNameTag]);
+//             }
+//         }else{
+//             ResetNameTag(playerid, true);
+//         }
             
-        // new output[1500];
+//         // new output[1500];
 
-        // strcat(output, "ID\tName (Admin Name)\tDuty\tOnline Time (minutes)\n");
+//         // strcat(output, "ID\tName (Admin Name)\tDuty\tOnline Time (minutes)\n");
 
-        // foreach (new i : Player) if (IsPlayerConnected(i) && AccountData[i][pAdmin] && !AccountData[i][pAdminHide])
-        //     {
-        //         strcat(output, sprintf("%d\t%s (%s)\t%s\t%d\n", i, NormalName(i), ReturnAdminName(i), (AccountData[i][pAdminDuty]) ? ("Yes") : ("No"), ((gettime() - AccountData[i][pLoginDate]) / 60)));
-        //         count++;
-        //     }
+//         // foreach (new i : Player) if (IsPlayerConnected(i) && AccountData[i][pAdmin] && !AccountData[i][pAdminHide])
+//         //     {
+//         //         strcat(output, sprintf("%d\t%s (%s)\t%s\t%d\n", i, NormalName(i), ReturnAdminName(i), (AccountData[i][pAdminDuty]) ? ("Yes") : ("No"), ((gettime() - AccountData[i][pLoginDate]) / 60)));
+//         //         count++;
+//         //     }
 
-        // if (!count) SendClientMessage(playerid, X11_WHITE, "* No admin/helper online.");
-        // else Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_TABLIST_HEADERS, "Admin/Helper list", output, "Close", "");
-    }
-    else
-    {
-        //SendClientMessage(playerid, X11_GREY_60, "Admin/Helper list:");
+//         // if (!count) SendClientMessage(playerid, X11_WHITE, "* No admin/helper online.");
+//         // else Dialog_Show(playerid, ShowOnly, DIALOG_STYLE_TABLIST_HEADERS, "Admin/Helper list", output, "Close", "");
+//     }
+//     else
+//     {
+//         //SendClientMessage(playerid, X11_GREY_60, "Admin/Helper list:");
 
-        // foreach (new i : Player) if (IsPlayerConnected(i) && AccountData[i][pAdmin] && AccountData[i][pAdminDuty] && AccountData[i][pAdminHide] != 1)
-        // {
-        //     if (!strcmp(AccountData[i][pAdminRankName], "None")) SendClientMessageEx(playerid, X11_WHITE, "* (%s) %s (ID: %d), AOD: %s%s", gAdminLevel[AccountData[i][pAdmin]], ReturnAdminName(i), i, (AccountData[i][pAdminDuty]) ? (GREEN) : (RED), (AccountData[i][pAdminDuty]) ? ("Yes") : ("No"));
-        //     else SendClientMessageEx(playerid, X11_WHITE, "* (%s) %s (ID: %d), AOD: %s%s", ReturnAdminRankName(i), ReturnAdminName(i), i, (AccountData[i][pAdminDuty]) ? (GREEN) : (RED), (AccountData[i][pAdminDuty]) ? ("Yes") : ("No"));
-        //     count++;
-        // }
+//         // foreach (new i : Player) if (IsPlayerConnected(i) && AccountData[i][pAdmin] && AccountData[i][pAdminDuty] && AccountData[i][pAdminHide] != 1)
+//         // {
+//         //     if (!strcmp(AccountData[i][pAdminRankName], "None")) SendClientMessageEx(playerid, X11_WHITE, "* (%s) %s (ID: %d), AOD: %s%s", gAdminLevel[AccountData[i][pAdmin]], ReturnAdminName(i), i, (AccountData[i][pAdminDuty]) ? (GREEN) : (RED), (AccountData[i][pAdminDuty]) ? ("Yes") : ("No"));
+//         //     else SendClientMessageEx(playerid, X11_WHITE, "* (%s) %s (ID: %d), AOD: %s%s", ReturnAdminRankName(i), ReturnAdminName(i), i, (AccountData[i][pAdminDuty]) ? (GREEN) : (RED), (AccountData[i][pAdminDuty]) ? ("Yes") : ("No"));
+//         //     count++;
+//         // }
 
-        // if (!count) SendClientMessage(playerid, X11_WHITE, "* No admin/helper online.");
-    }
-    return 1;
-}
+//         // if (!count) SendClientMessage(playerid, X11_WHITE, "* No admin/helper online.");
+//     }
+//     return 1;
+// }
 
 CMD:netstats(playerid, params[])
 {
@@ -397,6 +397,26 @@ CMD:a(playerid, params[])
     else SendAdminMessage(X11_OLIVE_DRAB_1, "%s %s: {33EE33}%s", AccountData[playerid][pAdminRankName], ReturnAdminName(playerid), params);
 
     Log_Save(E_LOG_ADMIN_CHAT, sprintf("[%s] %s: %s", ReturnDate(), ReturnAdminName(playerid), params));
+    return 1;
+}
+
+CMD:hidename(playerid, params[])
+{
+    if (CheckAdmin(playerid, 8))
+        return PermissionError(playerid);
+    //if (PlayerData[playerid][pMaskOn]) return SendErrorMessage(playerid, "You're using a mask remove the mask first");
+    new hide;
+	if(sscanf(params, "d", hide)) return SendClientMessageEx(playerid, COLOR_WHITE, "USAGE: 0/1");
+
+    if(hide == 1){
+        
+        new string[32];
+        format(string, sizeof(string), "");
+        UpdateDynamic3DTextLabelText(PlayerData[playerid][pNameTag], X11_WHITE, string);
+    }else{
+        ResetNameTag(playerid, true);
+        //SendNearbyMessage(playerid, 15.0, X11_PLUM, "berubah manusia", ReturnName(playerid, 0));
+    }
     return 1;
 }
 
