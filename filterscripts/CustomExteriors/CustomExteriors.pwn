@@ -15,6 +15,7 @@
 #include "exteriors/sw.inc"
 #include "exteriors/tm.inc"
 #include "exteriors/tx.inc"
+#include "exteriors/teressa.inc"
 
 public OnFilterScriptInit()
 {
@@ -29,6 +30,7 @@ public OnFilterScriptInit()
     Init_IdlewoodGasStation();
     Init_Ikea();
     Init_LSMarketDoughnutShop();
+    Init_TerresaExtHouse();
     return 1;
 }
 
@@ -44,5 +46,6 @@ public OnPlayerConnect(playerid)
     TM_RemoveBuilding(playerid);
     MC_RemoveBuilding(playerid);
     BV2_RemoveBuilding(playerid);
+    TerresaExtRemoveBuilding(playerid);
     return 1;
 }
