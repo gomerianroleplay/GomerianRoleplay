@@ -202,7 +202,7 @@ Garage_Exists(garage_id)
 
 Garage_Nearest(playerid)
 {
-    for (new i = 0; i != MAX_GARAGE; i++) if(GarageInfo[i][garageExists] && IsPlayerInRangeOfPoint(playerid, 2.5, GarageInfo[i][GarageLoc][0], GarageInfo[i][GarageLoc][1], GarageInfo[i][GarageLoc][2]))
+    for (new i = 0; i != MAX_GARAGE; i++) if(GarageInfo[i][garageExists] && IsPlayerInRangeOfPoint(playerid, 2.5, GarageInfo[i][garageLoc][0], GarageInfo[i][garageLoc][1], GarageInfo[i][garageLoc][2]))
     {
         //if(GetPlayerInterior(playerid) == GarageInfo[i][houseExterior] && GetPlayerVirtualWorld(playerid) == GarageInfo[i][houseExteriorVW])
         return i;
