@@ -478,6 +478,8 @@ public OnGameModeInit()
 
 #include "modules/misc/vehicle_object.pwn"
 
+#include "modules\misc\objectCreator.inc"
+
 #include "modules/core/player_timer.pwn"
 #include "modules/core/global_timer.pwn"
 
@@ -16681,6 +16683,29 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
                         SendServerMessage(playerid, "You have edited the position of item \"%s\".", FurnitureData[PlayerData[playerid][pEditFurniture]][furnitureName]);
 
                         PlayerData[playerid][pEditFurniture] = -1;
+                    }
+                }
+            }
+            case OBJECT: {
+                if(PlayerData[playerid][pEditObject] != -1 && PlayerData[playerid][pEditingMode] == OBJECT) {
+                    if(PlayerData[playerid][pEditObject] != -1 && Iter_Contains(Obj, PlayerData[playerid][pEditObject]) && PlayerData[playerid][pEditingMode] == 1) {
+                        new tid = PlayerData[playerid][pEditObject];
+                        ObjData[tid][oPos][0] = x;
+                        ObjData[tid][oPos][1] = y;
+                        ObjData[tid][oPos][2] = z;
+                        ObjData[tid][oRot][0] = rx;
+                        ObjData[tid][oRot][1] = ry;
+                        ObjData[tid][oRot][2] = rz;
+
+                        SetDynamicObjectPos(objectid, x, y, z);
+                        SetDynamicObjectRot(objectid, rx, ry, rz);
+
+                        Object_Refresh(tid);
+                        Object_Save(tid);
+
+                        SendClientMessageEx(playerid, X11_LIGHT_SKY_BLUE_1, "You've successfully edited object"RED"id: "WHITE"%D", tid);
+                        PlayerData[playerid][pEditObject] = -1;
+                        Streamer_Update(playerid);
                     }
                 }
             }

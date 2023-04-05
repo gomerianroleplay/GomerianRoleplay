@@ -4,7 +4,8 @@
 
 //============================== GLOBAL =============================
 
-enum {
+enum
+{
     CARGO_NONE = 0,
     CARGO_MART,
     CARGO_GUN,
@@ -35,7 +36,8 @@ enum
     DRUGLAB_AREA_INDEX
 };
 
-enum    _:E_ISSUE {
+enum    _:E_ISSUE
+{
     THREAD_CREATE_CHAR = 1,
     THREAD_CHARACTERS,
     THREAD_SHOW_CHARACTERS,
@@ -56,14 +58,15 @@ enum    _:E_ISSUE {
     THREAD_LOAD_WEPATTACH
 }
 
-enum    _:E_SELECTION_TYPE {
+enum    _:E_SELECTION_TYPE
+{
     MODEL_SELECTION_NONE = 0,
-    MODEL_SELECTION_AKSESORIS,  
-    MODEL_SELECTION_GLASSES,    
-    MODEL_SELECTION_SKIN,       
-    MODEL_SELECTION_INVENTORY,  
-    MODEL_SELECTION_DEALER,     
-    MODEL_SELECTION_DEALER_ADD, 
+    MODEL_SELECTION_AKSESORIS,
+    MODEL_SELECTION_GLASSES,
+    MODEL_SELECTION_SKIN,
+    MODEL_SELECTION_INVENTORY,
+    MODEL_SELECTION_DEALER,
+    MODEL_SELECTION_DEALER_ADD,
     MODEL_SELECTION_BUY_CAR,
     MODEL_SELECTION_FURNITURE,
     MODEL_SELECTION_SKINS,
@@ -74,49 +77,55 @@ enum    _:E_SELECTION_TYPE {
     MODEL_SELECTION_VEHOBJECT
 }
 
-enum    _:E_FACTION_TYPE {
+enum    _:E_FACTION_TYPE
+{
     FACTION_NONE = 0,
     FACTION_POLICE,
     FACTION_NEWS,
-    FACTION_MEDIC, 
-    FACTION_GOV, 
+    FACTION_MEDIC,
+    FACTION_GOV,
     FACTION_GANG,
     FACTION_SADOC,
     FACTION_LEGAL
 }
 
-enum    _:E_JOB_TYPE {
+enum    _:E_JOB_TYPE
+{
     JOB_NONE = 0,
-    JOB_COURIER,   
-    JOB_MECHANIC,  
-    JOB_TAXI,    
-    JOB_UNLOADER,  
-    JOB_MINER,     
-    JOB_FOOD_VENDOR, 
-    JOB_SORTER,    
+    JOB_COURIER,
+    JOB_MECHANIC,
+    JOB_TAXI,
+    JOB_UNLOADER,
+    JOB_MINER,
+    JOB_FOOD_VENDOR,
+    JOB_SORTER,
     JOB_ARMS_DEALER,
     JOB_LUMBERJACK,
     JOB_HAULER,
     JOB_FARMER
 }
 
-enum    _:E_EDITING_TYPE {
+enum    _:E_EDITING_TYPE
+{
     NOTHING = 0,
     GATE,
     LUMBER,
     OBJECTTEXT,
     FURNITURE,
+    OBJECT,
     VEHICLE,
     ROADBLOCK
 }
 
-enum    _:E_AMMO_TYPE {
+enum    _:E_AMMO_TYPE
+{
     AMMO_TYPE_NORMAL = 0,
     AMMO_TYPE_RUBBER,
     AMMO_TYPE_SURPLUSE
 }
 
-enum    _:E_PREVIEWMODEL_DIALOG {
+enum    _:E_PREVIEWMODEL_DIALOG
+{
     DIALOG_NONE = 0,
     DIALOG_BUYVEHICLE,
     DIALOG_VIPCAR,
@@ -127,7 +136,8 @@ enum    _:E_PREVIEWMODEL_DIALOG {
     DIALOG_MOD_SELECT_WHEELS
 }
 
-enum    _:E_HOUSE_TYPE {
+enum    _:E_HOUSE_TYPE
+{
     TYPE_SMALL = 0,
     TYPE_MEDIUM,
     TYPE_LARGE
@@ -135,7 +145,8 @@ enum    _:E_HOUSE_TYPE {
 
 //============================== LOCAL =============================
 
-enum ucpData {
+enum ucpData
+{
     pID,
     pUsername[MAX_PLAYER_NAME + 1],
     pPassword[65],
@@ -170,7 +181,8 @@ enum ucpData {
     Timer:pEmailTimer
 }
 
-enum playerData {
+enum playerData
+{
     pID,
     pCharacter,
     pLogged,
@@ -485,6 +497,7 @@ enum playerData {
     pCWarn,
     pTWarn,
     pEditingMode,
+    pEditObject,
     pFishing,
     Timer:pFishingTime,
     pWoodCheckpoint,
@@ -577,11 +590,12 @@ enum playerData {
     pGarageSeller,
     pGarageOffered,
     pGarageValue,
-    
+
 
 };
 
-enum factionData {
+enum factionData
+{
     factionID,
     factionExists,
     factionName[225],
@@ -614,7 +628,8 @@ enum factionData {
     factionNumber,
 };
 
-enum houseData {
+enum houseData
+{
     houseID,
     houseExists,
     houseOwner,
@@ -648,7 +663,8 @@ enum houseData {
     houseSeal
 };
 
-enum playerTextraws {
+enum playerTextraws
+{
     PlayerText:textdraw_prison,
     PlayerText:textdraw_map,
     PlayerText:textdraw_ammo,
@@ -670,7 +686,8 @@ enum playerTextraws {
     PlayerText:textdraw_blindfold
 };
 
-enum jobData {
+enum jobData
+{
     jobID,
     jobExists,
     jobType,
@@ -688,7 +705,8 @@ enum jobData {
     Text3D:jobText3D[3]
 };
 
-enum objectData {
+enum objectData
+{
     oID,
     oExists,
     oModel,
@@ -703,7 +721,8 @@ enum objectData {
     oFontSize
 };
 
-enum billboardData {
+enum billboardData
+{
     bbID,
     bbExists,
     bbName[32],
@@ -715,7 +734,8 @@ enum billboardData {
     Text3D:bbText3D
 };
 
-enum crateData {
+enum crateData
+{
     crateID,
     crateExists,
     crateType,
@@ -727,7 +747,8 @@ enum crateData {
     Text3D:crateText3D
 };
 
-enum businessData {
+enum businessData
+{
     bizID,
     bizExists,
     bOwnerName[25],
@@ -760,7 +781,8 @@ enum businessData {
     bizDurability
 };
 
-enum entranceData {
+enum entranceData
+{
     entranceID,
     entranceExists,
     entranceName[128],
@@ -784,7 +806,8 @@ enum entranceData {
     entranceCheckpoint
 };
 
-enum workshopEnums {
+enum workshopEnums
+{
     wID,
     wExists,
     wName[32],
@@ -802,7 +825,8 @@ enum workshopEnums {
     wSeal
 };
 
-enum acc {
+enum acc
+{
     accID,
     accName[32],
     accExists,
@@ -816,7 +840,8 @@ enum acc {
     Float:accScale[3],
 };
 
-enum garbageData {
+enum garbageData
+{
     garbageID,
     garbageExists,
     garbageModel,
@@ -827,7 +852,8 @@ enum garbageData {
     garbageObject
 };
 
-enum impoundData {
+enum impoundData
+{
     impoundID,
     impoundExists,
     Float:impoundLot[3],
@@ -836,7 +862,8 @@ enum impoundData {
     impoundPickup
 };
 
-enum serverPropertise {
+enum serverPropertise
+{
     g_Motd[225],
     a_Motd[225],
     h_Motd[225],
@@ -861,7 +888,8 @@ enum serverPropertise {
     Enums
 ==============================================================================*/
 
-enum playerTemp  {
+enum playerTemp
+{
     temp_colindex,
     temp_pivot,
     temp_col1,
@@ -875,7 +903,8 @@ enum playerTemp  {
     Float:temp_voldpos[6]
 };
 
-enum inventoryData {
+enum inventoryData
+{
     invExists,
     invID,
     invItem[32 char],
@@ -883,7 +912,8 @@ enum inventoryData {
     invQuantity
 };
 
-enum houseStorage {
+enum houseStorage
+{
     hItemID,
     hItemExists,
     hItemName[32 char],
@@ -891,7 +921,8 @@ enum houseStorage {
     hItemQuantity
 };
 
-enum droppedItems {
+enum droppedItems
+{
     droppedID,
     droppedItem[32],
     droppedPlayer[24],
@@ -907,7 +938,8 @@ enum droppedItems {
     Text3D:droppedLabel
 };
 
-enum furnitureData {
+enum furnitureData
+{
     furnitureID,
     furnitureHouse,
     furnitureExists,
@@ -919,7 +951,8 @@ enum furnitureData {
     furnitureUnused
 };
 
-enum contactData {
+enum contactData
+{
     contactID,
     contactExists,
     contactName[32],
@@ -927,14 +960,16 @@ enum contactData {
 };
 
 
-enum locationData {
+enum locationData
+{
     locationID,
     locationExists,
     locationName[32],
     Float:locationPos[3],
 };
 
-enum arrestPoints {
+enum arrestPoints
+{
     arrestID,
     arrestExists,
     Float:arrestPos[3],
@@ -944,7 +979,8 @@ enum arrestPoints {
     arrestPickup
 };
 
-enum ticketData {
+enum ticketData
+{
     ticketID,
     ticketExists,
     ticketFee,
