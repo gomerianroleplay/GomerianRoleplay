@@ -92,9 +92,10 @@ Garage_Create(playerid, price, type)
 {
     new garage_id = INVALID_ITERATOR_SLOT;
 
-    if ((garage_id = Iter_Free(Garages)) != INVALID_ITERATOR_SLOT)
+    for (new i = 0; i != MAX_GARAGE; i ++) if (GarageInfo[i][garageExists] == false)
     {
-        Iter_Add(Garages, garage_id);
+        garage_id = i;
+        //Iter_Add(Garages, garage_id);
         GetPlayerPos(playerid, GarageInfo[garage_id][garageLoc][0], GarageInfo[garage_id][garageLoc][1], GarageInfo[garage_id][garageLoc][2]);
         GetPlayerFacingAngle(playerid, GarageInfo[garage_id][garageLoc][3]);
 
@@ -121,14 +122,41 @@ Garage_Destroy(garage_id)
 {
     if (Garage_Exists(garage_id))
     {
-        mysql_tquery(g_iHandle, sprintf("DELETE FROM `garage` WHERE `garageID`='%d'", GarageInfo[garage_id][garageID]));
-        mysql_tquery(g_iHandle, sprintf("UPDATE `player_vehicles` SET `Garage`= 0, Pos1 = '%.01f', Pos2 = '%.01f', Pos3 = '%.01f', Pos4 = '%.01f' WHERE Garage='%d'",
-                                        GarageInfo[garage_id][garageLoc][0],  GarageInfo[garage_id][garageLoc][1], GarageInfo[garage_id][garageLoc][2], GarageInfo[garage_id][garageLoc][3],
-                                        GarageInfo[garage_id][garageID])
-                    );
-
-        Garage_Reset(garage_id);
+        if(Garage_Reset(garage_id)){
+            mysql_tquery(g_iHandle, sprintf("DELETE FROM `garage` WHERE `garageID`='%d'", GarageInfo[garage_id][garageID]));
+            mysql_tquery(g_iHandle, sprintf("UPDATE `player_vehicles` SET `Garage`= 0, Pos1 = '%.01f', Pos2 = '%.01f', Pos3 = '%.01f', Pos4 = '%.01f' WHERE Garage='%d'",
+                                            GarageInfo[garage_id][garageLoc][0],  GarageInfo[garage_id][garageLoc][1], GarageInfo[garage_id][garageLoc][2], GarageInfo[garage_id][garageLoc][3],
+                                            GarageInfo[garage_id][garageID])
+                        );
+        }
     }
+    return 1;
+}
+
+Garage_Reset(garage_id)
+{
+    if (!GarageInfo[garage_id][garageExists])
+        return 0;
+
+    if (IsValidDynamicPickup(GarageInfo[garage_id][garagePickup]))
+        DestroyDynamicPickup(GarageInfo[garage_id][garagePickup]);
+
+    if (IsValidDynamic3DTextLabel(GarageInfo[garage_id][garageLabel]))
+        DestroyDynamic3DTextLabel(GarageInfo[garage_id][garageLabel]);
+
+    GarageInfo[garage_id][garageOwner] = EOS;
+
+    GarageInfo[garage_id][garageExists] = false;
+    GarageInfo[garage_id][garageID] = 0;
+    GarageInfo[garage_id][garageType] = 0;
+    GarageInfo[garage_id][garagePrice] = 0;
+    GarageInfo[garage_id][garageInside] = 0;
+    GarageInfo[garage_id][garageOwnerId] = 0;
+    GarageInfo[garage_id][garageLock] = 1;
+    GarageInfo[garage_id][garageHouseLink] = 0;
+    GarageInfo[garage_id][garageLabel] = Text3D:INVALID_STREAMER_ID;
+    GarageInfo[garage_id][garagePickup] = INVALID_STREAMER_ID;
+
     return 1;
 }
 
@@ -210,30 +238,7 @@ Garage_Nearest(playerid)
     return -1;
 }
 
-Garage_Reset(garage_id)
-{
-    if (!GarageInfo[garage_id][garageExists])
-        return 0;
 
-    if (IsValidDynamicPickup(GarageInfo[garage_id][garagePickup]))
-        DestroyDynamicPickup(GarageInfo[garage_id][garagePickup]);
-
-    if (IsValidDynamic3DTextLabel(GarageInfo[garage_id][garageLabel]))
-        DestroyDynamic3DTextLabel(GarageInfo[garage_id][garageLabel]);
-
-    GarageInfo[garage_id][garageOwner] = EOS;
-
-    GarageInfo[garage_id][garageExists] = false;
-    GarageInfo[garage_id][garageID] = 0;
-    GarageInfo[garage_id][garageType] = 0;
-    GarageInfo[garage_id][garagePrice] = 0;
-    GarageInfo[garage_id][garageInside] = 0;
-    GarageInfo[garage_id][garageOwnerId] = 0;
-    GarageInfo[garage_id][garageLock] = 1;
-    GarageInfo[garage_id][garageHouseLink] = 0;
-
-    return 1;
-}
 
 Garage_FreeID()
 {
