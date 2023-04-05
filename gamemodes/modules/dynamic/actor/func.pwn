@@ -48,8 +48,7 @@ Actor_Create(playerid, model, name[])
 		ActorData[index][actorObject] = CreateDynamicActor(ActorData[index][actorModel], ActorData[index][actorPos][0], ActorData[index][actorPos][1], ActorData[index][actorPos][2], ActorData[index][actorPos][3], true, 100, ActorData[index][actorVirtualWorld], ActorData[index][actorInterior]);
 
 		format(string, sizeof(string), ""RED"[Actor] "WHITE"%s (%d)", ActorData[index][actorName], index);
-		ActorData[index][actorText] = CreateDynamic3DTextLabel(string, COLOR_WHITE, ActorData[index][actorPos][0], ActorData[index][actorPos][1], ActorData[index][actorPos][2]+1, 30, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, ActorData[index][actorVirtualWorld], ActorData[index][actorInterior]);
-		
+		ActorData[index][actorText] = CreateDynamic3DTextLabel(string, COLOR_WHITE, ActorData[index][actorPos][0], ActorData[index][actorPos][1], ActorData[index][actorPos][2]+1, 10, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, ActorData[index][actorVirtualWorld], ActorData[index][actorInterior]);
 		Streamer_SetIntData(STREAMER_TYPE_ACTOR, ActorData[index][actorObject], E_STREAMER_EXTRA_ID, index);
 
 		mysql_tquery(g_iHandle, sprintf("INSERT INTO `actor`(`actorInterior`,`actorVirtualWorld`) VALUES('%d', '%d');", ActorData[index][actorInterior], ActorData[index][actorVirtualWorld]), "OnActorCreated", "d", index);
@@ -134,6 +133,14 @@ Actor_Delete(index)
 
 stock Actor_Sync(index)
 {
+    if(!Iter_Contains(ServerActor, index)) return 0;
+
+    if(IsValidDynamicActor(ActorData[index][actorObject]))
+		DestroyDynamicActor(ActorData[index][actorObject]);
+
+	if(IsValidDynamic3DTextLabel(ActorData[index][actorText]))
+		DestroyDynamic3DTextLabel(ActorData[index][actorText]);
+
 	if(Actor_IsExists(index))
 	{	
 		new string[255];

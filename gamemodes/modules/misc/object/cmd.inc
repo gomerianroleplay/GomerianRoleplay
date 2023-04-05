@@ -25,7 +25,7 @@ CMD:editobject(playerid, params[]) {
   new opt[64], value[128];
   if (sscanf(params, "s[64]S()[128]", opt, value)) {
     SendSyntaxMessage(playerid, "/editobject [option]");
-    SendClientMessageEx(playerid, X11_YELLOW, "[OPTIONS]: position, fixpos, model, copy, gethere, material, resetmaterial, textprop, resettextprop, vw, int, drawdistance, house");
+    SendClientMessageEx(playerid, X11_YELLOW, "[OPTIONS]: "WHITE"position, fixpos, model, copy, gethere, material, resetmaterial, textprop, resettextprop, vw, int, drawdistance, house");
     return 1;
   }
 
