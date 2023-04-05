@@ -14254,9 +14254,9 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
             if(Entrance_HasRecentTeleport(playerid))
                 return ShowPlayerFooter(playerid, "~g~INFO: ~w~Tunggu beberapa detik sebelum keluar...");
 
-             SetPlayerPosEx(playerid, EntranceData[id][entrancePos][0], EntranceData[id][entrancePos][1], EntranceData[id][entrancePos][2], 2500);
             Entrance_UpdateRecentTeleport(playerid);
             Entrance_Exit(playerid, id);
+            SetPlayerPosEx(playerid, EntranceData[id][entrancePos][0], EntranceData[id][entrancePos][1], EntranceData[id][entrancePos][2], 2500);
         }
     }
 
@@ -18261,7 +18261,7 @@ CMD:credits(playerid, params[])
     strcat(credits, CYAN"Script Development\n");
     strcat(credits, WHITE"Leynardo Yosef (Scripter Base)\n");
     strcat(credits, WHITE"Rachmad Setiawan (Scripter Base)\n");
-    strcat(credits, WHITE"Blockring (Scripter Development)\n");
+    strcat(credits, WHITE"IntheBleakMidWinter (Scripter Development)\n");
     strcat(credits, WHITE"GigUp (Scripter)\n");
     strcat(credits, WHITE"Nandes (Manager In Game)\n\n");
     strcat(credits, CYAN"Lifetime Donations\n");
@@ -21734,20 +21734,6 @@ CMD:nearesttags(playerid, params[])
 
     if((id = Tags_Nearest(playerid)) != -1) SendServerMessage(playerid, "You are standing near tags "YELLOW"ID: %d.", id);
     else SendServerMessage(playerid, "Kamu tidak berada didekat property apapun!");
-
-    return 1;
-}
-
-CMD:nearestatm(playerid, params[])
-{
-    if (CheckAdmin(playerid, 3))
-        return PermissionError(playerid);
-
-    new
-        id = -1;
-
-    if((id = ATM_Nearest(playerid)) != -1) SendServerMessage(playerid, "You are standing near atm "YELLOW"ID: %d.", id);
-    else SendServerMessage(playerid, "Kamu tidak berada didekat atm manapun apapun!");
 
     return 1;
 }
