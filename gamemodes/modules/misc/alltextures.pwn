@@ -1,4 +1,4 @@
-#include <YSI_DATA/y_playerarray>
+#include <YSI_Data/y_playerarray>
 
 #define GetTModel(%0) ObjectTextures[%0][TModel]
 #define GetTXDName(%0) ObjectTextures[%0][TXDName]
