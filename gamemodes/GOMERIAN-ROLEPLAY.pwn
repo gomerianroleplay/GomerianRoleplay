@@ -6335,7 +6335,8 @@ Entrance_Exit(playerid, id)
     SetPlayerInterior(playerid, EntranceData[id][entranceExterior]);
     SetPlayerVirtualWorld(playerid, EntranceData[id][entranceExteriorVW]);
     SetCameraBehindPlayer(playerid);
-
+    SetPlayerPosEx(playerid, EntranceData[id][entrancePos][0], EntranceData[id][entrancePos][1], EntranceData[id][entrancePos][2], 2500);
+    
     PlayerData[playerid][pEntrance] = Entrance_GetLink(playerid);
     return 1;
 }
