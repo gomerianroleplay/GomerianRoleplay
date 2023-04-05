@@ -6335,8 +6335,7 @@ Entrance_Exit(playerid, id)
     SetPlayerInterior(playerid, EntranceData[id][entranceExterior]);
     SetPlayerVirtualWorld(playerid, EntranceData[id][entranceExteriorVW]);
     SetCameraBehindPlayer(playerid);
-    SetPlayerPosEx(playerid, EntranceData[id][entrancePos][0], EntranceData[id][entrancePos][1], EntranceData[id][entrancePos][2], 2500);
-    
+
     PlayerData[playerid][pEntrance] = Entrance_GetLink(playerid);
     return 1;
 }
@@ -14255,6 +14254,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
             if(Entrance_HasRecentTeleport(playerid))
                 return ShowPlayerFooter(playerid, "~g~INFO: ~w~Tunggu beberapa detik sebelum keluar...");
 
+             SetPlayerPosEx(playerid, EntranceData[id][entrancePos][0], EntranceData[id][entrancePos][1], EntranceData[id][entrancePos][2], 2500);
             Entrance_UpdateRecentTeleport(playerid);
             Entrance_Exit(playerid, id);
         }
