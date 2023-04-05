@@ -41,7 +41,12 @@ stock GetVehicleNeedFlip(vehicleid)//return 1 if need, 0 if not
 
 SendPlayerPos(playerid, Float:x, Float:y, Float:z, Float:angle, int = 0, vw = 0)
 {
-	if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER) SetVehiclePos(GetPlayerVehicleID(playerid), x, y, z);
+	if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER) 
+    {
+        SetVehiclePos(GetPlayerVehicleID(playerid), x, y, z);
+        LinkVehicleToInterior(GetPlayerVehicleID(playerid), int);
+        SetVehicleVirtualWorld(GetPlayerVehicleID(playerid), vw);
+    }
     else SetPlayerPos(playerid, x, y, z);
 
     SetPlayerFacingAngle(playerid, angle);

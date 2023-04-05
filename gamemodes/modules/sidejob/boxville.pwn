@@ -55,7 +55,7 @@ hook OnScriptInit()
 {
 	CreateDynamicMapIcon(1632.9908,-1908.9866,13.5521, 56, -1, 0, 0, -1, _, MAPICON_GLOBAL);
 	CreateDynamicPickup(1239, 23, 1632.9908,-1908.9866,13.5521);
-	CreateDynamic3DTextLabel("[Box Ville]\n"WHITE"Gunakan "YELLOW"/stopboxville"WHITE" untuk mendapatkan upah", COLOR_CLIENT, 1613.1182,-1891.2689,13.5469+0.5, 5.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0);
+	CreateDynamic3DTextLabel("[Box Ville]\n"WHITE"Gunakan "YELLOW"/stopboxville"WHITE" untuk mendapatkan upah", COLOR_CLIENT, 1632.9908,-1908.9866,13.5521+0.5, 5.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0);
 }
 
 hook EnterBoxvilleVehicle(playerid, vehicleid)
@@ -273,7 +273,7 @@ CMD:deliverpacket(playerid, params[])
 
 	if(HouseDelivered[playerid] >= JobConfig_GetMaxHousesDelivered())
 	{
-		SetPlayerWaypoint(playerid, "Boxville HQ", 1363.1598,-1648.3190,13.3828);
+		SetPlayerWaypoint(playerid, "Boxville HQ", 1632.9908,-1908.9866,13.5521);
 		return SendServerMessage(playerid, "Jumlah packet di dalam boxville habis, silahkan kembalikan mobil!");
 	}
 
@@ -290,7 +290,7 @@ CMD:deliverpacket(playerid, params[])
 	{
 		HouseData[id][housePacket] = 1;
 		HouseDelivered[playerid] = max_houses_delivered;
-		SetPlayerWaypoint(playerid, "Boxville HQ", 1363.1598,-1648.3190,13.3828);
+		SetPlayerWaypoint(playerid, "Boxville HQ", 1632.9908,-1908.9866,13.5521);
 		SendServerMessage(playerid, "Packet di dalam boxville sudah habis, kembalikan truck!");
 		SendCustomMessage(playerid, "PACKET", "Jumlah yang kamu kirim sekarang: "GREEN"%d "WHITE". Packet yang tersisa di truck: "GREEN"%d", HouseDelivered[playerid], (max_houses_delivered - HouseDelivered[playerid]));
 	}
@@ -304,7 +304,7 @@ CMD:stopboxville(playerid, params[])
 	if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 		return SendErrorMessage(playerid, "Kemudikan kendaraan untuk menggunakan perintah ini!");
     
-	if(!IsPlayerInRangeOfPoint(playerid, 4, 1613.1182,-1891.2689,13.5469)) 
+	if(!IsPlayerInRangeOfPoint(playerid, 4, 1632.9908,-1908.9866,13.5521)) 
 		return SendErrorMessage(playerid, "Pergi ke lokasi untuk mengembalikan boxville dan mengambil upah!");
 
 	if(!IsBoxvilleWorking(playerid))

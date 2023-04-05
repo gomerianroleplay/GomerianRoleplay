@@ -5,6 +5,7 @@ SSCANF:AtmMenu(string[])
  	else if(!strcmp(string,"position",true)) return 3;
  	else if(!strcmp(string,"capacity",true)) return 4;
  	else if(!strcmp(string,"reset",true)) return 5;
+    else if(!strcmp(string, "nearest", true)) return 6;
  	return 0;
 }
 
@@ -19,7 +20,7 @@ CMD:atmmenu(playerid, params[])
         return PermissionError(playerid);
 
 	if(sscanf(params, "k<AtmMenu>S()[128]", action, nextParams))
-		return SendSyntaxMessage(playerid, "/atmmenu [create/delete/position/capacity/reset]");
+		return SendSyntaxMessage(playerid, "/atmmenu [create/delete/position/capacity/reset/nearest]");
 
 	switch(action)
 	{
@@ -39,7 +40,7 @@ CMD:atmmenu(playerid, params[])
 		case 3: // Position
 		{
 			if(sscanf(nextParams, "d", index))
-				return SendSyntaxMessage(playerid, "/atmmenu position [atm ID (/near)]");
+				return SendSyntaxMessage(playerid, "/atmmenu position [atm ID (/nearestatm)]");
 
 			if(!ATM_IsExists(index))
 				return SendErrorMessage(playerid, "ID ATM yang kamu input tidak terdaftar!");
@@ -79,7 +80,15 @@ CMD:atmmenu(playerid, params[])
 			}
 			SendServerMessage(playerid, "Sukses me-reset capacity ATM");
 		}
-		default: SendSyntaxMessage(playerid, "/atmmenu [create/delete/position/capacity/reset]");
+        case 6: // NEAREST
+        {
+            new id = -1;
+            if((id = ATM_Nearest(playerid)) != -1) SendServerMessage(playerid, "You are standing near atm "YELLOW"ID: %d", id);
+            else SendServerMessage(playerid, "You are not any nearest ATM");
+
+            return 1;
+        }
+		default: SendSyntaxMessage(playerid, "/atmmenu [create/delete/position/capacity/reset/nearest]");
 	}
 	return 1;
 }

@@ -478,6 +478,8 @@ public OnGameModeInit()
 
 #include "modules/misc/vehicle_object.pwn"
 
+#include "modules\misc\objectCreator.inc"
+
 #include "modules/core/player_timer.pwn"
 #include "modules/core/global_timer.pwn"
 
@@ -14254,6 +14256,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
             Entrance_UpdateRecentTeleport(playerid);
             Entrance_Exit(playerid, id);
+            SetPlayerPosEx(playerid, EntranceData[id][entrancePos][0], EntranceData[id][entrancePos][1], EntranceData[id][entrancePos][2], 2500);
         }
     }
 
@@ -16684,6 +16687,29 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
                     }
                 }
             }
+            case OBJECT: {
+                if(PlayerData[playerid][pEditObject] != -1 && PlayerData[playerid][pEditingMode] == OBJECT) {
+                    if(PlayerData[playerid][pEditObject] != -1 && Iter_Contains(Obj, PlayerData[playerid][pEditObject]) && PlayerData[playerid][pEditingMode] == 1) {
+                        new tid = PlayerData[playerid][pEditObject];
+                        ObjData[tid][oPos][0] = x;
+                        ObjData[tid][oPos][1] = y;
+                        ObjData[tid][oPos][2] = z;
+                        ObjData[tid][oRot][0] = rx;
+                        ObjData[tid][oRot][1] = ry;
+                        ObjData[tid][oRot][2] = rz;
+
+                        SetDynamicObjectPos(objectid, x, y, z);
+                        SetDynamicObjectRot(objectid, rx, ry, rz);
+
+                        Object_Refresh(tid);
+                        Object_Save(tid);
+
+                        SendClientMessageEx(playerid, X11_LIGHT_SKY_BLUE_1, "You've successfully edited object"RED"id: "WHITE"%D", tid);
+                        PlayerData[playerid][pEditObject] = -1;
+                        Streamer_Update(playerid);
+                    }
+                }
+            }
         }
         ResetEditing(playerid);
     }
@@ -18235,7 +18261,7 @@ CMD:credits(playerid, params[])
     strcat(credits, CYAN"Script Development\n");
     strcat(credits, WHITE"Leynardo Yosef (Scripter Base)\n");
     strcat(credits, WHITE"Rachmad Setiawan (Scripter Base)\n");
-    strcat(credits, WHITE"Blockring (Scripter Development)\n");
+    strcat(credits, WHITE"IntheBleakMidWinter (Scripter Development)\n");
     strcat(credits, WHITE"GigUp (Scripter)\n");
     strcat(credits, WHITE"Nandes (Manager In Game)\n\n");
     strcat(credits, CYAN"Lifetime Donations\n");
@@ -21708,20 +21734,6 @@ CMD:nearesttags(playerid, params[])
 
     if((id = Tags_Nearest(playerid)) != -1) SendServerMessage(playerid, "You are standing near tags "YELLOW"ID: %d.", id);
     else SendServerMessage(playerid, "Kamu tidak berada didekat property apapun!");
-
-    return 1;
-}
-
-CMD:nearestatm(playerid, params[])
-{
-    if (CheckAdmin(playerid, 3))
-        return PermissionError(playerid);
-
-    new
-        id = -1;
-
-    if((id = ATM_Nearest(playerid)) != -1) SendServerMessage(playerid, "You are standing near atm "YELLOW"ID: %d.", id);
-    else SendServerMessage(playerid, "Kamu tidak berada didekat atm manapun apapun!");
 
     return 1;
 }

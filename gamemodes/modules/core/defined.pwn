@@ -49,7 +49,7 @@ Script Defined List
 #define MAX_HOUSE_FURNITURE             (100)
 #define SAVE_CHARACTERS_INTERVAL				(5) // Menyimpan data player setiap 5 menit
 #define ENTRANCE_RECENT_TELEPORTED			(4) // Waktu minimum sebelum player bisa teleport lagi (dalam detik)
-
+#define MAX_MATERIALS                   (16)
 //#define MAX_RENT_POINT					(100)
 //#define MAX_RENT_LIST					(5)
 
@@ -63,6 +63,8 @@ Script Defined List
 #define GetUCPSQLID(%0)                 AccountData[%0][pID]
 
 #define NormalName(%0)                  CharacterList[%0][PlayerData[%0][pCharacter]]
+
+#define Loop(%0,%1)                     for(new %0; %0 != %1; %0++)
 
 #define MAX_ADS 						(100)
 

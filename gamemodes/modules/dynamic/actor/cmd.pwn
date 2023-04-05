@@ -5,8 +5,7 @@ SSCANF:ActorMenu(string[])
  	else if(!strcmp(string,"type",true)) return 3;
  	else if(!strcmp(string,"cash",true)) return 4;
  	else if(!strcmp(string,"anim",true)) return 5;
- 	else if(!strcmp(string,"info",true)) return 6;
- 	else if(!strcmp(string,"anim",true)) return 7;
+    else if(!strcmp(string, "position", true)) return 6;
  	return 0;
 }
 
@@ -36,7 +35,7 @@ CMD:actormenu(playerid, params[])
 	if(sscanf(params, "k<ActorMenu>S()[128]", action, nextParams))
 	{
 		SendSyntaxMessage(playerid, "/actormenu [entity]");
-		SendSyntaxMessage(playerid, "ENTITY: [create/delete/type/cash/info/anim]");
+		SendSyntaxMessage(playerid, "ENTITY: [create/delete/type/cash/anim/position]");
 		return 1;
 	}
 
@@ -48,8 +47,8 @@ CMD:actormenu(playerid, params[])
 			if(sscanf(nextParams, "ds[128]", model, name))
 				return SendSyntaxMessage(playerid, "/actormenu create [model] [name]");
 
-			if((index = Actor_Create(playerid, model, name)) != -1) SendServerMessage(playerid, "Sukses membuat Actor "YELLOW"id: %d.", index);
-			else SendErrorMessage(playerid, "Jumlah Actor sudah mencapai batas limit ("#MAX_DYNAMIC_ACTOR" actor)");
+			if((index = Actor_Create(playerid, model, name)) != -1) SendServerMessage(playerid, "Success create actor "YELLOW"id: %d"WHITE"(Total Actors: "YELLOW"%d"WHITE").", index,Iter_Count(ServerActor));
+			else SendErrorMessage(playerid, "Actor has reach limit ("#MAX_DYNAMIC_ACTOR")");
 		}
 		case 2: // Delete
 		{
@@ -59,7 +58,7 @@ CMD:actormenu(playerid, params[])
 			if(Actor_Delete(index)) SendServerMessage(playerid, "Sukses menghapus Actor "YELLOW"id: %d.", index);
 			else SendErrorMessage(playerid, "ID Actor yang kamu input tidak terdaftar!");
 		}
-		case 3:
+		case 3: //TYPE
 		{
 			new type;
 			if(sscanf(nextParams, "dd", index, type))
@@ -71,16 +70,16 @@ CMD:actormenu(playerid, params[])
 			if(Actor_SetType(index, type)) SendServerMessage(playerid, "You set actor id %d type to %d", index, type);
 			else SendErrorMessage(playerid, "ID Actor yang kamu input tidak terdaftar!");
 		}
-		case 4:
+		case 4: //CASH
 		{
 			new amount;
 			if(sscanf(nextParams, "dd", index, amount))
 				return SendSyntaxMessage(playerid, "/actormenu cash [actorid] [amount]");
 			
-			if(Actor_SetCash(index, amount)) SendServerMessage(playerid, "You set actor id %d cash to $%d", index, amount);
+			if(Actor_SetCash(index, amount)) SendServerMessage(playerid, "You set actor "YELLOW"id %d cash to "GREEN"$%d", index, amount);
 			else SendErrorMessage(playerid, "ID Actor yang kamu input tidak terdaftar!");
 		}
-		case 5:
+		case 5: //ANIMATION
 		{
 			new animlib[128], animname[128];
 			if(sscanf(nextParams, "ds[128]s[128]", index, animlib, animname))
@@ -89,13 +88,30 @@ CMD:actormenu(playerid, params[])
 			if(isnull(animname) || isnull(animlib))
         		return SendSyntaxMessage(playerid, "/actormenu anim [actorid] [animlib] [animname]");
 
-			if(Actor_SetAnim(index, animlib, animname)) SendServerMessage(playerid, "You set actor id %d animation", index);
+			if(Actor_SetAnim(index, animlib, animname)) SendServerMessage(playerid, "You set actor "YELLOW"id %d animation", index);
 			else SendErrorMessage(playerid, "ID Actor yang kamu input tidak terdaftar!");
 		}
+        case 6:
+        {
+            if(sscanf(nextParams, "d", index))
+                return SendServerMessage(playerid, "/actormenu position [actor ID]");
+
+            if(!Actor_IsExists(index))
+                return SendErrorMessage(playerid, "ID actor not exists!");
+
+            GetPlayerPos(playerid, ActorData[index][actorPos][0], ActorData[index][actorPos][1], ActorData[index][actorPos][2]);
+            GetPlayerFacingAngle(playerid, ActorData[index][actorPos][3]);
+
+            ActorData[index][actorInterior] = GetPlayerInterior(playerid);
+                
+            SendServerMessage(playerid, "You've changed actor position for "YELLOW"id: %d", index);
+            Actor_Sync(index);
+            Actor_Save(index);
+        }
 		default: 
 		{
 			SendSyntaxMessage(playerid, "/actormenu [entity]");
-			SendSyntaxMessage(playerid, "ENTITY: [create/delete/type/cash/info/anim]");
+			SendSyntaxMessage(playerid, "ENTITY: [create/delete/type/cash/info/anim/position]");
 		}
 	}
 	return 1;

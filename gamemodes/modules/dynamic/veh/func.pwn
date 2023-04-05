@@ -1177,7 +1177,7 @@ Vehicle_PlayerTotalCount(playerid)
 {
 	new Cache:execute, total = 0;
 
-	execute = mysql_query(g_iHandle, sprintf("SELECT `id` FROM `server_vehicles` WHERE `extraid`='%d' AND `type`='%d' AND `parking`= 0 AND `house_parking` = -1 AND `garage` = 0;", GetPlayerSQLID(playerid), VEHICLE_TYPE_PLAYER));
+	execute = mysql_query(g_iHandle, sprintf("SELECT `id` FROM `server_vehicles` WHERE `extraid`='%d' AND `type`='%d' AND `parking`= 0 AND `house_parking` = -1", GetPlayerSQLID(playerid), VEHICLE_TYPE_PLAYER));
 
 	if(cache_num_rows())
 		total = cache_num_rows();
@@ -1523,7 +1523,7 @@ Vehicle_GetState(vehicleid)
 
 Vehicle_PlayerLoad(playerid)
 {
-	mysql_tquery(g_iHandle, sprintf("SELECT * FROM `server_vehicles` WHERE `parking`='0' AND `house_parking`='-1' AND `extraid`='%d' AND `type`='%d' AND `state`='%d' ORDER BY `id` ASC LIMIT %d;", GetPlayerSQLID(playerid), VEHICLE_TYPE_PLAYER, VEHICLE_STATE_SPAWNED, MAX_OWNED_VEHICLES), "VehicleLoaded", "");
+	mysql_tquery(g_iHandle, sprintf("SELECT * FROM `server_vehicles` WHERE `parking`='0' AND `house_parking`='-1' AND `extraid`='%d' AND `type`='%d' AND `state`='%d' OR `state` = '8' ORDER BY `id` ASC LIMIT %d;", GetPlayerSQLID(playerid), VEHICLE_TYPE_PLAYER, VEHICLE_STATE_SPAWNED, MAX_OWNED_VEHICLES), "VehicleLoaded", "");
 	mysql_tquery(g_iHandle, sprintf("SELECT * FROM `player_vehicles` WHERE `owner`='%d';", GetPlayerSQLID(playerid)), "OldVehicleLoaded", "d", playerid);
 	return 1;
 }

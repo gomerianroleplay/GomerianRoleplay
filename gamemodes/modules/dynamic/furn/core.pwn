@@ -1,7 +1,6 @@
 /*
 	Defined list for furniture system.
 */
-#define MAX_MATERIALS		        16
 #define MAX_FURNSTORE				10
 #define MAX_EMPLOYE					3
 
