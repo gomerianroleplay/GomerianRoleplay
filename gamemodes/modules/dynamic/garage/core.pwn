@@ -92,7 +92,7 @@ Garage_Create(playerid, price, type)
 {
     new garage_id = INVALID_ITERATOR_SLOT;
 
-    for (new i = 0; i != MAX_GARAGE; i ++) if (GarageInfo[i][garageExists] == false)
+    for (new i = 0; i != MAX_GARAGE; i ++) if (GarageInfo[i][garageExists] == -1)
     {
         garage_id = i;
         //Iter_Add(Garages, garage_id);

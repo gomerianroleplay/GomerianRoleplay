@@ -1,11 +1,234 @@
-/*
-	Furniture store.
+#include <YSI_Coding\y_hooks>
 
-	Made by: Agus Syahputra
-	Idea by: Jogjagamers
-*/
-// #include <YSI_Coding\y_hooks>
-public FurnStore_Load()
+Function:FurnObject_Load(index)
+{
+	new query[32];
+
+	for(new i = 0; i != cache_num_rows(); i++)
+	{
+		Iter_Add(FurnObject, i);
+
+		cache_get_field_content(i, "name", FurnStore[i][furnName], 32);
+
+		cache_get_field_content(i, "materials", query, 32);
+        sscanf(query, "p<|>dddddddddddddddd", 
+        	FurnStore[i][furnMaterials][0],
+			FurnStore[i][furnMaterials][1],
+			FurnStore[i][furnMaterials][2],
+			FurnStore[i][furnMaterials][3],
+			FurnStore[i][furnMaterials][4],
+			FurnStore[i][furnMaterials][5],
+			FurnStore[i][furnMaterials][6],
+			FurnStore[i][furnMaterials][7],
+			FurnStore[i][furnMaterials][8],
+			FurnStore[i][furnMaterials][9],
+			FurnStore[i][furnMaterials][10],
+			FurnStore[i][furnMaterials][11],
+			FurnStore[i][furnMaterials][12],
+			FurnStore[i][furnMaterials][13],
+			FurnStore[i][furnMaterials][14],
+			FurnStore[i][furnMaterials][15]
+		);
+
+        FurnStore[i][furnID] = cache_get_field_int(i, "id");
+		FurnStore[i][furnModel] = cache_get_field_int(i, "model");
+
+		FurnStore[i][furnPos][0] = cache_get_field_float(i, "x");
+		FurnStore[i][furnPos][1] = cache_get_field_float(i, "y");
+		FurnStore[i][furnPos][2] = cache_get_field_float(i, "z");
+		FurnStore[i][furnRot][0] = cache_get_field_float(i, "rx");
+		FurnStore[i][furnRot][1] = cache_get_field_float(i, "ry");
+		FurnStore[i][furnRot][2] = cache_get_field_float(i, "rz");
+		
+		FurnStore[i][furnPrice] = cache_get_field_int(i, "price");
+		FurnStore[i][furnStock] = cache_get_field_int(i, "stock");
+		FurnStore[i][furnStoreId] = cache_get_field_int(i, "storeid");
+
+		FurnObject_Refresh(i);
+	}
+	printf("Loaded furnobject data - %d count.", cache_num_rows());
+	return 1;
+}
+
+FurnObject_Save(index)
+{
+	if(Iter_Contains(FurnObject, index))
+	{
+		new query[500];
+
+		format(query, sizeof(query), "UPDATE `furnobject` SET model=%d,name='%s',x=%.3f,y=%.3f,z=%.3f,rx=%.3f,ry=%.3f,rz=%.3f", 
+			FurnStore[index][furnModel],
+			FurnStore[index][furnName],
+			FurnStore[index][furnPos][0],
+			FurnStore[index][furnPos][1],
+			FurnStore[index][furnPos][2],
+			FurnStore[index][furnRot][0],
+			FurnStore[index][furnRot][1],
+			FurnStore[index][furnRot][2]
+		);
+		format(query, sizeof(query), "%s, price=%d,stock=%d,storeid=%d,materials='%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d|%d' WHERE id=%d", 
+			query,
+			FurnStore[index][furnPrice],
+			FurnStore[index][furnStock],
+			FurnStore[index][furnStoreId],
+			FurnStore[index][furnMaterials][0],
+			FurnStore[index][furnMaterials][1],
+			FurnStore[index][furnMaterials][2],
+			FurnStore[index][furnMaterials][3],
+			FurnStore[index][furnMaterials][4],
+			FurnStore[index][furnMaterials][5],
+			FurnStore[index][furnMaterials][6],
+			FurnStore[index][furnMaterials][7],
+			FurnStore[index][furnMaterials][8],
+			FurnStore[index][furnMaterials][9],
+			FurnStore[index][furnMaterials][10],
+			FurnStore[index][furnMaterials][11],
+			FurnStore[index][furnMaterials][12],
+			FurnStore[index][furnMaterials][13],
+			FurnStore[index][furnMaterials][14],
+			FurnStore[index][furnMaterials][15],
+			FurnStore[index][furnID]
+		);
+		mysql_tquery(g_iHandle, query);
+	}
+	return 1;
+}
+
+FurnObject_Sync(index)
+{
+	Streamer_SetFloatData(STREAMER_TYPE_OBJECT, FurnStore[index][furnObject], E_STREAMER_X, FurnStore[index][furnPos][0]);
+    Streamer_SetFloatData(STREAMER_TYPE_OBJECT, FurnStore[index][furnObject], E_STREAMER_Y, FurnStore[index][furnPos][1]);
+    Streamer_SetFloatData(STREAMER_TYPE_OBJECT, FurnStore[index][furnObject], E_STREAMER_Z, FurnStore[index][furnPos][2]);
+
+    Streamer_SetFloatData(STREAMER_TYPE_OBJECT, FurnStore[index][furnObject], E_STREAMER_R_X, FurnStore[index][furnRot][0]);
+    Streamer_SetFloatData(STREAMER_TYPE_OBJECT, FurnStore[index][furnObject], E_STREAMER_R_Y, FurnStore[index][furnRot][1]);
+    Streamer_SetFloatData(STREAMER_TYPE_OBJECT, FurnStore[index][furnObject], E_STREAMER_R_Z, FurnStore[index][furnRot][2]);
+
+    Streamer_SetIntData(STREAMER_TYPE_OBJECT, FurnStore[index][furnObject], E_STREAMER_MODEL_ID, FurnStore[index][furnModel]);
+
+    for(new i = 0; i != MAX_MATERIALS; i++) if(FurnStore[index][furnMaterials][i] > 0)
+	{
+			SetDynamicObjectMaterial(FurnStore[index][furnObject], i, 
+			GetTModel(FurnStore[index][furnMaterials][i]), 
+			GetTXDName(FurnStore[index][furnMaterials][i]), 
+			GetTextureName(FurnStore[index][furnMaterials][i]), 0
+		);
+
+	}
+	return 1;
+}
+
+FurnObject_Refresh(index)
+{
+	if(Iter_Contains(FurnObject, index)) 
+	{
+		if(!IsValidDynamicObject(FurnStore[index][furnObject]))
+		{
+			FurnStore[index][furnObject] = CreateDynamicObject(FurnStore[index][furnModel], 
+				FurnStore[index][furnPos][0], FurnStore[index][furnPos][1], FurnStore[index][furnPos][2], 
+				FurnStore[index][furnRot][0], FurnStore[index][furnRot][1], FurnStore[index][furnRot][2], 
+				(FurnStore[index][furnStoreId]+1), 3
+			);
+		}
+		FurnObject_Sync(index);	    
+			
+		if(IsValidDynamic3DTextLabel(FurnStore[index][furnLabel]))
+			DestroyDynamic3DTextLabel(FurnStore[index][furnLabel]);
+		
+		new string[100];
+		format(string, sizeof(string), ""WHITE"[id: %d]\n"YELLOW"%s \n"WHITE"Price: "GREEN"%s \n"WHITE"Stock: "GREEN"%d", index, FurnStore[index][furnName], FormatNumber(FurnStore[index][furnPrice]), FurnStore[index][furnStock]);
+		FurnStore[index][furnLabel] = CreateDynamic3DTextLabel(string, COLOR_BLUE, FurnStore[index][furnPos][0], FurnStore[index][furnPos][1], FurnStore[index][furnPos][2], 5, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, FurnStore[index][furnStoreId]+1, 3);
+
+		foreach(new i : Player) if(SQL_IsLogged(i) && IsPlayerInRangeOfPoint(i, 5, FurnStore[index][furnPos][0], FurnStore[index][furnPos][1], FurnStore[index][furnPos][2])) {
+			Streamer_Update(i);
+		}
+	}
+	return 1;
+}
+
+FurnObject_List(playerid, index)
+{
+	if(Iter_Contains(FurnStore, index))
+	{
+		new count = 0,
+	    	info[255];
+
+	    strcat(info, "Furniture\tSlot (ID)\tDistance (meters)\n");
+	    foreach(new i : FurnObject) if(FurnStore[i][furnStoreId] == storeData[index][storeID])
+	    {
+	    	strcat(info, sprintf("%s\t%d\t%.1f\n", FurnStore[i][furnName], i, GetPlayerDistanceFromPoint(playerid, FurnStore[i][furnPos][0], FurnStore[i][furnPos][1], FurnStore[i][furnPos][2])));
+	    	ListedFurnObject[playerid][count++] = i;
+	    }
+	    if(count != MAX_FURNSTORE_OBJECT)
+	    	strcat(info, "Add New\t\n");
+
+	    Dialog_Show(playerid, ManageFurn, DIALOG_STYLE_TABLIST_HEADERS, "Exhibits", info, "Select", "Back");
+	}
+	return 1;
+}
+
+FurnObject_Category(playerid)
+{
+	new string[120];
+	for (new i = 0; i < sizeof(g_aFurnitureTypes); i ++) {
+        strcat(string, sprintf("%s\n", g_aFurnitureTypes[i]));
+    }
+    Dialog_Show(playerid, SelectType, DIALOG_STYLE_LIST, "Object Category", string, "Modify", "Cancel");
+	return 1;
+}
+
+FurnObject_Count(index)
+{
+	new count = 0;
+
+	foreach(new i : FurnObject) if(FurnStore[i][furnStoreId] == storeData[index][storeID]) {
+		count++;
+	}
+	return count;
+}
+
+FurnObject_Add(playerid, objectid, index)
+{
+	if(FurnObject_Count(index) >= MAX_FURNSTORE_OBJECT) return -1;
+
+	new id = Iter_Free(FurnObject),
+		Float:x, Float:y, Float:z;
+
+	GetPlayerPos(playerid, x, y, z);
+	GetXYInFrontOfPlayer(playerid, x, y, 1.5);
+
+	format(FurnStore[id][furnName], 32, "Unnamed");
+
+	FurnStore[id][furnPos][0] = x;
+	FurnStore[id][furnPos][1] = y;
+	FurnStore[id][furnPos][2] = z;
+	FurnStore[id][furnRot][0] = 0;
+	FurnStore[id][furnRot][1] = 0;
+	FurnStore[id][furnRot][2] = 0;
+
+	FurnStore[id][furnModel] = objectid;
+	FurnStore[id][furnStoreId] = storeData[index][storeID];
+	FurnStore[id][furnPrice] = 0;
+	FurnStore[id][furnStock] = 0;
+
+	Iter_Add(FurnObject, id);
+
+	mysql_tquery(g_iHandle, "INSERT INTO `furnobject`(`price`) VALUES (0)", "FurnObject_Created", "d", id);
+	
+	FurnObject_Refresh(id);
+	Streamer_Update(playerid);
+	return id;
+}
+
+Function:FurnObject_Created(index)
+{
+	FurnStore[index][furnID] = cache_insert_id();
+	
+	FurnObject_Save(index);
+	return 1;
+}
+
+hook FurnStore_Load()
 {
 	for(new index = 0; index != cache_num_rows(); index++)
 	{
@@ -21,8 +244,8 @@ public FurnStore_Load()
 		storeData[id][storeEmploye][1] = cache_get_field_int(index, "employe2");
 		storeData[id][storeEmploye][2] = cache_get_field_int(index, "employe3");
 
-		cache_get_field_content(index, "name", storeData[id][storeName], g_iHandle, 32);
-		cache_get_field_content(index, "ownername", storeData[id][storeOwnerName], g_iHandle, MAX_PLAYER_NAME);
+		cache_get_field_content(index, "name", storeData[id][storeName], 32);
+		cache_get_field_content(index, "ownername", storeData[id][storeOwnerName], MAX_PLAYER_NAME);
 
 		storeData[id][storePos][0] = cache_get_field_float(index, "x");
 		storeData[id][storePos][1] = cache_get_field_float(index, "y");
@@ -38,7 +261,7 @@ public FurnStore_Load()
 	return 1;
 }
 
-public OnFurnstoreCreated(index)
+hook OnFurnstoreCreated(index)
 {
 	storeData[index][storeID] = cache_insert_id();
 
@@ -92,9 +315,9 @@ FurnStore_Create(playerid, price)
 		storeData[index][storePos][1] = y;
 		storeData[index][storePos][2] = z;
 
-		storeData[index][storeIntPos][0] = 1488.78;
-		storeData[index][storeIntPos][1] = 1789.09;
-		storeData[index][storeIntPos][2] = 9.926;
+		storeData[index][storeIntPos][0] = 1464.5621;
+		storeData[index][storeIntPos][1] = 1768.3160;
+		storeData[index][storeIntPos][2] = 10.9062;
 
 		storeData[index][storePrice] = price;
 		storeData[index][storeOwner] = 0;
@@ -122,10 +345,10 @@ FurnStore_Refresh(index)
 			DestroyDynamicCP(storeData[index][storeCP]);
 
 		if(storeData[index][storeOwner])  {
-			storeData[index][storeLabel] = CreateDynamic3DTextLabel(sprintf("[id: %d]\n%s\n"COL_WHITE"Owned by: "COL_YELLOW"%s\n"COL_WHITE"Press '"COL_RED"H"COL_WHITE"' to go inside", index, storeData[index][storeName], storeData[index][storeOwnerName]), COLOR_LIGHTBLUE, storeData[index][storePos][0], storeData[index][storePos][1], storeData[index][storePos][2]+0.5, 10, _, _, 1, 0, 0);
-		}
+			storeData[index][storeLabel] = CreateDynamic3DTextLabel(sprintf("[id: %d]\n%s\n"WHITE"Owned by: "YELLOW"%s\n"WHITE"Press '"RED"H"WHITE"' to go inside", index, storeData[index][storeName], storeData[index][storeOwnerName]), X11_AZURE, storeData[index][storePos][0], storeData[index][storePos][1], storeData[index][storePos][2]+0.5, 10, _, _, 1, 0, 0);
+        }
 		else {
-			storeData[index][storeLabel] = CreateDynamic3DTextLabel(sprintf("[id: %d]\n"COL_WHITE"Owned by: "COL_YELLOW"NONE\n"COL_WHITE"Price: "COL_YELLOW"%s\n"COL_WHITE"Type /buyfurnstore to buy this", index, FormatNumber(storeData[index][storePrice])), COLOR_LIGHTBLUE, storeData[index][storePos][0], storeData[index][storePos][1], storeData[index][storePos][2]+0.5, 10, _, _, 1, 0, 0);
+			storeData[index][storeLabel] = CreateDynamic3DTextLabel(sprintf("[id: %d]\n"WHITE"Owned by: "YELLOW"NONE\n"WHITE"Price: "YELLOW"%s\n"WHITE"Type /buyfurnstore to buy this", index, FormatNumber(storeData[index][storePrice])), X11_AZURE, storeData[index][storePos][0], storeData[index][storePos][1], storeData[index][storePos][2]+0.5, 10, _, _, 1, 0, 0);
 		}
 
 		storeData[index][storePickup] = CreateDynamicPickup(1239, 23, storeData[index][storePos][0], storeData[index][storePos][1], storeData[index][storePos][2], 0, 0, _, 5);
@@ -186,9 +409,9 @@ GetDataByIndex(index, type = 0)
 	getname = mysql_query(g_iHandle, sprintf("SELECT `%s` FROM `characters` WHERE `ID`='%d'", !type ? ("Character") : ("LoginDate"), index));
 	if(cache_num_rows()) {
 		if(!type)
-			cache_get_field_content(0, "Character", name);
+			cache_get_value(0, "Character", name);
 		else {
-			seen = cache_get_field_content_int(0, "LoginDate");
+			cache_get_value_int(0, "LoginDate", seen);
 			format(name, MAX_PLAYER_NAME, "%s", GetDuration(gettime()-seen));
 		}
 	}
@@ -217,254 +440,16 @@ Employee_List(playerid, index)
 	return 1;
 }
 
-CMD:addfurnstore(playerid, params[])
-{
-	CheckAdmin(playerid, 5);
-
-	static
-		price;
-
-	if(sscanf(params, "d", price))
-		return SendSyntaxMessage(playerid, "/addfurnstore [price]");
-
-	new id = FurnStore_Create(playerid, price);
-
-	if(id == -1)
-		return SendErrorMessage(playerid, "Tidak ada slot furniture store lagi.");
-
-	SendServerMessage(playerid, "Furniture store id %d telah di buat, gunakan /editfurnstore untuk mengubah sesuatu.", id);
-	return 1;
-}
-
-CMD:destroyfurnstore(playerid, params[])
-{
-	CheckAdmin(playerid, 5);
-
-	static
-		id;
-
-	if(sscanf(params, "d", id))
-		return SendSyntaxMessage(playerid, "/destroyfurnstore [index]");
-
-	if(!Iter_Contains(FurnStore, id))
-		return SendErrorMessage(playerid, "Invalid furnstore id.");
-
-	foreach(new i : FurnObject) if(FurnStore[i][furnStoreId] == storeData[id][storeID])
-	{
-		DestroyDynamic3DTextLabel(FurnStore[i][furnLabel]);
-		DestroyDynamicObject(FurnStore[i][furnObject]);
-
-		mysql_tquery(g_iHandle, sprintf("DELETE FROM `furnobject` WHERE id=%d", FurnStore[i][furnID]));
-
-		FurnStore[i][furnID] = 0;
-		FurnStore[i][furnStoreId] = 0;
-
-		Iter_Remove(FurnObject, i);
-	}
-
-	mysql_tquery(g_iHandle, sprintf("DELETE FROM furnstore WHERE id = %d", storeData[id][storeID]));
-
-	storeData[id][storeID] = 0;
-	storeData[id][storeOwner] = 0;
-
-	DestroyDynamicPickup(storeData[id][storePickup]);
-	DestroyDynamic3DTextLabel(storeData[id][storeLabel]);
-	DestroyDynamicCP(storeData[id][storeCP]);
-
-	Iter_Remove(FurnStore, id);	
-
-	SendServerMessage(playerid, "Kamu telah menghapus furnstore id %d", id);
-	return 1;
-}
-
-CMD:editfurnstore(playerid, params[])
-{
-	CheckAdmin(playerid, 5);
-
-	static
-		id,
-		opsi[32],
-		extend_str[128];
-
-	if(sscanf(params, "ds[32]S()[128]", id, opsi, extend_str))
-		return SendSyntaxMessage(playerid, "/editfurnstore [index] [location/price/vault/resetemployee/sell]");
-
-	if(!Iter_Contains(FurnStore, id))
-		return SendErrorMessage(playerid, "Invalid furnstore id.");
-
-	if(!strcmp(opsi, "location"))
-	{
-		GetPlayerPos(playerid, storeData[id][storePos][0], storeData[id][storePos][1], storeData[id][storePos][2]);
-
-		FurnStore_Refresh(id);
-		FurnStore_Save(id);
-	}
-	else if(!strcmp(opsi, "price"))
-	{
-		new price;
-
-		if(sscanf(extend_str, "d", price))
-			return SendSyntaxMessage(playerid, "/editfurnstore [id] [price]");
-
-		storeData[id][storePrice] = price;
-		SendServerMessage(playerid, "You've update price for furnstore id #%d to %d.", id, price);
-
-		FurnStore_Refresh(id);
-		FurnStore_Save(id);
-	}
-	else if(!strcmp(opsi, "vault"))
-	{
-		new vault;
-
-		if(sscanf(extend_str, "d", vault))
-			return SendSyntaxMessage(playerid, "/editfurnstore [id] [vault]");
-
-		storeData[id][storeVault] = vault;
-		SendServerMessage(playerid, "You've update vault for furnstore id #%d to %s.", id, FormatNumber(vault));
-
-		FurnStore_Refresh(id);
-		FurnStore_Save(id);
-	}
-	else if(!strcmp(opsi, "resetemployee"))
-	{
-		storeData[id][storeEmploye][0] = storeData[id][storeEmploye][1] = storeData[id][storeEmploye][2] = 0;
-		SendServerMessage(playerid, "You've reset employee for furnstore id #%d", id);
-		FurnStore_Save(id);
-	}
-	else if(!strcmp(opsi, "sell"))
-	{
-		CheckAdmin(playerid, 7);
-
-		if(!storeData[id][storeOwner])
-			return SendErrorMessage(playerid, "There are no one owned this furnstore.");
-
-		storeData[id][storeVault] = storeData[id][storeOwner] = 0;
-		storeData[id][storeEmploye][0] = storeData[id][storeEmploye][1] = storeData[id][storeEmploye][2] = 0;
-		format(storeData[id][storeOwnerName], MAX_PLAYER_NAME, "NONE");
-
-		SendServerMessage(playerid, "You've selling furnstore id #%d.", id);
-
-		FurnStore_Refresh(id);
-		FurnStore_Save(id);
-	}
-	else if(!strcmp(opsi, "employee"))
-	{
-		CheckAdmin(playerid, 7);
-
-		ManageFurnStore[playerid] = id;
-		Employee_List(playerid, id);
-		SendServerMessage(playerid, "You've edit employee for furnstore id #%d", id);
-	}
-	else SendSyntaxMessage(playerid, "/editfurnstore [index] [location/price/vault/resetemployee/sell]");
-	return 1;
-}
-
-CMD:buyfurnstore(playerid, params[])
-{
-	static
-		id = -1;
-
-	if((id = FurnStore_Nearest(playerid)) != -1)
-	{
-		if(GetMoney(playerid) < storeData[id][storePrice])
-			return SendErrorMessage(playerid, "Uang kamu tidak mencukupi.");
-
-		storeData[id][storeOwner] = GetPlayerSQLID(playerid);
-		format(storeData[id][storeOwnerName], MAX_PLAYER_NAME, ReturnName2(playerid));
-
-		FurnStore_Refresh(id);
-		FurnStore_Save(id);
-
-		GiveMoney(playerid, -storeData[id][storePrice], ECONOMY_ADD_SUPPLY, "bought furniture store");
-		SendServerMessage(playerid, "Kamu telah membeli furniture store baru!.");
-		return 1;
-	}
-	SendErrorMessage(playerid, "Kamu tidak berada di dekat furniture store.");
-	return 1;
-}
-
-CMD:fsm(playerid, params[])
-{
-	static
-		id = -1;
-
-	if((id = FurnStore_Inside(playerid)) != -1)
-	{
-		if(FurnStore_IsOwner(playerid, id) || FurnStore_IsEmployee(playerid, id))
-		{
-			Dialog_Show(playerid, FurnStoreMenu, DIALOG_STYLE_LIST, "Furniture Store Menu", "Exhibits%s", "Select", "Close", FurnStore_IsOwner(playerid, id) ? ("\nEmployee\nBank\nChange Name") : (""));
-			ManageFurnStore[playerid] = id;
-			return 1;
-		}
-		SendErrorMessage(playerid, "Kamu bukan pemilik/pegawai furniture store ini (%d-%d).", FurnStore_IsOwner(playerid, id), FurnStore_IsEmployee(playerid, id));
-		return 1;
-	}
-	SendErrorMessage(playerid, "Kamu tidak berada di dalam furniture store.");
-	return 1;
-}
-
-CMD:gotofurnstore(playerid, params[])
-{
-	CheckAdmin(playerid, 5);
-
-	static
-		index;
-
-	if(sscanf(params, "d", index))
-		return SendSyntaxMessage(playerid, "/gotofurnstore [id]");
-
-	if(!Iter_Contains(FurnStore, index))
-		return SendErrorMessage(playerid, "Invalid furnstore id.");
-
-	SetPlayerPos(playerid, storeData[index][storePos][0], storeData[index][storePos][1], storeData[index][storePos][2]);
-	SetPlayerInterior(playerid, 0);
-	SetPlayerVirtualWorld(playerid, 0);
-	SendServerMessage(playerid, "You've teleported to furn store id %d.", index);
-	return 1;
-}
-
-CMD:buyfurniture(playerid, params[])
-{
-	static
-		id = -1;
-
-	if((id = FurnStore_Inside(playerid)) != -1)
-	{
-		if(!IsPlayerInRangeOfPoint(playerid, 3.0, 1470.3416,1770.1165,10.9062))
-			return SendErrorMessage(playerid, "Kamu harus berada di buy point.");
-
-		new buy[255],
-			count = 0;
-
-		strcat(buy, "#\tModel\tPrice\n");
-		foreach(new index : FurnObject) if(FurnStore[index][furnStoreId] == storeData[id][storeID] && FurnStore[index][furnStock] > 0)
-		{
-			strcat(buy, sprintf("{000000}%d\t%s\t%s\n", index, FurnStore[index][furnName], FormatNumber(FurnStore[index][furnPrice])));
-			count++;
-		}
-		if(count) Dialog_Show(playerid, BuyFurniture, DIALOG_STYLE_TABLIST_HEADERS, "Buy Furniture", buy, "Select", "Close");
-		else SendErrorMessage(playerid, "Tidak ada furniture yang dapat di jual sekarang.");
-	}
-	else SendErrorMessage(playerid, "You're not inside furniture store.");
-	return 1;
-}
-
 Dialog:SelectType(playerid, response, listitem, inputtext[])
 {
 	if(response)
 	{
-		// new models[50] = {-1, ... },
-  //           count;	
-
-		new furniture[255];
+		new furnitures[64 * 128];
 
 		for (new i = 0; i < sizeof(g_aFurnitureData); i ++) if(g_aFurnitureData[i][e_FurnitureType] == listitem + 1) {
-			strcat(furniture, sprintf("%i\t%s\n", g_aFurnitureData[i][e_FurnitureModel], g_aFurnitureData[i][e_FurnitureName]));
-            // models[count++] = g_aFurnitureData[i][e_FurnitureModel];
-        }
-//        Dialog_Show(playerid, SelectFurnObject, DIALOG_STYLE_PREVIEW_MODEL, "Select Furniture", furniture, "Select", "Close");
-        ShowPlayerDialog(playerid, 1, DIALOG_STYLE_PREVIEW_MODEL, "Select Furniture", furniture, "Select", "Close");
-//        ShowCustomSelection(playerid, "Select Furniture", MODEL_SELECTION_FURNITURE, models, count);
+			strcat(furnitures, sprintf("%i\t%s\n", g_aFurnitureData[i][e_FurnitureModel], g_aFurnitureData[i][e_FurnitureName]));
+		}
+		ShowPlayerDialog(playerid, 1, DIALOG_STYLE_PREVIEW_MODEL, "Select Furniture", furnitures, "Select", "Close");
 	}
 	else FurnObject_List(playerid, ManageFurnStore[playerid]);
 	return 1;
@@ -515,7 +500,7 @@ Dialog:ManageFurnObject(playerid, response, listitem, inputtext[])
 			}
 			case 2: Dialog_Show(playerid, FurnObjectName, DIALOG_STYLE_INPUT, "Set Name", "Masukkan nama untuk furniture ini", "Set", "Close");
 			case 3: Dialog_Show(playerid, FurnObjectPrice, DIALOG_STYLE_INPUT, "Set Price", "Masukkan harga untuk furniture ini", "Set", "Close");
-			case 4: Dialog_Show(playerid, FurnObjectTexture, DIALOG_STYLE_INPUT, "Set Texture", "Masukkan data texture dengan mengikuti format berikut:\nFormat: "COL_YELLOW"[index(0-16)] [Model ID] [TXD Name] [Texture Name]", "Update", "Back");
+			case 4: Dialog_Show(playerid, FurnObjectTexture, DIALOG_STYLE_INPUT, "Set Texture", "Masukkan data texture dengan mengikuti format berikut:\nFormat: "YELLOW"[index(0-16)] [Model ID] [TXD Name] [Texture Name]", "Update", "Back");
 			case 5: {
 				DestroyDynamic3DTextLabel(FurnStore[id][furnLabel]);
 				DestroyDynamicObject(FurnStore[id][furnObject]);
@@ -531,6 +516,35 @@ Dialog:ManageFurnObject(playerid, response, listitem, inputtext[])
 	}
 	else FurnObject_List(playerid, ManageFurnStore[playerid]);
 	return 1;
+}
+
+timer productionTimers[1000](playerid)
+{
+	new 
+		keys,ud,lr;
+
+    GetPlayerKeys(playerid,keys,ud,lr);
+    if(keys == KEY_SPRINT && startProduce[playerid] && IsPlayerInDynamicArea(playerid, production) && GetPVarInt(playerid, "lagiedit") == 2)
+    {
+		if(++productionCount[playerid] >= 20)
+		{
+			new index = ManageFurnObject[playerid];
+			FurnStore[index][furnStock] += productionAdd[playerid];
+
+			startProduce[playerid] = false;
+			stop productionTimer[playerid];
+
+			DestroyDynamicObject(produceObject[playerid]);
+
+			FurnObject_Refresh(index);
+			FurnObject_Save(index);
+
+			SendServerMessage(playerid, "Production successfull.");
+			DeletePVar(playerid, "lagiedit");
+		}
+		ApplyAnimation(playerid, "BOMBER", "BOM_Plant", 4.1, 0, 0, 0, 0, 0, 1);
+		ShowPlayerFooter(playerid, sprintf("~b~~h~Memproduksi furniture: ~w~%d/~r~~h~20",productionCount[playerid]), 1000);
+	}
 }
 
 Dialog:FurnStoreProduct(playerid, response, listitem, inputtext[])
@@ -549,7 +563,7 @@ Dialog:FurnStoreProduct(playerid, response, listitem, inputtext[])
 
 		productionTimer[playerid] = repeat productionTimers(playerid);
 
-		produceObject[playerid] = CreateDynamicObject(FurnStore[index][furnModel], 1579.47, 1611.47, 9.896, 0.0, 0.0, 0.0, (FurnStore[index][furnStoreId]+1), 3);
+		produceObject[playerid] = CreateDynamicObject(FurnStore[index][furnModel], 1489.54, 1789.14, 10.90, 0.0, 0.0, 0.0, (FurnStore[index][furnStoreId]+1), 3);
 		
 		for(new i = 0; i != MAX_MATERIALS; i++) if(FurnStore[index][furnMaterials][i] > 0)
 		{
@@ -573,15 +587,15 @@ Dialog:FurnObjectTexture(playerid, response, listitem, inputtext[])
 		new index, model, txd[32], textures[32];
 
 		if(sscanf(inputtext, "dds[32]s[32]", index, model, txd, textures))
-			return Dialog_Show(playerid, FurnObjectTexture, DIALOG_STYLE_INPUT, "Set Price", "Masukkan data texture dengan mengikuti format berikut:\nFormat: "COL_YELLOW"[index(0-16)] [Model ID] [TXD Name] [Texture Name]", "Update", "Back");
+			return Dialog_Show(playerid, FurnObjectTexture, DIALOG_STYLE_INPUT, "Set Price", "Masukkan data texture dengan mengikuti format berikut:\nFormat: "YELLOW"[index(0-16)] [Model ID] [TXD Name] [Texture Name]", "Update", "Back");
 
 		if(index < 0 || index > 16)
-			return Dialog_Show(playerid, FurnObjectTexture, DIALOG_STYLE_INPUT, "Set Price", "ERROR: Index yang hanya dapat di gunakan 0 - 16\n\nMasukkan data texture dengan mengikuti format berikut:\nFormat: "COL_YELLOW"[index(0-16)] [Model ID] [TXD Name] [Texture Name]", "Update", "Back");
+			return Dialog_Show(playerid, FurnObjectTexture, DIALOG_STYLE_INPUT, "Set Price", "ERROR: Index yang hanya dapat di gunakan 0 - 16\n\nMasukkan data texture dengan mengikuti format berikut:\nFormat: "YELLOW"[index(0-16)] [Model ID] [TXD Name] [Texture Name]", "Update", "Back");
 
-		if(!IsValidTexture(model, txd, textures))
-			return Dialog_Show(playerid, FurnObjectTexture, DIALOG_STYLE_INPUT, "Set Price", "ERROR: Texture model tidak terdaftar dalam database.\n\nMasukkan data texture dengan mengikuti format berikut:\nFormat: "COL_YELLOW"[index(0-16)] [Model ID] [TXD Name] [Texture Name]", "Update", "Back");
+		if(!IsValidTexture(textures))
+			return Dialog_Show(playerid, FurnObjectTexture, DIALOG_STYLE_INPUT, "Set Price", "ERROR: Texture model tidak terdaftar dalam database.\n\nMasukkan data texture dengan mengikuti format berikut:\nFormat: "YELLOW"[index(0-16)] [Model ID] [TXD Name] [Texture Name]", "Update", "Back");
 
-		FurnStore[ManageFurnObject[playerid]][furnMaterials][index] = GetTextureIndex(model, txd, textures);
+		FurnStore[ManageFurnObject[playerid]][furnMaterials][index] = GetTextureIndex(textures);
 		
 		FurnObject_Refresh(ManageFurnObject[playerid]);
 		FurnObject_Save(ManageFurnObject[playerid]);
@@ -623,7 +637,7 @@ Dialog:FurnObjectPrice(playerid, response, listitem, inputtext[])
 		FurnStore[ManageFurnObject[playerid]][furnPrice] = strval(inputtext);
 		FurnObject_Refresh(ManageFurnObject[playerid]);
 		FurnObject_Save(ManageFurnObject[playerid]);
-		SendServerMessage(playerid, "Harga telah di ganti menjadi: "COL_YELLOW"%s", FormatNumber((FurnStore[ManageFurnObject[playerid]][furnPrice])));
+		SendServerMessage(playerid, "Harga telah di ganti menjadi: "YELLOW"%s", FormatNumber((FurnStore[ManageFurnObject[playerid]][furnPrice])));
 	}
 	return 1;
 }
@@ -677,8 +691,8 @@ Dialog:HireEmployee(playerid, response, listitem, inputtext[])
 			{
 				storeData[index][storeEmploye][i] = GetPlayerSQLID(userid);
 				FurnStore_Save(index);
-				SendServerMessage(playerid, "Kamu telah mempekerjakan "COL_YELLOW"%s "COL_WHITE"ke dalam furniture store milikmu.", ReturnName(userid, 0));
-				SendServerMessage(playerid, "Kamu telah dipekerjakan oleh "COL_YELLOW"%s "COL_WHITE"di furniture store miliknya.", ReturnName(playerid, 0));
+				SendServerMessage(playerid, "Kamu telah mempekerjakan "YELLOW"%s "WHITE"ke dalam furniture store milikmu.", ReturnName(userid, 0));
+				SendServerMessage(playerid, "Kamu telah dipekerjakan oleh "YELLOW"%s "WHITE"di furniture store miliknya.", ReturnName(playerid, 0));
 				printf("Slot: %d", i);
 				return 1;
 			}
@@ -777,36 +791,7 @@ Dialog:FurnStoreName(playerid, response, listitem, inputtext[])
 	return 1;
 }
 
-timer productionTimers[1000](playerid)
-{
-	new 
-		keys,ud,lr;
-
-    GetPlayerKeys(playerid,keys,ud,lr);
-    if(keys == KEY_SPRINT && startProduce[playerid] && IsPlayerInDynamicArea(playerid, production) && GetPVarInt(playerid, "lagiedit") == 2)
-    {
-		if(++productionCount[playerid] >= 20)
-		{
-			new index = ManageFurnObject[playerid];
-			FurnStore[index][furnStock] += productionAdd[playerid];
-
-			startProduce[playerid] = false;
-			stop productionTimer[playerid];
-
-			DestroyDynamicObject(produceObject[playerid]);
-
-			FurnObject_Refresh(index);
-			FurnObject_Save(index);
-
-			SendServerMessage(playerid, "Production successfull.");
-			DeletePVar(playerid, "lagiedit");
-		}
-		ApplyAnimation(playerid, "BOMBER", "BOM_Plant", 4.1, 0, 0, 0, 0, 0, 1);
-		ShowPlayerFooter(playerid, sprintf("~b~~h~Memproduksi furniture: ~w~%d/~r~~h~20",productionCount[playerid]), 1000);
-	}
-}
-
-public editFurnObject(playerid, objectid, response, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, Float:offx, Float:offy, Float:offz)
+hook editFurnObject(playerid, objectid, response, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, Float:offx, Float:offy, Float:offz)
 {
 	if(response == EDIT_RESPONSE_CANCEL)
     {
@@ -840,13 +825,13 @@ public editFurnObject(playerid, objectid, response, Float:x, Float:y, Float:z, F
 	return 1;
 }
 
-public editLokasiFurn(playerid, objectid, response, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, Float:offx, Float:offy, Float:offz)
+hook editLokasiFurn(playerid, objectid, response, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, Float:offx, Float:offy, Float:offz)
 {
 	if(response == EDIT_RESPONSE_CANCEL)
     {
         if(startProduce[playerid])
         {
-        	PlayerEditPoint(playerid, 1579.47, 1611.47, 9.896, 0.0, 0.0, 0.0, "editLokasiFurn", produceObject[playerid]);
+        	PlayerEditPoint(playerid, 1489.54, 1789.14, 10.90, 0.0, 0.0, 0.0, "editLokasiFurn", produceObject[playerid]);
         	ShowPlayerFooter(playerid, "~r~~h~Tidak dapat menekan 'ESC' dalam mode ini");
         }
     }
@@ -855,16 +840,16 @@ public editLokasiFurn(playerid, objectid, response, Float:x, Float:y, Float:z, F
         if(startProduce[playerid])
         {
         	if(!IsPointInDynamicArea(production, x, y, z))
-        		return PlayerEditPoint(playerid, 1579.47, 1611.47, 9.896, 0.0, 0.0, 0.0, "editLokasiFurn", produceObject[playerid]), ShowPlayerFooter(playerid, "~r~~h~Tidak dapat di lakukan di luar area produksi.");
+        		return PlayerEditPoint(playerid, 1489.54, 1789.14, 10.90, 0.0, 0.0, 0.0, "editLokasiFurn", produceObject[playerid]), ShowPlayerFooter(playerid, "~r~~h~Tidak dapat di lakukan di luar area produksi.");
 
-        	SendServerMessage(playerid, "Mulailah memproduksi furniture dengan menahan tombol "COL_RED"'SPACE'");
+        	SendServerMessage(playerid, "Mulailah memproduksi furniture dengan menahan tombol "RED"'SPACE'");
         	SetPVarInt(playerid, "lagiedit", 2);
         }
     }
 	return 1;
 }
 
-public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
+hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
 	if(PRESSED(KEY_CTRL_BACK))
 	{
@@ -898,50 +883,23 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
             return 1;
         }
     }
-	#if defined store_OnPlayerKeyStateChange
-		return store_OnPlayerKeyStateChange(playerid, newkeys, oldkeys);
-	#else
-		return 1;
-	#endif
+	return 1;
 }
-#if defined _ALS_OnPlayerKeyStateChange
-	#undef OnPlayerKeyStateChange
-#else
-	#define _ALS_OnPlayerKeyStateChange
-#endif
 
-#define OnPlayerKeyStateChange store_OnPlayerKeyStateChange
-#if defined store_OnPlayerKeyStateChange
-	forward store_OnPlayerKeyStateChange(playerid, newkeys, oldkeys);
-#endif
 
-public OnPlayerEnterDynamicArea(playerid, areaid)
+hook OnPlayerEnterDynamicArea(playerid, areaid)
 {
 	if(areaid == production && startProduce[playerid] && GetPVarInt(playerid, "lagiedit") == 0)
 	{
 		ShowPlayerFooter(playerid, "Posisikan furniture pada area kerja");
 
-		PlayerEditPoint(playerid, 1579.47, 1611.47, 9.896, 0.0, 0.0, 0.0, "editLokasiFurn", produceObject[playerid]);
+		PlayerEditPoint(playerid, 1489.54, 1789.14, 10.90, 0.0, 0.0, 0.0, "editLokasiFurn", produceObject[playerid]);
 		SetPVarInt(playerid, "lagiedit", 1);
 	}
-	#if defined store_OnPlayerEnterDynamicArea
-		return store_OnPlayerEnterDynamicArea(playerid, areaid);
-	#else
-		return 1;
-	#endif
+	return 1;
 }
-#if defined _ALS_OnPlayerEnterDynamicArea
-	#undef OnPlayerEnterDynamicArea
-#else
-	#define _ALS_OnPlayerEnterDynamicArea
-#endif
 
-#define OnPlayerEnterDynamicArea store_OnPlayerEnterDynamicArea
-#if defined store_OnPlayerEnterDynamicArea
-	forward store_OnPlayerEnterDynamicArea(playerid, areaid);
-#endif
-
-public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
+hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 {
 	if (dialogid == 1)
     {
@@ -961,19 +919,5 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		}
 		else FurnObject_Category(playerid);
 	}
-	#if defined store_OnDialogResponse
-		return store_OnDialogResponse(playerid, dialogid, response, listitem, inputtext[]);
-	#else
-		return 1;
-	#endif
+	return 1;
 }
-#if defined _ALS_OnDialogResponse
-	#undef OnDialogResponse
-#else
-	#define _ALS_OnDialogResponse
-#endif
-
-#define OnDialogResponse store_OnDialogResponse
-#if defined store_OnDialogResponse
-	forward store_OnDialogResponse(playerid, dialogid, response, listitem, inputtext[]);
-#endif
