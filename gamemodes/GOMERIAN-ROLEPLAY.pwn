@@ -83,7 +83,7 @@ Server Update list URP v2.9a Blackjack!
 #include <lookup>                   //by Emmet_
 #include <evi>                      //by Vince
 #include <cb>                       //by Emmet_
-//#include <editing>                  //by Pottus
+#include <editing>                  //by Pottus
 #include <garage_block>             //by Crayder
 #include <PreviewModelDialog>       //by Gammix
 #include <OPVD>
@@ -202,7 +202,6 @@ public OnGameModeInit()
 #include "modules/dynamic/cade/core.pwn"
 #include "modules/dynamic/speed/core.pwn"
 #include "modules/dynamic/ccp/core.pwn"
-#include "modules/dynamic/furn/core.pwn"
 #include "modules/dynamic/garage/core.pwn"
 
 
@@ -335,8 +334,7 @@ public OnGameModeInit()
 
 #include "modules\dynamic\vending.pwn"
 
-#include "modules/dynamic/furn/furnobject.pwn"
-#include "modules/dynamic/furn/furnstore.pwn"
+#include "modules\dynamic\furnstore.pwn"
 
 //===Deadbody===
 #include "modules/dynamic/corps/func.pwn"
@@ -458,9 +456,6 @@ public OnGameModeInit()
 #include "modules/admin/core.pwn"
 #include "modules/admin/cmd.pwn"
 #include "modules/admin/callbacks.pwn"
-
-// Server
-#include "modules/server/furniture.pwn"
 
 /*==============================================================================
     Module Script
@@ -15773,7 +15768,7 @@ OnGameModeInit_Setup()
     mysql_pquery(g_iHandle, "SELECT * FROM `objecttext`", "ObjectText_Load", "");
     mysql_pquery(g_iHandle, "SELECT * FROM `workshop`", "Workshop_Load", "");
     mysql_pquery(g_iHandle, "SELECT * FROM `garage` ORDER BY `garageID` ASC", "Garage_Load", "");
-    // mysql_pquery(g_iHandle, "SELECT * FROM `furnstore` ORDER BY `id` ASC", "FurnStore_Load", "");
+    mysql_pquery(g_iHandle, "SELECT * FROM `furnstore` ORDER BY `id` ASC", "FurnStore_Load", "");
     mysql_pquery(g_iHandle, "SELECT * FROM `furnobject` ORDER BY `id` ASC", "FurnObject_Load", "");
 
     SetModelPreviewRotation(18875, 90.0, 180.0, 0.0);
@@ -15805,7 +15800,7 @@ OnGameModeInit_Setup()
     JailArea = CreateDynamicPolygon(JailArray, _, _, _, _, 3, _);
     NSArea = CreateDynamicPolygon(NSArray, _, _, _, _, 20, _);
     SAMDArea = CreateDynamicPolygon(SAMDArray, _, _, _, _, 4, _);
-    //production = CreateDynamicPolygon(production_Array, _, _, _, _, 3, _);
+    production = CreateDynamicPolygon(production_Array, _, _, _, _, 3, _);
     mechanic_zone_main = CreateDynamicPolygon(mekanikzone, _, _, _, _, 0);
     mechanic_zone_repair[0] = CreateDynamicPolygon(mekanikrepair[0], _, _, _, _, 0);
     mechanic_zone_repair[1] = CreateDynamicPolygon(mekanikrepair[1], _, _, _, _, 0);

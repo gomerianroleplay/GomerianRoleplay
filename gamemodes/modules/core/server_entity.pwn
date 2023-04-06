@@ -42,7 +42,7 @@ new g_StatusOOC = 1, g_ServerLocked, Auction;
 new Text:gLoginTextdraws, BillboardCheckout[MAX_PLAYERS], g_ServerRestart, g_RestartTime, fishzone[FISH_ZONE], g_MysqlRaceCheck[MAX_PLAYERS];
 
 new selectCategory[MAX_PLAYERS] = {-1, ...}, selectIndex[MAX_PLAYERS] = {-1, ...};
-new JailArea, NSArea, SAMDArea;//, production;
+new JailArea, NSArea, SAMDArea;
 
 new fishNames[5][] = {
     "Carp", "Bass", "Cod", "Plaice", "Tuna"
@@ -59,14 +59,6 @@ new Float:NSArray[] =
     1121.7913,2010.0787,
     1170.5946,2012.2588
 };
-
-/*new Float:production_Array[] =
-{
-    1492.01, 1791.86,
-    1491.96, 1786.34,
-    1487.19, 1786.48,
-    1487.16, 1792.00
-};*/
 
 new Float:SAMDArray[] =
 {
