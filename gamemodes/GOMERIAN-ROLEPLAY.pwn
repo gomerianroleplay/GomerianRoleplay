@@ -203,6 +203,7 @@ public OnGameModeInit()
 #include "modules/dynamic/speed/core.pwn"
 #include "modules/dynamic/ccp/core.pwn"
 #include "modules/dynamic/garage/core.pwn"
+#include "modules/dynamic/object/core.pwn"
 
 
 
@@ -252,6 +253,7 @@ public OnGameModeInit()
 #include "modules/server/database.pwn"
 #include "modules/server/waypoint.pwn"
 #include "modules/server/weather.pwn"
+#include "modules/server/furniture.pwn"
 
 
 //AFK System
@@ -333,9 +335,6 @@ public OnGameModeInit()
 #include "modules/dynamic/fire/cmd.pwn"
 
 #include "modules\dynamic\vending.pwn"
-
-#include "modules\dynamic\furnstore.pwn"
-
 //===Deadbody===
 #include "modules/dynamic/corps/func.pwn"
 #include "modules/dynamic/corps/cmd.pwn"
@@ -354,6 +353,9 @@ public OnGameModeInit()
 
 #include "modules/dynamic/speed/func.pwn"
 #include "modules/dynamic/speed/cmd.pwn"
+
+#include "modules/dynamic/object/func.pwn"
+#include "modules/dynamic/object/cmd.pwn"
 
 // Misc
 #include "modules/misc/housekeys.pwn"
@@ -470,10 +472,7 @@ public OnGameModeInit()
 
 //#include "modules/misc/weaponsystem.pwn"
 //#include "modules/misc/dropweapon.pwn"
-
 #include "modules/misc/vehicle_object.pwn"
-
-#include "modules\misc\objectCreator.inc"
 
 #include "modules/core/player_timer.pwn"
 #include "modules/core/global_timer.pwn"
@@ -15800,7 +15799,7 @@ OnGameModeInit_Setup()
     JailArea = CreateDynamicPolygon(JailArray, _, _, _, _, 3, _);
     NSArea = CreateDynamicPolygon(NSArray, _, _, _, _, 20, _);
     SAMDArea = CreateDynamicPolygon(SAMDArray, _, _, _, _, 4, _);
-    production = CreateDynamicPolygon(production_Array, _, _, _, _, 3, _);
+    // production = CreateDynamicPolygon(production_Array, _, _, _, _, 3, _);
     mechanic_zone_main = CreateDynamicPolygon(mekanikzone, _, _, _, _, 0);
     mechanic_zone_repair[0] = CreateDynamicPolygon(mekanikrepair[0], _, _, _, _, 0);
     mechanic_zone_repair[1] = CreateDynamicPolygon(mekanikrepair[1], _, _, _, _, 0);
