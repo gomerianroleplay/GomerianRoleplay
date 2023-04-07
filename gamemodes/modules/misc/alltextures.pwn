@@ -1,5 +1,3 @@
-#include <YSI_Data/y_playerarray>
-
 #define GetTModel(%0) ObjectTextures[%0][TModel]
 #define GetTXDName(%0) ObjectTextures[%0][TXDName]
 #define GetTextureName(%0) ObjectTextures[%0][TextureName]
@@ -9078,65 +9076,20 @@ new ObjectTextures[][TEXTUREDEF] =
 	{19076, "xmastree1", "goldplate"}
 };
 
-static BitArray:FoundTextures<sizeof(ObjectTextures) + 1>;
-
-stock SearchTextures(playerid, const texturename[]) {
-	Bit_SetAll(FoundTextures, false);
-
-	new numFound;
-	for (new i; i < sizeof(ObjectTextures); i ++) {
-		if (strfind(ObjectTextures[i][TextureName], texturename, true) > -1) {
-			Bit_Let(FoundTextures, i);
-			numFound++;
-		}
-	}
-
-	if (numFound) {
-		for (new i; i < sizeof(ObjectTextures); i ++) {
-			if (Bit_Get(FoundTextures, i)) {
-				SendCustomMessage(playerid, "TEXTURES", "Found texture with name %s, ID: %d", ObjectTextures[i][TextureName], i);
-			}
-		}
-	} else {
-    SendErrorMessage(playerid, "No texture were found");
-	}
-}
-
-stock IsValidTexture(const texturename[]) {
-	Bit_SetAll(FoundTextures, false);
-
-	new result;
-	for (new i; i < sizeof(ObjectTextures); i ++) if (!strcmp(ObjectTextures[i][TextureName], texturename, true)) {
-		Bit_Let(FoundTextures, i);
-		result++;
-	}
-
-	if (result) {
-		for (new i; i < sizeof(ObjectTextures); i ++) if (Bit_Get(FoundTextures, i)) {
-			return i;
-		}
-	} else {
-		return -1;
-	}
-
-	return -1;
-}
-
-stock GetTextureIndex(const texturename[])
+IsValidTexture(model, txd[], texturename[])
 {
-	Bit_SetAll(FoundTextures, false);
-
-	new result;
-	for (new i; i < sizeof(ObjectTextures); i ++) if (!strcmp(ObjectTextures[i][TextureName], texturename, true)) {
-		Bit_Let(FoundTextures, i);
-		result++;
+	for(new i = 0; i != sizeof(ObjectTextures); i++) if(model == ObjectTextures[i][TModel] && (!strcmp(txd, ObjectTextures[i][TXDName], true)) && (!strcmp(texturename, ObjectTextures[i][TextureName], true)))
+	{
+		return 1;
 	}
+	return 0;
+}
 
-	if (result) {
-		for (new i; i < sizeof(ObjectTextures); i ++) if (Bit_Get(FoundTextures, i)) {
-			return i;
-		}
+GetTextureIndex(model, txd[], texturename[])
+{
+	for(new i = 0; i != sizeof(ObjectTextures); i++) if(model == ObjectTextures[i][TModel] && (!strcmp(txd, ObjectTextures[i][TXDName], true)) && (!strcmp(texturename, ObjectTextures[i][TextureName], true)))
+	{
+		return i;
 	}
-
 	return 0;
 }

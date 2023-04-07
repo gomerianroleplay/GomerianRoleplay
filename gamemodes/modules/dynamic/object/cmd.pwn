@@ -93,7 +93,7 @@ CMD:editobject(playerid, params[]) {
     if (newobj == cellmin) return SendErrorMessage(playerid, "Server has reached the maximum of Objects!");
 
     GetDynamicObjectMaterial(ObjData[id][oObject], index, modelid, txdname, texture, color);
-    ObjData[newobj][oMaterials][index] = GetTextureIndex(texture);
+    ObjData[newobj][oMaterials][index] = GetTextureIndex(model, txdname, texture);
     ObjData[newobj][oMatsColor][index] = color;
 
     if (ObjData[id][oMatsText]) {
@@ -153,7 +153,7 @@ CMD:editobject(playerid, params[]) {
     if (IsValidDynamicObject(ObjData[slot][oObject]))
       DestroyDynamicObject(ObjData[slot][oObject]), ObjData[slot][oObject] = INVALID_STREAMER_ID;
 
-    ObjData[slot][oMaterials][index] = GetTextureIndex(texture);
+    ObjData[slot][oMaterials][index] = GetTextureIndex(model, txdname, texture);
     ObjData[slot][oMatsColor][index] = RGBAToInt(color[0], color[1], color[2], color[3]);
     Object_Refresh(slot);
     Object_Save(slot);
