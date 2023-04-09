@@ -218,3 +218,62 @@ CMD:togsiren(playerid, params[])
 	}
     return 1;
 }
+
+hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
+{
+    if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER && (newkeys & KEY_CROUCH))
+    {
+        new
+            vehicle_index,
+            vehicleid = GetPlayerVehicleID(playerid)
+            ;
+
+        if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
+            return 0;
+
+        if((vehicle_index = Vehicle_ReturnID(vehicleid)) != RETURN_INVALID_VEHICLE_ID)
+        {
+            if(Vehicle_GetType(vehicle_index) != VEHICLE_TYPE_FACTION)
+                return 0;
+
+            if(Vehicle_GetExtraID(vehicle_index) != GetPlayerFactionID(playerid))
+                return 0;
+        }
+
+        if(GetFactionType(playerid) != FACTION_POLICE && GetFactionType(playerid) != FACTION_MEDIC)
+            return 0;
+
+        if(!gToggleELM[vehicleid])
+        {
+            static
+					Float:fSize[3],
+					Float:fSeat[3];
+            gToggleELM[vehicleid] = true;
+            gELMTimer[vehicleid] = SetTimerEx("ToggleELM", 200, true, "d", vehicleid);
+
+			GetVehicleModelInfo(GetVehicleModel(vehicleid), VEHICLE_MODEL_INFO_SIZE, fSize[0], fSize[1], fSize[2]);
+			GetVehicleModelInfo(GetVehicleModel(vehicleid), VEHICLE_MODEL_INFO_FRONTSEAT, fSeat[0], fSeat[1], fSeat[2]);
+
+			gSirenObject[vehicleid] = CreateDynamicObject(18646, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+			AttachDynamicObjectToVehicle(gSirenObject[vehicleid], vehicleid, -fSeat[0], fSeat[1], fSize[2] / 2.0, 0.0, 0.0, 0.0);
+			gToggleSiren[vehicleid] = true;
+        }
+        else
+        {
+            static panels, doors, lights, tires;
+
+            gToggleELM[vehicleid] = false;
+            KillTimer(gELMTimer[vehicleid]);
+
+            GetVehicleDamageStatus(vehicleid, panels, doors, lights, tires);
+            UpdateVehicleDamageStatus(vehicleid, panels, doors, 0, tires);
+            if(IsValidDynamicObject(gSirenObject[vehicleid]))
+				DestroyDynamicObject(gSirenObject[vehicleid]);
+
+			gSirenObject[vehicleid] = INVALID_STREAMER_ID;
+			gToggleSiren[vehicleid] = false;
+        }
+        return 1;
+    }
+    return 1;
+}
