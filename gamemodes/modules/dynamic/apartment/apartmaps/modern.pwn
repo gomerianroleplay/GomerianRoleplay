@@ -1,27 +1,26 @@
-#include <YSI_Coding\y_hooks>
 
-#define MAX_APARTMENT_VIRTUAL_WORLD (100000)
+// #define MAX_APARTMENT_VIRTUAL_WORLD (100000)
 
-new Apartment_World[MAX_APARTMENT_VIRTUAL_WORLD+1] = {1, 2, ...};
+// new Apartment_World[MAX_APARTMENT_VIRTUAL_WORLD+1] = {1, 2, ...};
 
-Apartment_CreateDynamicObject(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, worldid = -1, interiorid = -1, playerid = -1, Float:streamdistance = STREAMER_OBJECT_SD, Float:drawdistance = STREAMER_OBJECT_DD)
-{
-    #pragma unused worldid
-    #pragma unused interiorid
-    #pragma unused playerid
+// Apartment_CreateDynamicObject(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, worldid = -1, interiorid = -1, playerid = -1, Float:streamdistance = STREAMER_OBJECT_SD, Float:drawdistance = STREAMER_OBJECT_DD)
+// {
+//     #pragma unused worldid
+//     #pragma unused interiorid
+//     #pragma unused playerid
 
-    new objectid;
+//     new objectid;
 
-	objectid = CreateDynamicObjectEx(modelid, x, y, z, rx, ry, rz, streamdistance, drawdistance, Apartment_World, { -1 }, { -1 }, { -1 });
+// 	objectid = CreateDynamicObjectEx(modelid, x, y, z, rx, ry, rz, streamdistance, drawdistance, Apartment_World, { -1 }, { -1 }, { -1 });
 
-    return objectid;
-}
+//     return objectid;
+// }
 
-hook OnPlayerconnect(playerid)
-{
-	//Remove Buildings///////////////////////////////////////////////////////////////////////////////////////////////
-	RemoveBuildingForPlayer(playerid, 14795, 1388.880, -20.882, 1005.200, 0.250);
-}
+// hook OnPlayerconnect(playerid)
+// {
+// 	//Remove Buildings///////////////////////////////////////////////////////////////////////////////////////////////
+// 	RemoveBuildingForPlayer(playerid, 14795, 1388.880, -20.882, 1005.200, 0.250);
+// }
 
 /*hook OnGameModeInit()
 {
