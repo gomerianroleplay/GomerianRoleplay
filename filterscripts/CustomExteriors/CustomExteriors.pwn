@@ -31,6 +31,7 @@ public OnFilterScriptInit()
     Init_Ikea();
     Init_LSMarketDoughnutShop();
     Init_TerresaExtHouse();
+    Init_Mechanic_new();
     return 1;
 }
 
