@@ -16,6 +16,7 @@
 #include "exteriors/tm.inc"
 #include "exteriors/tx.inc"
 #include "exteriors/teressa.inc"
+#include "exteriors/mc_new.inc"
 
 public OnFilterScriptInit()
 {
@@ -31,7 +32,7 @@ public OnFilterScriptInit()
     Init_Ikea();
     Init_LSMarketDoughnutShop();
     Init_TerresaExtHouse();
-    Init_Mechanic_new();
+    Init_Mechanic_New();
     return 1;
 }
 
