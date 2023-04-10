@@ -23,7 +23,7 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		{
 			if (Gate_IsDisabled(gate_id))
 			{
-				ShowPlayerFooter(playerid, "Gerbang tol ~r~dimatikan~w~!", 3000, 1);
+				ShowPlayerFooter(playerid, "Gerbang tol ~r~tertutup~w~!", 3000, 1);
 				return 1;
 			}
 

@@ -2196,3 +2196,21 @@ CMD:changeacpname(playerid, params[])
     cache_delete(execute);
     return 1;
 }
+
+//debug Command
+CMD:mysqlstats(playerid, params[])
+{
+    if (CheckAdmin(playerid, 8))
+        return PermissionError(playerid);
+    new g_iHandle[256];
+    mysql_stat(g_iHandle);
+    if (strlen(g_iHandle) > 500)
+    {
+        SendClientMessageEx(playerid, X11_CYAN, "%.120s ... ", g_iHandle);
+        SendClientMessageEx(playerid, X11_CYAN, "... %s", g_iHandle[200]);
+    }
+    else SendClientMessageEx(playerid, X11_CYAN, g_iHandle);
+
+    SendClientMessageEx(playerid, X11_CYAN, "Unprocess Queries: %d", mysql_unprocessed_queries());
+    return true;
+}
