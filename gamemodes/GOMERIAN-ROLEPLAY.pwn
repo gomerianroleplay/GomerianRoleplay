@@ -1557,7 +1557,13 @@ ApplyAnimationEx(playerid, animlib[], animname[], Float:fDelta, loop, lockx, loc
 
 AnimationCheck(playerid)
 {
-    return (GetPlayerState(playerid) == PLAYER_STATE_ONFOOT && !PlayerData[playerid][pInjured] && !PlayerData[playerid][pKilled] && !PlayerData[playerid][pFreeze] /*&& !PlayerData[playerid][pCuffed]*/ && !PlayerData[playerid][pStunned] && !PlayerData[playerid][pFirstAid] && !PlayerData[playerid][pCrafting]);
+    return (GetPlayerState(playerid) == PLAYER_STATE_ONFOOT && 
+            !PlayerData[playerid][pInjured] && 
+            !PlayerData[playerid][pKilled] && 
+            !PlayerData[playerid][pFreeze] /*&& !PlayerData[playerid][pCuffed]*/ && 
+            !PlayerData[playerid][pStunned] && !PlayerData[playerid][pFirstAid] && 
+            !PlayerData[playerid][pCrafting])
+            ;
 }
 
 PreloadAnimations(playerid)
