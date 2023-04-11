@@ -8,7 +8,7 @@
                         |___/                    |_|            |___/ 
 
     * Development by: Leynardo Yosef (Revelt) & Rachmad Setiawan (sheenidgs).
-    * Continued by: BlockRing(Amar Thine)
+    * Continued by: IntheBleakMidWinter
     * Base Script: South Central Roleplay
     * Current Version: V2.0
 
