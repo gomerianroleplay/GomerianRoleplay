@@ -1,4 +1,4 @@
-<img>linux.svg</img>
+<img src="./linux.svg" alt="Linux Enthusiast">-=Gomerian Roleplay=-</img>
 
 # GOMERIAN CORP-RP
 .
