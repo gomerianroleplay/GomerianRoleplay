@@ -1,7 +1,8 @@
 <p align="center">
     <img src="./linux.svg" alt="Linux Enthusiast" width="100"></img>
 </p>
-#   GOMERIAN CORP-RP
+    <p align="center">Linux Enthusiast</p>
+    <h1 align="center">GOMERIAN CORP-RP</h1>
 
 ### Developed by
 
