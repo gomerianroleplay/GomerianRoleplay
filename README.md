@@ -27,5 +27,3 @@
 ### Include Version
 - Y_Ini
 - ZCMD
-# BlockRing-Project
-# Kentuz-Project
