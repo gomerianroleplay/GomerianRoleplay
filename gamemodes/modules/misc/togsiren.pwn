@@ -245,18 +245,8 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
         if(!gToggleELM[vehicleid])
         {
-            static
-					Float:fSize[3],
-					Float:fSeat[3];
             gToggleELM[vehicleid] = true;
             gELMTimer[vehicleid] = SetTimerEx("ToggleELM", 200, true, "d", vehicleid);
-
-			GetVehicleModelInfo(GetVehicleModel(vehicleid), VEHICLE_MODEL_INFO_SIZE, fSize[0], fSize[1], fSize[2]);
-			GetVehicleModelInfo(GetVehicleModel(vehicleid), VEHICLE_MODEL_INFO_FRONTSEAT, fSeat[0], fSeat[1], fSeat[2]);
-
-			gSirenObject[vehicleid] = CreateDynamicObject(18646, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-			AttachDynamicObjectToVehicle(gSirenObject[vehicleid], vehicleid, -fSeat[0], fSeat[1], fSize[2] / 2.0, 0.0, 0.0, 0.0);
-			gToggleSiren[vehicleid] = true;
         }
         else
         {
@@ -267,11 +257,6 @@ hook OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
             GetVehicleDamageStatus(vehicleid, panels, doors, lights, tires);
             UpdateVehicleDamageStatus(vehicleid, panels, doors, 0, tires);
-            if(IsValidDynamicObject(gSirenObject[vehicleid]))
-				DestroyDynamicObject(gSirenObject[vehicleid]);
-
-			gSirenObject[vehicleid] = INVALID_STREAMER_ID;
-			gToggleSiren[vehicleid] = false;
         }
         return 1;
     }

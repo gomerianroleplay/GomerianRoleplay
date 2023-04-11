@@ -15773,8 +15773,8 @@ OnGameModeInit_Setup()
     mysql_pquery(g_iHandle, "SELECT * FROM `objecttext`", "ObjectText_Load", "");
     mysql_pquery(g_iHandle, "SELECT * FROM `workshop`", "Workshop_Load", "");
     mysql_pquery(g_iHandle, "SELECT * FROM `garage` ORDER BY `garageID` ASC", "Garage_Load", "");
-    mysql_pquery(g_iHandle, "SELECT * FROM `furnstore` ORDER BY `id` ASC", "FurnStore_Load", "");
-    mysql_pquery(g_iHandle, "SELECT * FROM `furnobject` ORDER BY `id` ASC", "FurnObject_Load", "");
+    // mysql_pquery(g_iHandle, "SELECT * FROM `furnstore` ORDER BY `id` ASC", "FurnStore_Load", "");
+    // mysql_pquery(g_iHandle, "SELECT * FROM `furnobject` ORDER BY `id` ASC", "FurnObject_Load", "");
 
     SetModelPreviewRotation(18875, 90.0, 180.0, 0.0);
     SetModelPreviewRotation(2703, -105.0, 0.0, -15.0);
@@ -24085,10 +24085,11 @@ CMD:id(playerid, params[])
     {
         if(user == i || strfind(ReturnName(i), params, true) != -1) 
         {
-            //new szString[144];
-            //format(szString, sizeof(szString), "Packets lost: %.2f percent.", NetStats_PacketLossPercent(params));
-            //SendClientMessage(playerid, -1, szString);
-            SendClientMessageEx(playerid, X11_WHITE, "** %s | ID: %d | Level : %i | Ping : %d | Packets Loss : %.2f ", ReturnName(i), i, GetPlayerScore(i), GetPlayerPing(i), NetStats_PacketLossPercent(i));
+            new string[24];
+            GetPlayerVersion(playerid, string, sizeof(string));
+            format(string, sizeof(string), "Your version of SA-MP: %s", string);
+            SendClientMessage(playerid, 0xFFFFFFFF, string);
+            SendClientMessageEx(playerid, X11_WHITE, "** %s | ID: %d | Level: %i | Ping: %d | Packets Loss: %.2f", ReturnName(i), i, GetPlayerScore(i), GetPlayerPing(i), NetStats_PacketLossPercent(i));
             count++;
         }
     }
