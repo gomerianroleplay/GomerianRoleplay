@@ -1,3 +1,5 @@
+<img>linux.svg</img>
+
 # GOMERIAN CORP-RP
 .
 ### Developed by 
