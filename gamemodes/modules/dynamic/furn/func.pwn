@@ -1,4 +1,3 @@
-#include <YSI_Coding\y_hooks>
 
 Function:FurnObject_Load(index)
 {

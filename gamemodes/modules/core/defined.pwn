@@ -7,7 +7,7 @@ Script Defined List
 #define SERVER_NAME                     "Roleplay"
 #define SERVER_URL                      "ComingSoon"
 #define SERVER_DISCORD					"bit.ly/GC-RP"
-#define SERVER_REVISION                 "GC:RP V1.02"
+#define SERVER_REVISION                 "GC:RP V1.0.3 overtime"
 
 //==============================   SERVER MACROS 	=============================
 
