@@ -20846,6 +20846,59 @@ CMD:lock(playerid, params[])
             }
         }
     }
+    else if(Vehicle_Nearest(playerid)) // lock
+    {
+        new vw = GetPlayerVirtualWorld(playerid);
+        new rvid = (vw - 1000000);
+        if(vw > 1000000 && vw < 1200000)
+        {
+            SetDoorStatus(rvid, ((GetDoorStatus(rvid)) ? false : true));
+            GameTextForPlayer(playerid, sprintf("~w~VEHICLE %s", ((GetDoorStatus(rvid)) ? ("~r~Locked") : ("~g~Unlocked"))), 3000, 6);
+            return 1;
+        }
+
+        if(!Vehicle_PlayerCount(playerid) && !Vehicle_RentedCount(playerid))
+            return ShowPlayerFooter(playerid, "~r~ERROR: ~w~Kamu tidak memiliki kendaraan untuk di kunci!");
+
+        new vehicle_list[4096], count, Float:x, Float:y, Float:z;
+
+        strcat(vehicle_list, "Model\tDistance (m)\n");
+        
+        foreach(new vehicle : OwnedVehicles<playerid>)
+        {
+            GetVehiclePos(VehicleData[vehicle][vehVehicleID], x, y, z);
+            strcat(vehicle_list, sprintf("%s%s\t%.2f\n", ((GetDoorStatus(VehicleData[vehicle][vehVehicleID])) ? RED : GREEN), GetVehicleNameByVehicle(VehicleData[vehicle][vehVehicleID]), GetPlayerDistanceFromPoint(playerid, x, y, z)));
+            g_selected_vehicle[playerid][count++] = vehicle;
+        }
+        
+        foreach(new vehicle : RentedVehicles<playerid>)
+        {
+            GetVehiclePos(VehicleData[vehicle][vehVehicleID], x, y, z);
+            strcat(vehicle_list, sprintf("%s%s (Rental)\t%.2f\n", ((GetDoorStatus(VehicleData[vehicle][vehVehicleID])) ? RED : GREEN), GetVehicleNameByVehicle(VehicleData[vehicle][vehVehicleID]), GetPlayerDistanceFromPoint(playerid, x, y, z)));
+            g_selected_vehicle[playerid][count++] = vehicle;
+        }
+
+        foreach(new vehicle : Vehicle)
+        {
+            if(Vehicle_IsSharedToPlayer(playerid, vehicle))
+            {
+                GetVehiclePos(VehicleData[vehicle][vehVehicleID], x, y, z);
+                strcat(vehicle_list, sprintf("%s%s (Shared)\t%.2f\n", ((GetDoorStatus(VehicleData[vehicle][vehVehicleID])) ? RED : GREEN), GetVehicleNameByVehicle(VehicleData[vehicle][vehVehicleID]), GetPlayerDistanceFromPoint(playerid, x, y, z)));
+                g_selected_vehicle[playerid][count++] = vehicle;						
+            }
+        }
+        // vehicleid = Vehicle_Nearest(playerid, 5);
+        // if((vehicle_index = Vehicle_ReturnID(vehicleid)) != RETURN_INVALID_VEHICLE_ID && Vehicle_IsSharedToPlayer(playerid, vehicle_index))
+        // {
+        // 	SetDoorStatus(vehicleid, ((GetDoorStatus(vehicleid)) ? false : true));
+        // 	GameTextForPlayer(playerid, sprintf("~w~VEHICLE %s", ((GetDoorStatus(vehicleid)) ? ("~r~Locked") : ("~g~Unlocked"))), 3000, 6);
+        // }
+        // else
+        // {
+        Dialog_Show(playerid, LockVehicle, DIALOG_STYLE_TABLIST_HEADERS, "Vehicle Lock", vehicle_list, "Select", "Close");
+        // }
+
+    }
     else SendErrorMessage(playerid, "You are not in range of anything you can lock.");
     return 1;
 }
