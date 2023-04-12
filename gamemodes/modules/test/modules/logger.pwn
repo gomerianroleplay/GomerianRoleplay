@@ -4,7 +4,7 @@
 #include <a_samp>
 #include <chrono>
 #include "..\..\core\logger.pwn"
-#include <YSI\y_testing>
+#include <YSI_Core\y_testing>
 
 Test:TEST_LOG_NONE()
 {

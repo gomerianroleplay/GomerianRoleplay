@@ -52,7 +52,7 @@ hook OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			SetPVarInt(playerid, "RentalModel", model);
 			SetPVarInt(playerid, "RentalPrice", price);
 
-			Dialog_Show(playerid, RentalVehicleTime, DIALOG_STYLE_INPUT, "Rental Duration", WHITE"Model: "CYAN"%s\n"WHITE"Harga: "GREEN"%s/jam\n\n"WHITE"Masukkan berapa jam yang akan anda sewa? (batasan maksimal 3 jam)", "Rental", "Close", GetVehicleNameByModel(model), FormatNumber(price));
+			Dialog_Show(playerid, RentalVehicleTime, DIALOG_STYLE_INPUT, "Rental Duration", WHITE"Model: "CYAN"%s\n"WHITE"Harga: "GREEN"%s"WHITE"/jam\n\n"WHITE"Masukkan berapa jam yang akan anda sewa? (batasan maksimal "YELLOW"3 "WHITE"jam)", "Rental", "Close", GetVehicleNameByModel(model), FormatNumber(price));
 		}
 	}
 }

@@ -210,10 +210,12 @@ CMD:rentinfo(playerid, params[])
 
 CMD:renthelp(playerid, params[])
 {
+    SendClientMessage(playerid, X11_WHITE, "======================================================================");
 	SendClientMessage(playerid, X11_LIGHTGREEN, "Bantuan penyewaan kendaraan:");
 	SendCustomMessage(playerid, "/rentinfo", "Untuk melihat informasi kendaraan yang disewa.");
 	SendCustomMessage(playerid, "/rentvehicle", "Untuk menyewa kendaraan di "YELLOW"rental point.");
 	SendCustomMessage(playerid, "/unrentvehicle", "Untuk mengembalikan kendaraan yang telah disewa sebelumnya.");
+    SendClientMessage(playerid, X11_WHITE, "======================================================================");
 
 	if(GetAdminLevel(playerid) >= 8)
 		SendServerMessage(playerid, "/rm (rentalmenu)");

@@ -11,12 +11,11 @@
 #include "exteriors/ig.inc"
 #include "exteriors/ikea.inc"
 #include "exteriors/mc.inc"
-#include "exteriors/sh.inc"
 #include "exteriors/sw.inc"
 #include "exteriors/tm.inc"
 #include "exteriors/tx.inc"
 #include "exteriors/teressa.inc"
-#include "exteriors/mc_new.inc"
+#include "exteriors/JoaQuin_House.inc"
 
 public OnFilterScriptInit()
 {
@@ -32,7 +31,7 @@ public OnFilterScriptInit()
     Init_Ikea();
     Init_LSMarketDoughnutShop();
     Init_TerresaExtHouse();
-    Init_Mechanic_New();
+    Init_JoaQuin_House();
     return 1;
 }
 
@@ -49,5 +48,6 @@ public OnPlayerConnect(playerid)
     MC_RemoveBuilding(playerid);
     BV2_RemoveBuilding(playerid);
     TerresaExtRemoveBuilding(playerid);
+    JoaQuin_RemoveBuilding(playerid);
     return 1;
 }

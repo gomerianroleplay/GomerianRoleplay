@@ -66,7 +66,6 @@ Server Update list URP v2.9a Blackjack!
 #include <VehicleMatrix>            //by gzxmx94
 
 #include <evf>                      //by Emmet_
-#include <YSI_Coding\y_malloc>
 #include <YSI_Coding\y_timers>             //by Y_Less from YSI
 #include <YSI_Data\y_iterate>            //by Y_Less from YSI
 #include <YSI_Coding\y_hooks>              //by Y_Less from YSI
@@ -20300,7 +20299,7 @@ CMD:bizcmds(playerid, params[])
 CMD:housecmds(playerid, params[])
 {
     SendClientMessage(playerid, COLOR_CLIENT, "HOUSES:"WHITE" /buy, /abandon, /lock, /storage, /furniture.");
-    SendClientMessage(playerid, COLOR_CLIENT, "HOUSES:"WHITE" /doorbell, /switch.");
+    SendClientMessage(playerid, COLOR_CLIENT, "HOUSES:"WHITE" /doorbell, /switch /wardrobe.");
     return 1;
 }
 /*
@@ -20854,6 +20853,7 @@ CMD:lock(playerid, params[])
         {
             SetDoorStatus(rvid, ((GetDoorStatus(rvid)) ? false : true));
             GameTextForPlayer(playerid, sprintf("~w~VEHICLE %s", ((GetDoorStatus(rvid)) ? ("~r~Locked") : ("~g~Unlocked"))), 3000, 6);
+            PlayerPlaySound(playerid, 1145, 0.0, 0.0, 0.0);
             return 1;
         }
 
@@ -20884,19 +20884,11 @@ CMD:lock(playerid, params[])
             {
                 GetVehiclePos(VehicleData[vehicle][vehVehicleID], x, y, z);
                 strcat(vehicle_list, sprintf("%s%s (Shared)\t%.2f\n", ((GetDoorStatus(VehicleData[vehicle][vehVehicleID])) ? RED : GREEN), GetVehicleNameByVehicle(VehicleData[vehicle][vehVehicleID]), GetPlayerDistanceFromPoint(playerid, x, y, z)));
-                g_selected_vehicle[playerid][count++] = vehicle;						
+                g_selected_vehicle[playerid][count++] = vehicle;
             }
         }
-        // vehicleid = Vehicle_Nearest(playerid, 5);
-        // if((vehicle_index = Vehicle_ReturnID(vehicleid)) != RETURN_INVALID_VEHICLE_ID && Vehicle_IsSharedToPlayer(playerid, vehicle_index))
-        // {
-        // 	SetDoorStatus(vehicleid, ((GetDoorStatus(vehicleid)) ? false : true));
-        // 	GameTextForPlayer(playerid, sprintf("~w~VEHICLE %s", ((GetDoorStatus(vehicleid)) ? ("~r~Locked") : ("~g~Unlocked"))), 3000, 6);
-        // }
-        // else
-        // {
+       
         Dialog_Show(playerid, LockVehicle, DIALOG_STYLE_TABLIST_HEADERS, "Vehicle Lock", vehicle_list, "Select", "Close");
-        // }
 
     }
     else SendErrorMessage(playerid, "You are not in range of anything you can lock.");
