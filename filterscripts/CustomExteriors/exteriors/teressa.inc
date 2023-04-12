@@ -72,7 +72,8 @@ void:Init_TerresaExtHouse(){
     tmpobjid = CreateDynamicObject(640, 1454.210327, 380.531677, 18.976184, 0.000000, 0.000000, 66.099983, -1, -1, -1, 300.00, 300.00); 
 }
 
-void:TerresaExtRemoveBuilding(playerid){
+void:TerresaExtRemoveBuilding(playerid)
+{
     RemoveBuildingForPlayer(playerid, 3283, 1446.890, 380.492, 18.539, 0.250);
     RemoveBuildingForPlayer(playerid, 3299, 1446.890, 380.492, 18.539, 0.250);
 }

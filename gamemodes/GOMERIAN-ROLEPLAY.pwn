@@ -66,7 +66,6 @@ Server Update list URP v2.9a Blackjack!
 #include <VehicleMatrix>            //by gzxmx94
 
 #include <evf>                      //by Emmet_
-#include <YSI_Coding\y_malloc>
 #include <YSI_Coding\y_timers>             //by Y_Less from YSI
 #include <YSI_Data\y_iterate>            //by Y_Less from YSI
 #include <YSI_Coding\y_hooks>              //by Y_Less from YSI
@@ -20300,7 +20299,7 @@ CMD:bizcmds(playerid, params[])
 CMD:housecmds(playerid, params[])
 {
     SendClientMessage(playerid, COLOR_CLIENT, "HOUSES:"WHITE" /buy, /abandon, /lock, /storage, /furniture.");
-    SendClientMessage(playerid, COLOR_CLIENT, "HOUSES:"WHITE" /doorbell, /switch.");
+    SendClientMessage(playerid, COLOR_CLIENT, "HOUSES:"WHITE" /doorbell, /switch /wardrobe.");
     return 1;
 }
 /*
@@ -20845,6 +20844,52 @@ CMD:lock(playerid, params[])
                 PlayerPlaySound(playerid, 1145, 0.0, 0.0, 0.0);
             }
         }
+    }
+    else if(Vehicle_Nearest(playerid)) // lock
+    {
+        new vw = GetPlayerVirtualWorld(playerid);
+        new rvid = (vw - 1000000);
+        if(vw > 1000000 && vw < 1200000)
+        {
+            SetDoorStatus(rvid, ((GetDoorStatus(rvid)) ? false : true));
+            GameTextForPlayer(playerid, sprintf("~w~VEHICLE %s", ((GetDoorStatus(rvid)) ? ("~r~Locked") : ("~g~Unlocked"))), 3000, 6);
+            PlayerPlaySound(playerid, 1145, 0.0, 0.0, 0.0);
+            return 1;
+        }
+
+        if(!Vehicle_PlayerCount(playerid) && !Vehicle_RentedCount(playerid))
+            return ShowPlayerFooter(playerid, "~r~ERROR: ~w~Kamu tidak memiliki kendaraan untuk di kunci!");
+
+        new vehicle_list[4096], count, Float:x, Float:y, Float:z;
+
+        strcat(vehicle_list, "Model\tDistance (m)\n");
+        
+        foreach(new vehicle : OwnedVehicles<playerid>)
+        {
+            GetVehiclePos(VehicleData[vehicle][vehVehicleID], x, y, z);
+            strcat(vehicle_list, sprintf("%s%s\t%.2f\n", ((GetDoorStatus(VehicleData[vehicle][vehVehicleID])) ? RED : GREEN), GetVehicleNameByVehicle(VehicleData[vehicle][vehVehicleID]), GetPlayerDistanceFromPoint(playerid, x, y, z)));
+            g_selected_vehicle[playerid][count++] = vehicle;
+        }
+        
+        foreach(new vehicle : RentedVehicles<playerid>)
+        {
+            GetVehiclePos(VehicleData[vehicle][vehVehicleID], x, y, z);
+            strcat(vehicle_list, sprintf("%s%s (Rental)\t%.2f\n", ((GetDoorStatus(VehicleData[vehicle][vehVehicleID])) ? RED : GREEN), GetVehicleNameByVehicle(VehicleData[vehicle][vehVehicleID]), GetPlayerDistanceFromPoint(playerid, x, y, z)));
+            g_selected_vehicle[playerid][count++] = vehicle;
+        }
+
+        foreach(new vehicle : Vehicle)
+        {
+            if(Vehicle_IsSharedToPlayer(playerid, vehicle))
+            {
+                GetVehiclePos(VehicleData[vehicle][vehVehicleID], x, y, z);
+                strcat(vehicle_list, sprintf("%s%s (Shared)\t%.2f\n", ((GetDoorStatus(VehicleData[vehicle][vehVehicleID])) ? RED : GREEN), GetVehicleNameByVehicle(VehicleData[vehicle][vehVehicleID]), GetPlayerDistanceFromPoint(playerid, x, y, z)));
+                g_selected_vehicle[playerid][count++] = vehicle;
+            }
+        }
+       
+        Dialog_Show(playerid, LockVehicle, DIALOG_STYLE_TABLIST_HEADERS, "Vehicle Lock", vehicle_list, "Select", "Close");
+
     }
     else SendErrorMessage(playerid, "You are not in range of anything you can lock.");
     return 1;

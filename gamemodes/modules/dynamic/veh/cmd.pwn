@@ -828,6 +828,8 @@ CMD:vehicle(playerid, params[])
 				{
 					SetDoorStatus(rvid, ((GetDoorStatus(rvid)) ? false : true));
 					GameTextForPlayer(playerid, sprintf("~w~VEHICLE %s", ((GetDoorStatus(rvid)) ? ("~r~Locked") : ("~g~Unlocked"))), 3000, 6);
+                    PlayerPlaySound(playerid, 1145, 0.0, 0.0, 0.0);
+
 					return 1;
 				}
 
@@ -858,19 +860,12 @@ CMD:vehicle(playerid, params[])
 					{
 						GetVehiclePos(VehicleData[vehicle][vehVehicleID], x, y, z);
 						strcat(vehicle_list, sprintf("%s%s (Shared)\t%.2f\n", ((GetDoorStatus(VehicleData[vehicle][vehVehicleID])) ? RED : GREEN), GetVehicleNameByVehicle(VehicleData[vehicle][vehVehicleID]), GetPlayerDistanceFromPoint(playerid, x, y, z)));
-						g_selected_vehicle[playerid][count++] = vehicle;						
+						g_selected_vehicle[playerid][count++] = vehicle;
+
 					}
 				}
-				// vehicleid = Vehicle_Nearest(playerid, 5);
-				// if((vehicle_index = Vehicle_ReturnID(vehicleid)) != RETURN_INVALID_VEHICLE_ID && Vehicle_IsSharedToPlayer(playerid, vehicle_index))
-				// {
-				// 	SetDoorStatus(vehicleid, ((GetDoorStatus(vehicleid)) ? false : true));
-				// 	GameTextForPlayer(playerid, sprintf("~w~VEHICLE %s", ((GetDoorStatus(vehicleid)) ? ("~r~Locked") : ("~g~Unlocked"))), 3000, 6);
-				// }
-				// else
-				// {
+
 				Dialog_Show(playerid, LockVehicle, DIALOG_STYLE_TABLIST_HEADERS, "Vehicle Lock", vehicle_list, "Select", "Close");
-				// }
 
 			}
 		}

@@ -2002,6 +2002,7 @@ Dialog:LockVehicle(playerid, response, listitem, inputtext[])
 				SetDoorStatus(vid, ((GetDoorStatus(vid)) ? false : true));
 				VehicleData[vehicleid][vehDoorStatus] = (GetDoorStatus(vid) ? 1 : 0);
 				GameTextForPlayer(playerid, sprintf("~w~VEHICLE %s", ((GetDoorStatus(vid)) ? ("~r~Locked") : ("~g~Unlocked"))), 3000, 6);
+                PlayerPlaySound(playerid, 1145, 0.0, 0.0, 0.0);
 			}
 			else SendErrorMessage(playerid, "Kendaraan terlalu jauh dari posisimu.");
 	    }
