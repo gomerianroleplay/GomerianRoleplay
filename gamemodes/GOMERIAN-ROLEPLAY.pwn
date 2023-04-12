@@ -46,7 +46,8 @@ Server Update list URP v2.9a Blackjack!
 ==============================================================================*/
 #pragma compat 1
 #pragma compress 0
-#pragma dynamic 1_048_576
+// #pragma dynamic 1_048_576
+#define DYNAMIC_MEMORY (1_048_576)
 #define CGEN_MEMORY 40000
 #include <a_samp>                   //Credits to SA-MP
 //Uncomment this if you want to use high-level debug mode
@@ -66,6 +67,7 @@ Server Update list URP v2.9a Blackjack!
 #include <VehicleMatrix>            //by gzxmx94
 
 #include <evf>                      //by Emmet_
+#include <YSI_Coding\y_malloc>
 #include <YSI_Coding\y_timers>             //by Y_Less from YSI
 #include <YSI_Data\y_iterate>            //by Y_Less from YSI
 #include <YSI_Coding\y_hooks>              //by Y_Less from YSI
